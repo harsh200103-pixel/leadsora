@@ -26,7 +26,7 @@ function App() {
   const [apifyKey, setApifyKey] = useState('');
   const [showSettings, setShowSettings] = useState(false);
   const [highIntentOnly, setHighIntentOnly] = useState(false);
-  const [copiedId, setCopiedId] = useState(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   // 1. Auto-Save state using Local Storage (Hydration Safe)
   const [leads, setLeads] = useState<any[]>([]);
@@ -52,22 +52,22 @@ function App() {
     }
   }, [leads, mounted]);
 
-  const timeAgo = (dateString) => {
+  const timeAgo = (dateString: string) => {
     if (!dateString) return 'Recently';
-    const days = Math.floor((new Date() - new Date(dateString)) / (1000 * 60 * 60 * 24));
+    const days = Math.floor((new Date().getTime() - new Date(dateString).getTime()) / (1000 * 60 * 60 * 24));
     if (days === 0) return 'Today';
     if (days === 1) return 'Yesterday';
     return `${days} days ago`;
   };
 
-  const handleCopy = (id, text) => {
+  const handleCopy = (id: string, text: string) => {
     navigator.clipboard.writeText(text);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
   };
 
   // 2. Dynamic Color Coding for Intent Scores
-  const getScoreColor = (score) => {
+  const getScoreColor = (score: number) => {
     if (score >= 90) return '#27c93f'; // Glowing Green
     if (score >= 80) return '#ffbd2e'; // Warm Yellow
     return '#888'; // Neutral Grey
@@ -545,9 +545,9 @@ function App() {
               <Logo style={{ height: '48px', width: 'auto' }} />
             </div>
             <div style={{display: 'flex', gap: '2rem'}}>
-              <a href="#" style={{transition: 'color 0.2s'}} onMouseOver={e=>e.target.style.color='#fff'} onMouseOut={e=>e.target.style.color='var(--text-secondary)'}>Features</a>
-              <a href="#" style={{transition: 'color 0.2s'}} onMouseOver={e=>e.target.style.color='#fff'} onMouseOut={e=>e.target.style.color='var(--text-secondary)'}>Pricing</a>
-              <a href="#" style={{transition: 'color 0.2s'}} onMouseOver={e=>e.target.style.color='#fff'} onMouseOut={e=>e.target.style.color='var(--text-secondary)'}>Contact</a>
+              <a href="#" style={{transition: 'color 0.2s'}} onMouseOver={e=>(e.currentTarget as HTMLAnchorElement).style.color='#fff'} onMouseOut={e=>(e.currentTarget as HTMLAnchorElement).style.color='var(--text-secondary)'}>Features</a>
+              <a href="#" style={{transition: 'color 0.2s'}} onMouseOver={e=>(e.currentTarget as HTMLAnchorElement).style.color='#fff'} onMouseOut={e=>(e.currentTarget as HTMLAnchorElement).style.color='var(--text-secondary)'}>Pricing</a>
+              <a href="#" style={{transition: 'color 0.2s'}} onMouseOver={e=>(e.currentTarget as HTMLAnchorElement).style.color='#fff'} onMouseOut={e=>(e.currentTarget as HTMLAnchorElement).style.color='var(--text-secondary)'}>Contact</a>
             </div>
             <div style={{fontSize: '0.875rem'}}>
               &copy; 2026 LEADSORA. All rights reserved.
