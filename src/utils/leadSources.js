@@ -52,7 +52,7 @@ const timeAgo = (dateStr) => {
  * Build a lead object with real intent scoring and varied outreach.
  * This is the single point where leads are normalized from any source.
  */
-function buildLead({ id, company, country, title, description, sourceUrl, postedAt, sourceName }) {
+function buildLead({ id, company, country, title, description, sourceUrl, postedAt, sourceName, contactName, contactEmail, contactLinkedIn }) {
   // Combine title + description for scoring
   const fullText = `${title || ''} ${description || ''}`;
 
@@ -72,6 +72,9 @@ function buildLead({ id, company, country, title, description, sourceUrl, posted
     sourceUrl: sourceUrl || '',
     postedAt: postedAt || 'Recently',
     source: sourceName,
+    contactName: contactName || null,
+    contactEmail: contactEmail || null,
+    contactLinkedIn: contactLinkedIn || null,
   };
 }
 
@@ -266,10 +269,13 @@ const fetchApifyApollo = async (query) => {
       company: lead.company_name || 'Unknown Company',
       country: lead.location || 'Global',
       title: lead.job_title || query,
-      description: `Contact: ${lead.first_name} ${lead.last_name} | Email: ${lead.email || 'N/A'} | LinkedIn: ${lead.linkedin_url}`,
-      sourceUrl: lead.linkedin_url || lead.company_website,
+      description: `${lead.first_name || ''} ${lead.last_name || ''} is ${lead.job_title} at ${lead.company_name}`.trim(),
+      sourceUrl: lead.company_website || lead.linkedin_url || '',
       postedAt: 'Just Now',
       sourceName: 'Apollo via Apify',
+      contactName: `${lead.first_name || ''} ${lead.last_name || ''}`.trim() || null,
+      contactEmail: lead.email || null,
+      contactLinkedIn: lead.linkedin_url || null,
     }));
   } catch (err) {
     console.warn('Apify fetch failed:', err);

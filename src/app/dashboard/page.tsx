@@ -4,7 +4,7 @@ import {
   Globe, Zap, Users, Search, Target, MessageSquare, 
   MapPin, CheckCircle2, ChevronRight, Activity, 
   Briefcase, Loader2, Download, Check, Copy, Clock,
-  Mail, Trash2, LogOut
+  Mail, Trash2, LogOut, Sparkles
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import Logo from '../../components/Logo';
@@ -27,6 +27,8 @@ function App() {
   const [showSettings, setShowSettings] = useState(false);
   const [highIntentOnly, setHighIntentOnly] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [aiOutreach, setAiOutreach] = useState<{[key: string]: string}>({});
+  const [generatingId, setGeneratingId] = useState<string | null>(null);
 
   // 1. Auto-Save state using Local Storage (Hydration Safe)
   const [leads, setLeads] = useState<any[]>([]);
@@ -124,6 +126,30 @@ function App() {
     } finally {
       setIsScanning(false);
       setScanStatus('');
+    }
+  };
+
+  const generateAIOutreach = async (lead: any) => {
+    if (generatingId) return;
+    setGeneratingId(lead.id);
+    try {
+      const res = await fetch('/api/generate-outreach', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          company: lead.company,
+          title: lead.problem?.replace('Hiring: ', '') || '',
+          contactName: lead.contactName || null,
+        }),
+      });
+      const data = await res.json();
+      if (data.outreach) {
+        setAiOutreach(prev => ({ ...prev, [lead.id]: data.outreach }));
+      }
+    } catch (err) {
+      console.error('AI outreach failed:', err);
+    } finally {
+      setGeneratingId(null);
     }
   };
 
@@ -304,19 +330,29 @@ function App() {
                             <Clock size={12} /> {lead.postedAt}
                           </span>
                         </div>
-                        <div style={{background: 'rgba(0,0,0,0.3)', padding: '1rem', borderRadius: '8px', border: '1px solid #333', position: 'relative', marginTop: '1rem'}}>
-                          <p style={{fontSize: '0.875rem', color: '#aaa', paddingRight: '4.5rem'}}><em>"{lead.outreach}"</em></p>
-                          <div style={{position: 'absolute', top: '0.75rem', right: '0.75rem', display: 'flex', gap: '1rem'}}>
-                            {/* 3. Smart Email Pre-fill */}
+                        <div style={{background: 'rgba(0,0,0,0.3)', padding: '1rem', borderRadius: '8px', border: `1px solid ${aiOutreach[lead.id] ? '#7c3aed55' : '#333'}`, position: 'relative', marginTop: '1rem'}}>
+                          {aiOutreach[lead.id] && (
+                            <span style={{position: 'absolute', top: '-10px', left: '12px', background: 'linear-gradient(135deg,#7c3aed,#4facfe)', color: '#fff', fontSize: '0.65rem', padding: '2px 8px', borderRadius: '999px', fontWeight: 700}}>✨ AI Generated</span>
+                          )}
+                          <p style={{fontSize: '0.875rem', color: aiOutreach[lead.id] ? '#e2e8f0' : '#aaa', paddingRight: '5.5rem'}}><em>"{aiOutreach[lead.id] || lead.outreach}"</em></p>
+                          <div style={{position: 'absolute', top: '0.75rem', right: '0.75rem', display: 'flex', gap: '0.75rem'}}>
+                            <button
+                              onClick={() => generateAIOutreach(lead)}
+                              disabled={!!generatingId}
+                              style={{background: 'none', border: 'none', cursor: generatingId ? 'not-allowed' : 'pointer', color: aiOutreach[lead.id] ? '#a78bfa' : '#555', transition: 'color 0.2s', padding: 0}}
+                              title="Generate AI Outreach"
+                            >
+                              {generatingId === lead.id ? <Loader2 size={18} className="animate-spin" /> : <Sparkles size={18} />}
+                            </button>
                             <a 
-                              href={`mailto:?subject=Regarding ${lead.company} hiring a ${lead.problem.replace('Hiring: ', '')}&body=${encodeURIComponent(lead.outreach)}`}
-                              style={{background: 'none', border: 'none', cursor: 'pointer', color: '#4facfe', transition: 'color 0.2s', padding: 0}}
+                              href={`mailto:${lead.contactEmail || ''}?subject=Re: ${lead.company}&body=${encodeURIComponent(aiOutreach[lead.id] || lead.outreach)}`}
+                              style={{color: '#4facfe', transition: 'color 0.2s', padding: 0}}
                               title="Open in Email Client"
                             >
                               <Mail size={18} />
                             </a>
                             <button 
-                              onClick={() => handleCopy(lead.id, lead.outreach)}
+                              onClick={() => handleCopy(lead.id, aiOutreach[lead.id] || lead.outreach)}
                               style={{background: 'none', border: 'none', cursor: 'pointer', color: copiedId === lead.id ? '#27c93f' : '#666', transition: 'color 0.2s', padding: 0}}
                               title="Copy Outreach"
                             >
@@ -324,11 +360,23 @@ function App() {
                             </button>
                           </div>
                         </div>
-                        {lead.sourceUrl && (
-                          <a href={lead.sourceUrl} target="_blank" rel="noreferrer" style={{fontSize: '0.875rem', color: '#ffbd2e', textDecoration: 'underline', display: 'inline-block', marginTop: '1rem'}}>
-                            View Real Source ↗
-                          </a>
-                        )}
+                        {/* Contact info — from Apify/Apollo leads */}
+                        <div style={{display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center', marginTop: '0.75rem'}}>
+                          {lead.contactName && (
+                            <span style={{display:'inline-flex',alignItems:'center',gap:'0.3rem',fontSize:'0.78rem',color:'#ccc',background:'rgba(255,255,255,0.07)',padding:'3px 10px',borderRadius:'999px'}}>👤 {lead.contactName}</span>
+                          )}
+                          {lead.contactEmail && (
+                            <a href={`mailto:${lead.contactEmail}`} style={{display:'inline-flex',alignItems:'center',gap:'0.3rem',fontSize:'0.78rem',color:'#4facfe',background:'rgba(79,172,254,0.1)',padding:'3px 10px',borderRadius:'999px',textDecoration:'none'}}>📧 {lead.contactEmail}</a>
+                          )}
+                          {lead.contactLinkedIn ? (
+                            <a href={lead.contactLinkedIn} target="_blank" rel="noreferrer" style={{display:'inline-flex',alignItems:'center',gap:'0.3rem',fontSize:'0.78rem',color:'#fff',background:'#0a66c2',padding:'3px 10px',borderRadius:'999px',textDecoration:'none'}}>in LinkedIn</a>
+                          ) : (
+                            <a href={`https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(lead.company + ' hiring')}`} target="_blank" rel="noreferrer" style={{display:'inline-flex',alignItems:'center',gap:'0.3rem',fontSize:'0.78rem',color:'#94a3b8',background:'rgba(255,255,255,0.05)',padding:'3px 10px',borderRadius:'999px',textDecoration:'none'}}>🔍 Find on LinkedIn</a>
+                          )}
+                          {lead.sourceUrl && (
+                            <a href={lead.sourceUrl} target="_blank" rel="noreferrer" style={{fontSize: '0.78rem', color: '#ffbd2e', textDecoration: 'underline'}}>View Source ↗</a>
+                          )}
+                        </div>
                       </div>
                       <div className="intent-score" style={{fontSize: '1.25rem', padding: '0.75rem 1.5rem', color: getScoreColor(lead.intentScore), borderColor: getScoreColor(lead.intentScore)}}>
                         {lead.intentScore} 🔥
