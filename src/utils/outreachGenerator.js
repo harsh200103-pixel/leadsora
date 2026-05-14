@@ -69,30 +69,36 @@ async function generateWithAnthropic(company, role, signal) {
 // ============================================================
 
 const FALLBACK_TEMPLATES = [
-  // Template 1: Direct solution pitch
   (company, role) =>
-    `Hey! Saw that ${company} is hiring a ${role} — that's a clear sign you're investing in AI capabilities. Instead of a 6-month hiring cycle, our AI solutions company can design and deploy the exact system you need in weeks. We've built production-ready AI for companies just like yours. Worth a quick chat?`,
-
-  // Template 2: Build vs. hire angle
+    `Hey! Saw that ${company} is hiring a ${role} — a clear signal you need serious AI capabilities. Instead of a 6-month hiring cycle, our team can design and ship the exact AI system you need in weeks. We've built production-ready AI for companies just like yours. Worth a 15-min call?`,
   (company, role) =>
-    `Hi there — noticed ${company} has an open ${role} position. Building an in-house AI team is expensive and slow. We're an AI software solutions company that builds custom ML models, automation systems, and AI-powered platforms end-to-end. You get the AI product delivered, not just a hire. Happy to share a relevant case study.`,
-
-  // Template 3: Speed & expertise angle
+    `Hi — noticed ${company} posted a ${role} role. Building an in-house AI team is expensive and slow. We're an AI solutions company that delivers custom ML models, automation systems, and intelligent platforms end-to-end. You get the AI shipped, not just a hire. Happy to share a case study?`,
   (company, role) =>
-    `Quick note — I came across ${company}'s listing for a ${role}. We recently built a similar AI solution for a company in your space and had it in production within 8 weeks. Our team handles everything from model development to deployment. If you're open to exploring the build-vs-hire route, I'd love to connect.`,
-
-  // Template 4: No-pressure consultative
+    `Quick note — saw ${company}'s ${role} opening. We built a very similar AI system for a company in your space and had it in production in 8 weeks flat. Full stack: model training, API, deployment. Open to exploring the build-vs-hire route? I'd love to connect.`,
   (company, role) =>
-    `Hey! ${company} looking for a ${role} caught my eye — that's exactly the kind of AI solution our company builds. From intelligent automation to custom ML pipelines, we deliver production-ready AI systems without you needing to assemble an entire AI team. Want me to send over a quick demo of a similar project?`,
+    `${company} hiring a ${role} tells me you're serious about AI. We specialize in exactly that — building the custom AI infrastructure you need without you assembling a whole internal team. Let me send you a 2-minute walkthrough of something we shipped for a similar company.`,
+  (company, role) =>
+    `Hey! Came across ${company}'s ${role} listing — we've solved this exact problem for other companies. Rather than a long recruitment cycle, we can deliver a fully working AI system in your stack within weeks. Our last 3 clients went from brief to production in under 60 days. Interested?`,
+  (company, role) =>
+    `Hi there — ${company}'s search for a ${role} is a strong buying signal for us. We're a specialist AI engineering company; we build, train, and deploy the exact AI systems companies like you need. No recruitment risk, no ramp-up time — just working AI. Can I send over a quick overview?`,
+  (company, role) =>
+    `Saw ${company} is looking for a ${role}. We've built nearly identical solutions for 15+ companies and can usually move faster and cheaper than a full-time hire + infrastructure build. Our stack covers everything from fine-tuned LLMs to production APIs. Want a no-pitch, 10-min walkthrough?`,
+  (company, role) =>
+    `Quick one — ${company}'s ${role} opening stood out. We're an AI product studio that builds exactly what you're hiring for — but as a fully delivered system, not a headcount. If speed and cost matter, it's worth a conversation. Happy to share what we've shipped.`,
+  (company, role) =>
+    `Hi! ${company} posting for a ${role} tells me you have a real AI gap to fill. We close that gap by building the system instead of the team — custom models, integrations, deployment. We've done this for companies from Series A to Fortune 500. Would love to show you a quick example.`,
+  (company, role) =>
+    `Hey — noticed ${company} is hiring for ${role}. That search usually takes 3-6 months and $200k+ in first-year cost. We deliver the same capability as a finished AI system in a fraction of the time. Happy to share a relevant project we shipped recently. Worth 10 minutes?`,
 ];
 
 /**
  * Select a fallback template deterministically by company name hash.
  */
-function selectFallbackTemplate(company) {
+function selectFallbackTemplate(company, role = '') {
+  const seed = company + role;
   let hash = 0;
-  for (let i = 0; i < company.length; i++) {
-    hash = ((hash << 5) - hash) + company.charCodeAt(i);
+  for (let i = 0; i < seed.length; i++) {
+    hash = ((hash << 5) - hash) + seed.charCodeAt(i);
     hash |= 0;
   }
   return Math.abs(hash) % FALLBACK_TEMPLATES.length;

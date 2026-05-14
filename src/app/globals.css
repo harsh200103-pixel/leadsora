@@ -367,17 +367,129 @@ footer {
   color: var(--text-secondary);
 }
 
-@media (max-width: 768px) {
-  .hero h1 { font-size: 2.5rem; }
-  .hero p { font-size: 1rem; }
-  .pricing-card.popular { transform: scale(1); }
-  .hero-buttons { flex-direction: column; width: 100%; }
-  .hero-buttons button { width: 100%; }
-  .simulator-form { flex-direction: column; }
-  .simulator-input[style] { max-width: 100% !important; }
-  .dashboard-body { padding: 1rem; }
-  .dashboard-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
-  .glass-card { padding: 1.5rem; }
-  .intent-score { width: 100%; justify-content: center; margin-top: 1rem; padding: 0.5rem; }
-  .input-group { flex-direction: column; }
+/* ── 3D Card Tilt Effect ── */
+.glass-card {
+  transform-style: preserve-3d;
+  perspective: 1000px;
 }
+.glass-card:hover {
+  transform: translateY(-8px) rotateX(2deg) rotateY(-2deg);
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 30px rgba(255,255,255,0.08);
+}
+
+/* ── Floating Orb Background ── */
+@keyframes float-orb {
+  0%, 100% { transform: translateX(-50%) translateY(0px) scale(1); }
+  50% { transform: translateX(-50%) translateY(-30px) scale(1.05); }
+}
+.hero::before {
+  animation: float-orb 8s ease-in-out infinite;
+}
+
+/* ── Radar Pulse Ring ── */
+@keyframes radar-ring {
+  0% { transform: translateX(-50%) scale(0.5); opacity: 0.6; }
+  100% { transform: translateX(-50%) scale(2.5); opacity: 0; }
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  width: 300px;
+  height: 300px;
+  border: 1px solid rgba(255, 189, 46, 0.15);
+  border-radius: 50%;
+  animation: radar-ring 4s ease-out infinite;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* ── Shimmer on Buttons ── */
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+.btn-primary {
+  background: linear-gradient(135deg, #fff 0%, #e0e0e0 50%, #fff 100%);
+  background-size: 200% auto;
+  animation: shimmer 4s linear infinite;
+}
+.btn-primary:hover:not(:disabled) {
+  animation: none;
+  background: #fff;
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 0 40px rgba(255,255,255,0.5);
+}
+
+/* ── Intent Score 3D Badge ── */
+.intent-score {
+  position: relative;
+  overflow: hidden;
+}
+.intent-score::before {
+  content: '';
+  position: absolute;
+  top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  background: linear-gradient(45deg, transparent 40%, rgba(255,189,46,0.1) 50%, transparent 60%);
+  animation: shimmer 3s linear infinite;
+}
+
+/* ── Mobile Responsive ── */
+@media (max-width: 768px) {
+  /* Typography */
+  .hero h1 { font-size: 2.2rem; letter-spacing: -0.01em; }
+  .hero p { font-size: 1rem; }
+  .section-title { font-size: 1.8rem; margin-bottom: 2rem; }
+
+  /* Hero */
+  .hero { padding: 5rem 0 4rem; }
+  .hero-buttons { flex-direction: column; width: 100%; max-width: 320px; }
+  .hero-buttons button, .hero-buttons a { width: 100%; text-align: center; }
+
+  /* Cards */
+  .glass-card { padding: 1.25rem; }
+  .glass-card:hover { transform: translateY(-3px); } /* reduce 3D on mobile */
+
+  /* Grids */
+  .steps-grid { grid-template-columns: 1fr; }
+  .features-grid { grid-template-columns: 1fr; }
+  .pricing-grid { grid-template-columns: 1fr; }
+  .pricing-card.popular { transform: scale(1); }
+
+  /* Simulator */
+  .simulator-form { flex-direction: column; }
+  .simulator-input { max-width: 100% !important; width: 100% !important; }
+
+  /* Dashboard */
+  .dashboard-body { padding: 1rem; }
+  .dashboard-header { flex-wrap: wrap; gap: 0.5rem; }
+  .intent-score { width: 100%; justify-content: center; margin-top: 1rem; }
+
+  /* Container padding */
+  .container { padding: 0 1rem; }
+
+  /* Sections */
+  .how-it-works, .features, .dashboard-section, .pricing { padding: 3rem 0; }
+  .cta-section { padding: 4rem 0; }
+
+  /* Navbar */
+  nav { padding: 0.75rem 1rem !important; }
+  nav .logo-text { font-size: 1rem !important; }
+
+  /* Lead cards on mobile */
+  .lead-card-row { flex-direction: column !important; }
+  .lead-contact-chips { flex-wrap: wrap; }
+}
+
+@media (max-width: 480px) {
+  .hero h1 { font-size: 1.8rem; }
+  .section-title { font-size: 1.5rem; }
+  .pricing-price { font-size: 2.25rem; }
+  .btn-primary, .btn-secondary { padding: 0.75rem 1.25rem; font-size: 0.9rem; }
+  footer .container > div { flex-direction: column; gap: 1.5rem; text-align: center; }
+  footer .container > div > div:nth-child(2) { justify-content: center; }
+}
+
