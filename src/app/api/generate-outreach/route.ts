@@ -2,38 +2,61 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
-    const { company, title, contactName } = await request.json();
+    const body = await request.json();
+    const { company, title, contactName } = body;
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
-      return NextResponse.json({ error: 'Gemini API key not configured on server.' }, { status: 500 });
+      console.error('GEMINI_API_KEY is not set in environment variables');
+      return NextResponse.json(
+        { error: 'Gemini API key not configured. Add GEMINI_API_KEY in Vercel Environment Variables.' },
+        { status: 500 }
+      );
     }
 
-    const contactPart = contactName ? ` The key contact is ${contactName}.` : '';
-    const prompt = `You are an expert B2B sales copywriter. Write a SHORT, highly personalized cold outreach message (max 2-3 sentences) for reaching out to ${company}, which is actively hiring for "${title}".${contactPart} The message should feel human, reference their specific hiring signal as proof of research, and offer a clear value proposition. Output ONLY the message text, no quotes, no subject line.`;
+    if (!company || !title) {
+      return NextResponse.json({ error: 'Missing company or title' }, { status: 400 });
+    }
 
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.85, maxOutputTokens: 200 },
-        }),
-      }
-    );
+    const contactPart = contactName ? ` The contact person is ${contactName}.` : '';
+    const prompt = `You are a B2B sales expert. Write a SHORT cold outreach message (2-3 sentences max) for a company called "${company}" that is hiring for "${title}".${contactPart} Make it feel human, mention their hiring signal, and offer to solve a related business problem. Output ONLY the message, no quotes, no labels, no subject line.`;
+
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+
+    const res = await fetch(apiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: {
+          temperature: 0.85,
+          maxOutputTokens: 200,
+          topP: 0.9,
+        },
+      }),
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error('Gemini API error:', res.status, errorText);
+      return NextResponse.json(
+        { error: `Gemini API returned ${res.status}. Check your API key.` },
+        { status: 502 }
+      );
+    }
 
     const data = await res.json();
-    const outreach = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+    const outreach = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
 
     if (!outreach) {
-      return NextResponse.json({ error: 'Gemini returned no content.' }, { status: 500 });
+      console.error('Gemini returned empty response:', JSON.stringify(data));
+      return NextResponse.json({ error: 'Gemini returned no content' }, { status: 502 });
     }
 
     return NextResponse.json({ outreach });
-  } catch (err) {
-    console.error('Gemini API error:', err);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    console.error('generate-outreach error:', message);
+    return NextResponse.json({ error: `Server error: ${message}` }, { status: 500 });
   }
 }

@@ -22,38 +22,34 @@ export default function AnimatedBackground() {
     canvas.height = H;
 
     const COLORS = ['rgba(255,189,46,', 'rgba(255,255,255,', 'rgba(79,172,254,'];
-    const COUNT = Math.min(90, Math.floor((W * H) / 12000));
+    const COUNT = Math.min(80, Math.floor((W * H) / 14000));
     const FOV = 900;
-    const MAX_DIST = 180;
+    const MAX_DIST = 170;
 
-    // Mouse parallax
     let mouseX = 0, mouseY = 0;
     const onMouseMove = (e: MouseEvent) => {
       mouseX = (e.clientX - W / 2) / W;
       mouseY = (e.clientY - H / 2) / H;
     };
-    window.addEventListener('mousemove', onMouseMove);
-
     const onResize = () => {
       W = window.innerWidth; H = window.innerHeight;
       canvas.width = W; canvas.height = H;
     };
+    window.addEventListener('mousemove', onMouseMove);
     window.addEventListener('resize', onResize);
 
-    // Init particles in 3D space
     const particles: Particle[] = Array.from({ length: COUNT }, () => ({
-      x: (Math.random() - 0.5) * W * 1.5,
-      y: (Math.random() - 0.5) * H * 1.5,
+      x: (Math.random() - 0.5) * W * 1.4,
+      y: (Math.random() - 0.5) * H * 1.4,
       z: (Math.random() - 0.5) * 800,
-      vx: (Math.random() - 0.5) * 0.25,
-      vy: (Math.random() - 0.5) * 0.25,
-      vz: (Math.random() - 0.5) * 0.3,
+      vx: (Math.random() - 0.5) * 0.22,
+      vy: (Math.random() - 0.5) * 0.22,
+      vz: (Math.random() - 0.5) * 0.28,
       color: COLORS[Math.floor(Math.random() * COLORS.length)],
     }));
 
-    let rotY = 0, rotX = 0;
+    let rotY = 0, rotX = 0, radarAngle = 0;
     let animId: number;
-    let radarAngle = 0;
 
     const project = (x: number, y: number, z: number) => {
       const scale = FOV / (FOV + z);
@@ -63,92 +59,81 @@ export default function AnimatedBackground() {
     const animate = () => {
       ctx.clearRect(0, 0, W, H);
 
-      // Slow auto-rotation + mouse parallax
-      rotY += 0.0015 + mouseX * 0.002;
-      rotX += 0.0005 + mouseY * 0.001;
-      radarAngle += 0.012;
+      rotY += 0.0014 + mouseX * 0.002;
+      rotX += 0.0004 + mouseY * 0.001;
+      radarAngle += 0.011;
 
-      // ── Radar sweep in center ──
       const cx = W / 2, cy = H / 2;
-      const radarR = Math.min(W, H) * 0.22;
+      const radarR = Math.min(W, H) * 0.20;
 
-      // Faint radar circle rings
+      // Faint radar rings
       for (let r = 1; r <= 3; r++) {
         ctx.beginPath();
         ctx.arc(cx, cy, radarR * (r / 3), 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(255,189,46,${0.04 * r})`;
+        ctx.strokeStyle = `rgba(255,189,46,${0.035 * r})`;
         ctx.lineWidth = 1;
         ctx.stroke();
       }
 
-      // Radar sweep gradient
-      const sweepGrad = ctx.createConicalGradient
-        ? null // not standard, use manual arc
-        : null;
+      // Radar sweep (manual arc fill)
       ctx.save();
       ctx.translate(cx, cy);
       ctx.rotate(radarAngle);
-      const gradient = ctx.createLinearGradient(0, 0, radarR, 0);
-      gradient.addColorStop(0, 'rgba(255,189,46,0.18)');
-      gradient.addColorStop(1, 'rgba(255,189,46,0)');
       ctx.beginPath();
       ctx.moveTo(0, 0);
-      ctx.arc(0, 0, radarR, -0.6, 0.6);
+      ctx.arc(0, 0, radarR, -0.55, 0.55);
       ctx.closePath();
-      ctx.fillStyle = gradient;
+      const sweepGrad = ctx.createLinearGradient(0, 0, radarR, 0);
+      sweepGrad.addColorStop(0, 'rgba(255,189,46,0.14)');
+      sweepGrad.addColorStop(1, 'rgba(255,189,46,0)');
+      ctx.fillStyle = sweepGrad;
       ctx.fill();
       ctx.restore();
 
       // Cross-hairs
       ctx.save();
-      ctx.strokeStyle = 'rgba(255,189,46,0.06)';
+      ctx.strokeStyle = 'rgba(255,189,46,0.05)';
       ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(cx - radarR, cy); ctx.lineTo(cx + radarR, cy); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(cx, cy - radarR); ctx.lineTo(cx, cy + radarR); ctx.stroke();
       ctx.restore();
 
-      // ── 3D Particle Transform ──
+      // 3D transform + project particles
       const cosY = Math.cos(rotY), sinY = Math.sin(rotY);
       const cosX = Math.cos(rotX), sinX = Math.sin(rotX);
 
-      const projected = particles.map((p, i) => {
-        // Move
+      const projected = particles.map((p) => {
         p.x += p.vx; p.y += p.vy; p.z += p.vz;
-        // Bounce
         if (Math.abs(p.x) > W * 0.8) p.vx *= -1;
         if (Math.abs(p.y) > H * 0.8) p.vy *= -1;
         if (Math.abs(p.z) > 500) p.vz *= -1;
 
-        // Rotate Y
         const rx = p.x * cosY - p.z * sinY;
-        const rz = p.x * sinY + p.z * cosY;
-        // Rotate X
-        const ry = p.y * cosX - rz * sinX;
-        const rz2 = p.y * sinX + rz * cosX;
+        const rz0 = p.x * sinY + p.z * cosY;
+        const ry = p.y * cosX - rz0 * sinX;
+        const rz = p.y * sinX + rz0 * cosX;
 
-        const { px, py, scale } = project(rx, ry, rz2);
-        return { px, py, scale, color: p.color, i };
+        return { ...project(rx, ry, rz), color: p.color };
       });
 
-      // ── Draw connections ──
+      // Connections
       for (let i = 0; i < projected.length; i++) {
         for (let j = i + 1; j < projected.length; j++) {
           const a = projected[i], b = projected[j];
           const dx = a.px - b.px, dy = a.py - b.py;
           const dist = Math.sqrt(dx * dx + dy * dy);
           if (dist < MAX_DIST) {
-            const alpha = (1 - dist / MAX_DIST) * 0.18;
             ctx.beginPath();
             ctx.moveTo(a.px, a.py);
             ctx.lineTo(b.px, b.py);
-            ctx.strokeStyle = `rgba(255,255,255,${alpha})`;
+            ctx.strokeStyle = `rgba(255,255,255,${(1 - dist / MAX_DIST) * 0.15})`;
             ctx.lineWidth = 0.5;
             ctx.stroke();
           }
         }
       }
 
-      // ── Draw particles ──
+      // Particles + glow
       projected.forEach(({ px, py, scale, color }) => {
         const r = Math.max(1, scale * 2.5);
         const alpha = Math.min(0.85, scale * 0.9);
@@ -156,14 +141,12 @@ export default function AnimatedBackground() {
         ctx.arc(px, py, r, 0, Math.PI * 2);
         ctx.fillStyle = `${color}${alpha})`;
         ctx.fill();
-
-        // Glow
         if (scale > 0.85) {
-          const glow = ctx.createRadialGradient(px, py, 0, px, py, r * 4);
-          glow.addColorStop(0, `${color}${alpha * 0.3})`);
+          const glow = ctx.createRadialGradient(px, py, 0, px, py, r * 5);
+          glow.addColorStop(0, `${color}${alpha * 0.25})`);
           glow.addColorStop(1, `${color}0)`);
           ctx.beginPath();
-          ctx.arc(px, py, r * 4, 0, Math.PI * 2);
+          ctx.arc(px, py, r * 5, 0, Math.PI * 2);
           ctx.fillStyle = glow;
           ctx.fill();
         }
@@ -185,12 +168,9 @@ export default function AnimatedBackground() {
     <canvas
       ref={canvasRef}
       style={{
-        position: 'fixed',
-        top: 0, left: 0,
+        position: 'fixed', top: 0, left: 0,
         width: '100vw', height: '100vh',
-        zIndex: 0,
-        pointerEvents: 'none',
-        opacity: 0.75,
+        zIndex: 0, pointerEvents: 'none', opacity: 0.7,
       }}
     />
   );
