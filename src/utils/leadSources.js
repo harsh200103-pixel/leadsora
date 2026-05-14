@@ -49,6 +49,29 @@ const timeAgo = (dateStr) => {
 };
 
 /**
+ * Returns true if a location string matches the selected country filter.
+ * Falls back to true for 'Global' (no filter) or worldwide/remote tags.
+ */
+const LOCATION_TERMS = {
+  'USA':       ['united states', 'us ', ', us', 'usa', 'u.s.', 'america', 'new york', 'california', 'texas', 'seattle', 'chicago'],
+  'UK':        ['united kingdom', ' uk', ', uk', 'england', 'britain', 'london', 'u.k.', 'manchester'],
+  'Canada':    ['canada', 'toronto', 'vancouver', 'montreal', 'ottawa'],
+  'Australia': ['australia', 'sydney', 'melbourne', 'brisbane', 'perth'],
+  'India':     ['india', 'bangalore', 'bengaluru', 'mumbai', 'delhi', 'hyderabad', 'pune', 'chennai', 'kolkata'],
+  'Germany':   ['germany', 'berlin', 'munich', 'frankfurt', 'hamburg', 'cologne'],
+  'UAE':       ['uae', 'dubai', 'united arab emirates', 'abu dhabi', 'sharjah'],
+  'Singapore': ['singapore'],
+};
+
+const matchesLocation = (locationStr, filter) => {
+  if (!filter || filter === 'Global') return true;
+  if (!locationStr) return false;
+  const loc = locationStr.toLowerCase();
+  const terms = LOCATION_TERMS[filter] || [filter.toLowerCase()];
+  return terms.some(term => loc.includes(term));
+};
+
+/**
  * Build a lead object with real intent scoring and varied outreach.
  * This is the single point where leads are normalized from any source.
  */
@@ -119,7 +142,7 @@ const fetchRemotive = async (query, location) => {
 };
 
 /** Fetch EU jobs from Arbeitnow API */
-const fetchArbeitnow = async (query) => {
+const fetchArbeitnow = async (query, location) => {
   try {
     const url = `https://www.arbeitnow.com/api/job-board-api?search=${encodeURIComponent(query)}`;
     const response = await fetch(url);
@@ -127,23 +150,25 @@ const fetchArbeitnow = async (query) => {
 
     if (!data.data?.length) return [];
 
-    return data.data.slice(0, 5).map((job, i) => buildLead({
-      id: `arb-${i}-${job.slug}`,
-      company: job.company_name,
-      country: job.location || 'Europe',
-      title: job.title,
-      description: job.description,
-      sourceUrl: job.url,
-      postedAt: timeAgo(job.created_at),
-      sourceName: 'Arbeitnow',
-    }));
+    return data.data
+      .filter(job => matchesLocation(job.location, location))
+      .slice(0, 5).map((job, i) => buildLead({
+        id: `arb-${i}-${job.slug}`,
+        company: job.company_name,
+        country: job.location || 'Europe',
+        title: job.title,
+        description: job.description,
+        sourceUrl: job.url,
+        postedAt: timeAgo(job.created_at),
+        sourceName: 'Arbeitnow',
+      }));
   } catch {
     return [];
   }
 };
 
 /** Fetch remote jobs from Jobicy API */
-const fetchJobicy = async (query) => {
+const fetchJobicy = async (query, location) => {
   try {
     const url = `https://jobicy.com/api/v2/remote-jobs?count=10&tag=${encodeURIComponent(query)}`;
     const response = await fetch(url);
@@ -151,23 +176,25 @@ const fetchJobicy = async (query) => {
 
     if (!data.jobs?.length) return [];
 
-    return data.jobs.slice(0, 5).map((job, i) => buildLead({
-      id: `jby-${i}-${job.id}`,
-      company: job.companyName,
-      country: job.jobGeo || 'Worldwide',
-      title: job.jobTitle,
-      description: job.jobDescription,
-      sourceUrl: job.url,
-      postedAt: timeAgo(job.pubDate),
-      sourceName: 'Jobicy',
-    }));
+    return data.jobs
+      .filter(job => matchesLocation(job.jobGeo, location))
+      .slice(0, 5).map((job, i) => buildLead({
+        id: `jby-${i}-${job.id}`,
+        company: job.companyName,
+        country: job.jobGeo || 'Worldwide',
+        title: job.jobTitle,
+        description: job.jobDescription,
+        sourceUrl: job.url,
+        postedAt: timeAgo(job.pubDate),
+        sourceName: 'Jobicy',
+      }));
   } catch {
     return [];
   }
 };
 
 /** Fetch company intel from The Muse API */
-const fetchTheMuse = async (query) => {
+const fetchTheMuse = async (query, location) => {
   try {
     const url = `https://www.themuse.com/api/public/jobs?page=1&descending=true&category=${encodeURIComponent(query)}`;
     const response = await fetch(url);
@@ -175,23 +202,25 @@ const fetchTheMuse = async (query) => {
 
     if (!data.results?.length) return [];
 
-    return data.results.slice(0, 5).map((job, i) => buildLead({
-      id: `muse-${i}-${job.id}`,
-      company: job.company?.name || 'Unknown',
-      country: job.locations?.[0]?.name || 'Global',
-      title: job.name,
-      description: job.contents,
-      sourceUrl: job.refs?.landing_page,
-      postedAt: timeAgo(job.publication_date),
-      sourceName: 'The Muse',
-    }));
+    return data.results
+      .filter(job => matchesLocation(job.locations?.[0]?.name, location))
+      .slice(0, 5).map((job, i) => buildLead({
+        id: `muse-${i}-${job.id}`,
+        company: job.company?.name || 'Unknown',
+        country: job.locations?.[0]?.name || 'Global',
+        title: job.name,
+        description: job.contents,
+        sourceUrl: job.refs?.landing_page,
+        postedAt: timeAgo(job.publication_date),
+        sourceName: 'The Muse',
+      }));
   } catch {
     return [];
   }
 };
 
 /** Fetch remote-first jobs from Himalayas API */
-const fetchHimalayas = async (query) => {
+const fetchHimalayas = async (query, location) => {
   try {
     const url = `https://himalayas.app/jobs/api?q=${encodeURIComponent(query)}&limit=10`;
     const response = await fetch(url);
@@ -199,23 +228,25 @@ const fetchHimalayas = async (query) => {
 
     if (!data.jobs?.length) return [];
 
-    return data.jobs.slice(0, 5).map((job, i) => buildLead({
-      id: `him-${i}-${job.id}`,
-      company: job.companyName || job.company_name || 'Unknown',
-      country: job.location || 'Remote',
-      title: job.title,
-      description: job.description,
-      sourceUrl: `https://himalayas.app/jobs/${job.id}`,
-      postedAt: timeAgo(job.pubDate || job.published_date),
-      sourceName: 'Himalayas',
-    }));
+    return data.jobs
+      .filter(job => matchesLocation(job.location, location))
+      .slice(0, 5).map((job, i) => buildLead({
+        id: `him-${i}-${job.id}`,
+        company: job.companyName || job.company_name || 'Unknown',
+        country: job.location || 'Remote',
+        title: job.title,
+        description: job.description,
+        sourceUrl: `https://himalayas.app/jobs/${job.id}`,
+        postedAt: timeAgo(job.pubDate || job.published_date),
+        sourceName: 'Himalayas',
+      }));
   } catch {
     return [];
   }
 };
 
 /** Fetch developer hiring from FindWork.dev API */
-const fetchFindWork = async (query) => {
+const fetchFindWork = async (query, location) => {
   try {
     const url = `https://findwork.dev/api/jobs/?search=${encodeURIComponent(query)}&order_by=-date_posted`;
     const response = await fetch(url, {
@@ -225,16 +256,18 @@ const fetchFindWork = async (query) => {
 
     if (!data.results?.length) return [];
 
-    return data.results.slice(0, 5).map((job, i) => buildLead({
-      id: `fw-${i}-${job.id}`,
-      company: job.company_name,
-      country: job.location || 'Remote',
-      title: job.role,
-      description: job.text,
-      sourceUrl: job.url,
-      postedAt: timeAgo(job.date_posted),
-      sourceName: 'FindWork',
-    }));
+    return data.results
+      .filter(job => matchesLocation(job.location, location))
+      .slice(0, 5).map((job, i) => buildLead({
+        id: `fw-${i}-${job.id}`,
+        company: job.company_name,
+        country: job.location || 'Remote',
+        title: job.role,
+        description: job.text,
+        sourceUrl: job.url,
+        postedAt: timeAgo(job.date_posted),
+        sourceName: 'FindWork',
+      }));
   } catch {
     return [];
   }
@@ -302,11 +335,11 @@ export const scanAllSources = async (query, location, onSourceUpdate) => {
   // Active fetchers — sources with real API integrations
   const fetchers = [
     { source: SOURCES[0],  fn: () => fetchRemotive(query, location) },  // Remotive
-    { source: SOURCES[1],  fn: () => fetchArbeitnow(query) },           // Arbeitnow
-    { source: SOURCES[2],  fn: () => fetchJobicy(query) },              // Jobicy
-    { source: SOURCES[3],  fn: () => fetchTheMuse(query) },             // The Muse
-    { source: SOURCES[10], fn: () => fetchFindWork(query) },            // FindWork
-    { source: SOURCES[11], fn: () => fetchHimalayas(query) },           // Himalayas
+    { source: SOURCES[1],  fn: () => fetchArbeitnow(query, location) }, // Arbeitnow
+    { source: SOURCES[2],  fn: () => fetchJobicy(query, location) },    // Jobicy
+    { source: SOURCES[3],  fn: () => fetchTheMuse(query, location) },   // The Muse
+    { source: SOURCES[10], fn: () => fetchFindWork(query, location) },  // FindWork
+    { source: SOURCES[11], fn: () => fetchHimalayas(query, location) }, // Himalayas
   ];
 
   // If Apify Key exists, add it to the active fetchers
