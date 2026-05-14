@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Globe, Zap, Target, MessageSquare, MapPin, CheckCircle2, ChevronRight, Activity, Briefcase, Users, Search } from 'lucide-react';
 import Logo from '../components/Logo';
+import MobileNav from '../components/MobileNav';
 
 export default function LandingPage() {
   const router = useRouter();
@@ -14,19 +15,7 @@ export default function LandingPage() {
 
   return (
     <>
-      {/* Public Navbar */}
-      <nav style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 2rem', borderBottom: '1px solid #27272a', background: 'rgba(10,10,10,0.8)', backdropFilter: 'blur(10px)', position: 'sticky', top: 0, zIndex: 100 }}>
-        <Logo style={{ height: '64px', width: 'auto' }} />
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <button
-            onClick={() => router.push('/login')}
-            style={{ padding: '0.5rem 1.25rem', background: 'transparent', border: '1px solid #333', borderRadius: '8px', color: '#aaa', fontSize: '0.9rem', cursor: 'pointer', fontFamily: "'Inter', sans-serif", transition: 'all 0.2s' }}
-            onMouseOver={e => { (e.currentTarget as HTMLElement).style.borderColor = '#fff'; (e.currentTarget as HTMLElement).style.color = '#fff'; }}
-            onMouseOut={e => { (e.currentTarget as HTMLElement).style.borderColor = '#333'; (e.currentTarget as HTMLElement).style.color = '#aaa'; }}
-          >Sign In</button>
-          <button className="btn-primary" onClick={() => router.push('/signup')} style={{ padding: '0.5rem 1.25rem', fontSize: '0.9rem' }}>Get Started Free</button>
-        </div>
-      </nav>
+      <MobileNav />
 
       {/* Hero */}
       <section className="hero container text-center">

@@ -367,6 +367,10 @@ footer {
   color: var(--text-secondary);
 }
 
+/* ── Mobile Nav Toggle ── */
+.mobile-menu-btn { display: none; }
+.desktop-nav-links { display: flex; }
+
 /* ── 3D Card Tilt Effect ── */
 .glass-card {
   transform-style: preserve-3d;
@@ -439,6 +443,10 @@ footer {
 
 /* ── Mobile Responsive ── */
 @media (max-width: 768px) {
+  /* Nav */
+  .mobile-menu-btn { display: block !important; }
+  .desktop-nav-links { display: none !important; }
+
   /* Typography */
   .hero h1 { font-size: 2.2rem; letter-spacing: -0.01em; }
   .hero p { font-size: 1rem; }
