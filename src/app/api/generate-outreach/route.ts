@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     const contactPart = contactName ? ` The contact person is ${contactName}.` : '';
     const prompt = `You are a B2B sales expert. Write a SHORT cold outreach message (2-3 sentences max) for a company called "${company}" that is hiring for "${title}".${contactPart} Make it feel human, mention their hiring signal, and offer to solve a related business problem. Output ONLY the message, no quotes, no labels, no subject line.`;
 
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
     const res = await fetch(apiUrl, {
       method: 'POST',
