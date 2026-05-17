@@ -21,7 +21,6 @@ const SOURCES = [
   { id: 'remoteok',  name: 'RemoteOK',             icon: '✅', type: 'Remote Board' },
   { id: 'careerjet', name: 'CareerJet',            icon: '🚀', type: 'Global Scan' },
   { id: 'jooble',    name: 'Jooble',               icon: '🔎', type: 'Meta Search' },
-  { id: 'apify_apollo', name: 'Apollo via Apify',  icon: '🎯', type: 'B2B Contacts' },
 ];
 
 export const getAllSources = () => SOURCES;
@@ -226,56 +225,8 @@ const fetchFindWork = async (query, location) => {
   } catch { return []; }
 };
 
-// FIX: Apify fetcher — correct SOURCES index and better error handling
-const fetchApifyApollo = async (query, location) => {
-  const apiKey = localStorage.getItem('df_apify_api_key');
-  if (!apiKey) return [];
-
-  try {
-    const url = `https://api.apify.com/v2/acts/lucasnav~apollo-leads-finder/run-sync-get-dataset-items?token=${apiKey}`;
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ search_query: query, limit: 10 }),
-    });
-
-    if (!res.ok) {
-      const errText = await res.text();
-      console.error(`Apify API Error (${res.status}):`, errText);
-      return [];
-    }
-
-    const data = await res.json();
-    if (!Array.isArray(data) || !data.length) {
-      console.warn('Apify returned empty data:', data);
-      return [];
-    }
-
-    return data
-      .filter(lead => matchesLocation(lead.location, location))
-      .slice(0, 5)
-      .map((lead, i) => buildLead({
-        id: `apy-${i}`,
-        company: lead.company_name || 'Unknown',
-        country: lead.location || 'Global',
-        title: lead.job_title || query,
-        description: `${lead.first_name || ''} ${lead.last_name || ''} — ${lead.job_title || ''} at ${lead.company_name || ''}`.trim(),
-        sourceUrl: lead.company_website || lead.linkedin_url || '',
-        postedAt: 'Just Now',
-        sourceName: 'Apollo via Apify',
-        contactName: `${lead.first_name || ''} ${lead.last_name || ''}`.trim() || null,
-        contactEmail: lead.email || null,
-        contactLinkedIn: lead.linkedin_url || null,
-      }));
-  } catch (err) {
-    console.error('Apify network or parsing error:', err);
-    return [];
-  }
-};
-
 // ── Main Aggregator ────────────────────────────────────────────
 export const scanAllSources = async (query, location, onSourceUpdate) => {
-  const apifyKey = localStorage.getItem('df_apify_api_key');
 
   // FIX: Correct SOURCES index references (Apify is index 15)
   const fetchers = [
@@ -285,7 +236,6 @@ export const scanAllSources = async (query, location, onSourceUpdate) => {
     { source: SOURCES[3],  fn: () => fetchTheMuse(query, location) },
     { source: SOURCES[10], fn: () => fetchFindWork(query, location) },
     { source: SOURCES[11], fn: () => fetchHimalayas(query, location) },
-    ...(apifyKey ? [{ source: SOURCES[15], fn: () => fetchApifyApollo(query, location) }] : []),
   ];
 
   const passiveSources = SOURCES.filter(s => !fetchers.find(f => f.source.id === s.id));

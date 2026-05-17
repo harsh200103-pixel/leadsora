@@ -16,8 +16,7 @@ function Dashboard() {
   const [location, setLocation] = useState('Global');
   const [isScanning, setIsScanning] = useState(false);
   const [scanStatus, setScanStatus] = useState('');
-  const [apifyKey, setApifyKey] = useState('');
-  const [showSettings, setShowSettings] = useState(false);
+  const [highIntentOnly, setHighIntentOnly] = useState(false);
   const [highIntentOnly, setHighIntentOnly] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [aiOutreach, setAiOutreach] = useState<{[key: string]: string}>({});
@@ -29,14 +28,9 @@ function Dashboard() {
     setMounted(true);
     const saved = localStorage.getItem('dealfinder_leads');
     if (saved) { try { setLeads(JSON.parse(saved)); } catch (e) {} }
-    setApifyKey(localStorage.getItem('df_apify_api_key') || '');
   }, []);
 
   useEffect(() => {
-    if (mounted) localStorage.setItem('dealfinder_leads', JSON.stringify(leads));
-  }, [leads, mounted]);
-
-  const saveApifyKey = (val: string) => { setApifyKey(val); localStorage.setItem('df_apify_api_key', val); };
   const timeAgo = (dateString: string) => {
     if (!dateString) return 'Recently';
     const days = Math.floor((new Date().getTime() - new Date(dateString).getTime()) / (1000 * 60 * 60 * 24));
@@ -121,21 +115,6 @@ function Dashboard() {
               {isScanning ? <><Loader2 className="animate-spin" size={20} /> Scanning...</> : 'Scan Web'}
             </button>
           </form>
-
-          {/* Settings */}
-          <div className="text-center mt-4">
-            <button onClick={() => setShowSettings(!showSettings)} style={{ background: 'none', border: 'none', color: '#666', cursor: 'pointer', textDecoration: 'underline', fontSize: '0.875rem' }}>
-              {showSettings ? 'Hide API Settings' : 'API Settings (Apify)'}
-            </button>
-            {showSettings && (
-              <div style={{ marginTop: '1rem', background: 'rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '8px', display: 'inline-block', textAlign: 'left' }}>
-                <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.5rem', color: '#ccc' }}>Apify API Key (for Apollo Premium Leads):</label>
-                <input type="text" value={apifyKey} onChange={e => saveApifyKey(e.target.value)} placeholder="apify_api_..." style={{ width: '300px', padding: '0.5rem', background: '#000', border: '1px solid #333', color: '#fff', borderRadius: '4px' }} />
-              </div>
-            )}
-          </div>
-
-          {/* Scanning Status */}
           {isScanning && (
             <div className="text-center" style={{ padding: '2rem', color: 'var(--text-secondary)' }}>
               <p className="flex items-center justify-center gap-2" style={{ fontSize: '1.1rem', color: '#ffbd2e' }}>
