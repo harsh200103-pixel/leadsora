@@ -18,8 +18,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing company or title' }, { status: 400 });
     }
 
-    const contactPart = contactName ? ` The contact person is ${contactName}.` : '';
-    const prompt = `You are a B2B sales expert. Write a SHORT cold outreach message (2-3 sentences max) for a company called "${company}" that is hiring for "${title}".${contactPart} Make it feel human, mention their hiring signal, and offer to solve a related business problem. Output ONLY the message, no quotes, no labels, no subject line.`;
+    const contactPart = contactName ? ` Address the email to ${contactName}.` : ' Address the email to the Hiring Team.';
+    const prompt = `You are a B2B agency founder. Write a highly professional, well-structured cold email for a company called "${company}" that is hiring for "${title}".${contactPart} 
+    Format it exactly like a real email with line breaks. 
+    1. Start with a greeting (e.g. Hi [Name],)
+    2. Mention you saw they are hiring for the role and explain how your agency/services can help them achieve the same goals faster without the overhead.
+    3. Keep the body to 2-3 concise paragraphs.
+    4. End with a professional sign-off (e.g. Best regards,\n[Your Name]). 
+    Do NOT include a subject line in the output.`;
 
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
