@@ -240,12 +240,16 @@ const fetchApifyApollo = async (query, location) => {
     });
 
     if (!res.ok) {
-      console.warn('Apify returned', res.status);
+      const errText = await res.text();
+      console.error(`Apify API Error (${res.status}):`, errText);
       return [];
     }
 
     const data = await res.json();
-    if (!Array.isArray(data) || !data.length) return [];
+    if (!Array.isArray(data) || !data.length) {
+      console.warn('Apify returned empty data:', data);
+      return [];
+    }
 
     return data
       .filter(lead => matchesLocation(lead.location, location))
@@ -264,7 +268,7 @@ const fetchApifyApollo = async (query, location) => {
         contactLinkedIn: lead.linkedin_url || null,
       }));
   } catch (err) {
-    console.warn('Apify error:', err);
+    console.error('Apify network or parsing error:', err);
     return [];
   }
 };
