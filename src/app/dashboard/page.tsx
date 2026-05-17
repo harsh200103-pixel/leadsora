@@ -205,7 +205,7 @@ function Dashboard() {
                             <button onClick={() => generateAIOutreach(lead)} disabled={!!generatingId} style={{ background: 'none', border: 'none', cursor: generatingId ? 'not-allowed' : 'pointer', color: aiOutreach[lead.id] ? '#a78bfa' : '#555', padding: 0 }} title="Generate AI Outreach">
                               {generatingId === lead.id ? <Loader2 size={18} className="animate-spin" /> : <Sparkles size={18} />}
                             </button>
-                            <a href={`mailto:${lead.contactEmail || ''}?subject=Re: ${lead.company}&body=${encodeURIComponent(aiOutreach[lead.id] || lead.outreach)}`} style={{ color: '#4facfe', padding: 0 }} title="Email"><Mail size={18} /></a>
+                            <a href={`mailto:${foundEmails[lead.id]?.[0]?.value || lead.contactEmail || ''}?subject=Re: ${lead.company}&body=${encodeURIComponent(aiOutreach[lead.id] || lead.outreach)}`} style={{ color: '#4facfe', padding: 0 }} title="Email"><Mail size={18} /></a>
                             <button onClick={() => handleCopy(lead.id, aiOutreach[lead.id] || lead.outreach)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: copiedId === lead.id ? '#27c93f' : '#666', padding: 0 }} title="Copy">{copiedId === lead.id ? <Check size={18} /> : <Copy size={18} />}</button>
                           </div>
                         </div>

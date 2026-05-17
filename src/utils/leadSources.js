@@ -57,13 +57,12 @@ const matchesLocation = (locationStr, filter) => {
   // Global = no filter, return everything
   if (!filter || filter === 'Global') return true;
 
-  const loc = (locationStr || '').toLowerCase().trim();
+  // Strict geo-fencing: if no location provided by API, drop it.
+  if (!locationStr) return false;
 
-  // FIX: If location is empty or is a "remote/worldwide" term, INCLUDE it
-  // because we can't confirm it's NOT in the target country
-  if (!loc || REMOTE_TERMS.some(t => t && loc.includes(t))) return true;
+  const loc = locationStr.toLowerCase();
 
-  // Check if it matches the target country
+  // Check if it strictly matches the target country or its cities
   const terms = LOCATION_TERMS[filter] || [filter.toLowerCase()];
   return terms.some(term => loc.includes(term));
 };
