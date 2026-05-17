@@ -240,8 +240,11 @@ function Dashboard() {
                                     </div>
                                     <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                                       <a href={`mailto:${em.value}`} style={{ color: '#4facfe', textDecoration: 'none' }}>{em.value}</a>
+                                      <button onClick={() => handleCopy(`em-${idx}-${em.value}`, em.value)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: copiedId === `em-${idx}-${em.value}` ? '#27c93f' : '#666', padding: '0 4px' }} title="Copy Email">
+                                        {copiedId === `em-${idx}-${em.value}` ? <Check size={14} /> : <Copy size={14} />}
+                                      </button>
                                       {em.sources?.[0]?.uri?.includes('linkedin') && (
-                                        <a href={em.sources[0].uri} target="_blank" rel="noreferrer" style={{ color: '#0a66c2' }} title="LinkedIn Profile">in</a>
+                                        <a href={em.sources[0].uri} target="_blank" rel="noreferrer" style={{ color: '#0a66c2', marginLeft: '4px' }} title="LinkedIn Profile">in</a>
                                       )}
                                     </div>
                                   </div>
