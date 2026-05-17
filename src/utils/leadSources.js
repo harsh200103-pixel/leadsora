@@ -50,6 +50,10 @@ const LOCATION_TERMS = {
   'Germany':   ['germany', 'berlin', 'munich', 'frankfurt', 'hamburg', 'cologne', 'düsseldorf', 'dusseldorf'],
   'UAE':       ['uae', 'dubai', 'united arab emirates', 'abu dhabi', 'sharjah'],
   'Singapore': ['singapore'],
+  'France':    ['france', 'paris', 'lyon', 'marseille'],
+  'Netherlands':['netherlands', 'amsterdam', 'holland', 'rotterdam'],
+  'Ireland':   ['ireland', 'dublin', 'cork'],
+  'Spain':     ['spain', 'madrid', 'barcelona', 'valencia'],
 };
 
 // Words that mean "this job is available everywhere" — always include these

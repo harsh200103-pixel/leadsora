@@ -141,11 +141,17 @@ function Dashboard() {
             <datalist id="niche-options">
               <option value="AI Automation" /><option value="Software Engineering" /><option value="Marketing" />
               <option value="SEO" /><option value="Web Design" /><option value="Data Science" />
+              <option value="B2B SaaS" /><option value="Cybersecurity" /><option value="FinTech" />
+              <option value="Recruitment" /><option value="UI/UX Design" /><option value="Copywriting" />
+              <option value="Sales" /><option value="E-commerce" /><option value="Video Editing" />
             </datalist>
             <select className="simulator-input" style={{ maxWidth: '150px' }} value={location} onChange={e => setLocation(e.target.value)}>
               <option value="Global">Global</option><option value="USA">USA</option><option value="UK">UK</option>
               <option value="Canada">Canada</option><option value="Australia">Australia</option>
-              <option value="India">India</option><option value="Germany">Germany</option><option value="UAE">UAE</option>
+              <option value="India">India</option><option value="Germany">Germany</option>
+              <option value="UAE">UAE</option><option value="Singapore">Singapore</option>
+              <option value="France">France</option><option value="Netherlands">Netherlands</option>
+              <option value="Ireland">Ireland</option><option value="Spain">Spain</option>
             </select>
             <button type="submit" className="btn-primary flex items-center justify-center gap-2" disabled={isScanning}>
               {isScanning ? <><Loader2 className="animate-spin" size={20} /> Scanning...</> : 'Scan Web'}
