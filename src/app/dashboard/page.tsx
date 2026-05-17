@@ -16,9 +16,13 @@ function Dashboard() {
   const [location, setLocation] = useState('Global');
   const [isScanning, setIsScanning] = useState(false);
   const [scanStatus, setScanStatus] = useState('');
+  const [hunterKey, setHunterKey] = useState('b937eb0f532629a23bc002872195055922026f68'); // Default to provided key
+  const [showSettings, setShowSettings] = useState(false);
   const [highIntentOnly, setHighIntentOnly] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [aiOutreach, setAiOutreach] = useState<{[key: string]: string}>({});
+  const [foundEmails, setFoundEmails] = useState<{[key: string]: any[]}>({});
+  const [fetchingEmailsFor, setFetchingEmailsFor] = useState<string | null>(null);
   const [generatingId, setGeneratingId] = useState<string | null>(null);
   const [leads, setLeads] = useState<any[]>([]);
   const [mounted, setMounted] = useState(false);
@@ -27,11 +31,15 @@ function Dashboard() {
     setMounted(true);
     const saved = localStorage.getItem('dealfinder_leads');
     if (saved) { try { setLeads(JSON.parse(saved)); } catch (e) {} }
+    const savedHunter = localStorage.getItem('df_hunter_api_key');
+    if (savedHunter) setHunterKey(savedHunter);
   }, []);
 
   useEffect(() => {
     if (mounted) localStorage.setItem('dealfinder_leads', JSON.stringify(leads));
   }, [leads, mounted]);
+
+  const saveHunterKey = (val: string) => { setHunterKey(val); localStorage.setItem('df_hunter_api_key', val); };
 
   const timeAgo = (dateString: string) => {
     if (!dateString) return 'Recently';
@@ -69,6 +77,28 @@ function Dashboard() {
       const data = await res.json();
       if (data.outreach) setAiOutreach(prev => ({ ...prev, [lead.id]: data.outreach }));
     } catch (err) { console.error(err); } finally { setGeneratingId(null); }
+  };
+
+  const fetchEmailsWithHunter = async (lead: any) => {
+    if (!hunterKey) return alert("Please add your Hunter.io API key in the settings first!");
+    setFetchingEmailsFor(lead.id);
+    try {
+      // Clean company name (remove Inc, LLC, etc for better matching)
+      const cleanCompany = lead.company.replace(/ LLC| Inc\.?| Corp\.?| Ltd\.?/gi, '').trim();
+      const res = await fetch(`https://api.hunter.io/v2/domain-search?company=${encodeURIComponent(cleanCompany)}&limit=5&api_key=${hunterKey}`);
+      const data = await res.json();
+      
+      if (data?.data?.emails?.length > 0) {
+        setFoundEmails(prev => ({ ...prev, [lead.id]: data.data.emails }));
+      } else {
+        setFoundEmails(prev => ({ ...prev, [lead.id]: [] })); // Found nothing
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Failed to fetch from Hunter.io. Verify your API key.");
+    } finally {
+      setFetchingEmailsFor(null);
+    }
   };
 
   if (authLoading || !user) return (
@@ -117,6 +147,20 @@ function Dashboard() {
               {isScanning ? <><Loader2 className="animate-spin" size={20} /> Scanning...</> : 'Scan Web'}
             </button>
           </form>
+
+          {/* Settings */}
+          <div className="text-center mt-4">
+            <button onClick={() => setShowSettings(!showSettings)} style={{ background: 'none', border: 'none', color: '#666', cursor: 'pointer', textDecoration: 'underline', fontSize: '0.875rem' }}>
+              {showSettings ? 'Hide API Settings' : 'API Settings (Hunter.io)'}
+            </button>
+            {showSettings && (
+              <div style={{ marginTop: '1rem', background: 'rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '8px', display: 'inline-block', textAlign: 'left' }}>
+                <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.5rem', color: '#ccc' }}>Hunter.io API Key (For pulling decision-maker emails):</label>
+                <input type="text" value={hunterKey} onChange={e => saveHunterKey(e.target.value)} placeholder="Enter Hunter.io API key..." style={{ width: '300px', padding: '0.5rem', background: '#000', border: '1px solid #333', color: '#fff', borderRadius: '4px' }} />
+              </div>
+            )}
+          </div>
+
           {isScanning && (
             <div className="text-center" style={{ padding: '2rem', color: 'var(--text-secondary)' }}>
               <p className="flex items-center justify-center gap-2" style={{ fontSize: '1.1rem', color: '#ffbd2e' }}>
@@ -166,16 +210,48 @@ function Dashboard() {
                           </div>
                         </div>
 
-                        {/* Contact Info */}
-                        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center', marginTop: '0.75rem' }}>
-                          {lead.contactName && <span style={{ display: 'inline-flex', alignItems: 'center', fontSize: '0.78rem', color: '#ccc', background: 'rgba(255,255,255,0.07)', padding: '3px 10px', borderRadius: '999px' }}>👤 {lead.contactName}</span>}
-                          {lead.contactEmail && <a href={`mailto:${lead.contactEmail}`} style={{ display: 'inline-flex', alignItems: 'center', fontSize: '0.78rem', color: '#4facfe', background: 'rgba(79,172,254,0.1)', padding: '3px 10px', borderRadius: '999px', textDecoration: 'none' }}>📧 {lead.contactEmail}</a>}
+                        {/* Contact Info / Hunter Integration */}
+                        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center', marginTop: '1rem' }}>
+                          <button 
+                            onClick={() => fetchEmailsWithHunter(lead)} 
+                            disabled={fetchingEmailsFor === lead.id}
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.78rem', color: '#fff', background: '#ffbd2e', border: 'none', padding: '4px 12px', borderRadius: '999px', cursor: fetchingEmailsFor === lead.id ? 'not-allowed' : 'pointer', fontWeight: 600 }}
+                          >
+                            {fetchingEmailsFor === lead.id ? <Loader2 size={12} className="animate-spin" /> : '🎯'} Find Emails
+                          </button>
+                          
                           {lead.contactLinkedIn
-                            ? <a href={lead.contactLinkedIn} target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', fontSize: '0.78rem', color: '#fff', background: '#0a66c2', padding: '3px 10px', borderRadius: '999px', textDecoration: 'none' }}>in LinkedIn</a>
-                            : <a href={`https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(lead.company + ' hiring')}`} target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', fontSize: '0.78rem', color: '#94a3b8', background: 'rgba(255,255,255,0.05)', padding: '3px 10px', borderRadius: '999px', textDecoration: 'none' }}>🔍 Find on LinkedIn</a>
+                            ? <a href={lead.contactLinkedIn} target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', fontSize: '0.78rem', color: '#fff', background: '#0a66c2', padding: '4px 12px', borderRadius: '999px', textDecoration: 'none' }}>in LinkedIn</a>
+                            : <a href={`https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(lead.company + ' hiring')}`} target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', fontSize: '0.78rem', color: '#94a3b8', background: 'rgba(255,255,255,0.05)', padding: '4px 12px', borderRadius: '999px', textDecoration: 'none' }}>🔍 LinkedIn</a>
                           }
-                          {lead.sourceUrl && <a href={lead.sourceUrl} target="_blank" rel="noreferrer" style={{ fontSize: '0.78rem', color: '#ffbd2e', textDecoration: 'underline' }}>View Source ↗</a>}
+                          {lead.sourceUrl && <a href={lead.sourceUrl} target="_blank" rel="noreferrer" style={{ fontSize: '0.78rem', color: '#ffbd2e', textDecoration: 'underline', marginLeft: 'auto' }}>View Source ↗</a>}
                         </div>
+
+                        {/* Display Found Emails */}
+                        {foundEmails[lead.id] && (
+                          <div style={{ marginTop: '0.75rem', padding: '0.75rem', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', border: '1px solid #27272a' }}>
+                            <h5 style={{ fontSize: '0.75rem', color: '#888', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Decision Makers Found</h5>
+                            {foundEmails[lead.id].length > 0 ? (
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                                {foundEmails[lead.id].map((em: any, idx: number) => (
+                                  <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.85rem' }}>
+                                    <div style={{ color: '#ccc' }}>
+                                      <strong style={{ color: '#fff' }}>{em.first_name} {em.last_name}</strong> {em.position && <span style={{ color: '#888' }}>- {em.position}</span>}
+                                    </div>
+                                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                      <a href={`mailto:${em.value}`} style={{ color: '#4facfe', textDecoration: 'none' }}>{em.value}</a>
+                                      {em.sources?.[0]?.uri?.includes('linkedin') && (
+                                        <a href={em.sources[0].uri} target="_blank" rel="noreferrer" style={{ color: '#0a66c2' }} title="LinkedIn Profile">in</a>
+                                      )}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <p style={{ fontSize: '0.85rem', color: '#888', margin: 0 }}>No direct emails found for {lead.company}. Try manual LinkedIn search.</p>
+                            )}
+                          </div>
+                        )}
                       </div>
                       <div className="intent-score" style={{ fontSize: '1.25rem', padding: '0.75rem 1.5rem', color: getScoreColor(lead.intentScore), borderColor: getScoreColor(lead.intentScore) }}>{lead.intentScore} 🔥</div>
                     </div>
