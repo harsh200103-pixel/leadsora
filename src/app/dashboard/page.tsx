@@ -17,6 +17,7 @@ function Dashboard() {
   const [isScanning, setIsScanning] = useState(false);
   const [scanStatus, setScanStatus] = useState('');
   const [hunterKey, setHunterKey] = useState('b937eb0f532629a23bc002872195055922026f68'); // Default to provided key
+  const [rapidApiKey, setRapidApiKey] = useState('');
   const [showSettings, setShowSettings] = useState(false);
   const [highIntentOnly, setHighIntentOnly] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -33,6 +34,8 @@ function Dashboard() {
     if (saved) { try { setLeads(JSON.parse(saved)); } catch (e) {} }
     const savedHunter = localStorage.getItem('df_hunter_api_key');
     if (savedHunter) setHunterKey(savedHunter);
+    const savedRapid = localStorage.getItem('df_rapid_api_key');
+    if (savedRapid) setRapidApiKey(savedRapid);
   }, []);
 
   useEffect(() => {
@@ -40,6 +43,7 @@ function Dashboard() {
   }, [leads, mounted]);
 
   const saveHunterKey = (val: string) => { setHunterKey(val); localStorage.setItem('df_hunter_api_key', val); };
+  const saveRapidApiKey = (val: string) => { setRapidApiKey(val); localStorage.setItem('df_rapid_api_key', val); };
 
   const timeAgo = (dateString: string) => {
     if (!dateString) return 'Recently';
@@ -154,9 +158,15 @@ function Dashboard() {
               {showSettings ? 'Hide API Settings' : 'API Settings (Hunter.io)'}
             </button>
             {showSettings && (
-              <div style={{ marginTop: '1rem', background: 'rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '8px', display: 'inline-block', textAlign: 'left' }}>
-                <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.5rem', color: '#ccc' }}>Hunter.io API Key (For pulling decision-maker emails):</label>
-                <input type="text" value={hunterKey} onChange={e => saveHunterKey(e.target.value)} placeholder="Enter Hunter.io API key..." style={{ width: '300px', padding: '0.5rem', background: '#000', border: '1px solid #333', color: '#fff', borderRadius: '4px' }} />
+              <div style={{ marginTop: '1rem', background: 'rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '8px', display: 'flex', gap: '1rem', justifyContent: 'center', textAlign: 'left', flexWrap: 'wrap' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.5rem', color: '#ccc' }}>Hunter.io API Key (Email Discovery):</label>
+                  <input type="password" value={hunterKey} onChange={e => saveHunterKey(e.target.value)} placeholder="Enter Hunter.io API key..." style={{ width: '280px', padding: '0.5rem', background: '#000', border: '1px solid #333', color: '#fff', borderRadius: '4px' }} />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.5rem', color: '#ccc' }}>RapidAPI Key (JSearch India Leads):</label>
+                  <input type="password" value={rapidApiKey} onChange={e => saveRapidApiKey(e.target.value)} placeholder="Enter RapidAPI key..." style={{ width: '280px', padding: '0.5rem', background: '#000', border: '1px solid #333', color: '#fff', borderRadius: '4px' }} />
+                </div>
               </div>
             )}
           </div>

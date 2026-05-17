@@ -18,6 +18,8 @@ const SOURCES = [
   { id: 'adzuna_in', name: 'Adzuna IN',            icon: '🇮🇳', type: 'IN Market' },
   { id: 'findwork',  name: 'FindWork.dev',         icon: '⚡', type: 'Dev Hiring' },
   { id: 'himalayas', name: 'Himalayas',            icon: '🏔️', type: 'Remote-First' },
+  { id: 'jsearch',    name: 'JSearch (LinkedIn/Indeed)', icon: '🇮🇳', type: 'Pro Scraper' },
+  { id: 'hasjob',     name: 'Hasjob.co',               icon: '💻', type: 'Indian Tech' },
   { id: 'remoteok',  name: 'RemoteOK',             icon: '✅', type: 'Remote Board' },
   { id: 'careerjet', name: 'CareerJet',            icon: '🚀', type: 'Global Scan' },
   { id: 'jooble',    name: 'Jooble',               icon: '🔎', type: 'Meta Search' },
@@ -224,6 +226,63 @@ const fetchFindWork = async (query, location) => {
   } catch { return []; }
 };
 
+const fetchHasjob = async (query, location) => {
+  try {
+    const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=https://hasjob.co/feed`);
+    const data = await res.json();
+    if (!data.items?.length) return [];
+
+    return data.items
+      .filter(job => {
+        const text = (job.title + ' ' + job.description).toLowerCase();
+        const matchesQuery = !query || text.includes(query.toLowerCase());
+        const matchesLoc = matchesLocation(text, location);
+        return matchesQuery && matchesLoc;
+      })
+      .slice(0, 6)
+      .map((job, i) => buildLead({
+        id: `hasjob-${i}-${Date.now()}`,
+        company: job.title.split(' at ')[1] || 'Tech Startup',
+        country: 'India',
+        title: job.title.split(' at ')[0] || job.title,
+        description: job.description?.replace(/<[^>]*>?/gm, '').slice(0, 500),
+        sourceUrl: job.link,
+        postedAt: timeAgo(job.pubDate),
+        sourceName: 'Hasjob (India)',
+      }));
+  } catch { return []; }
+};
+
+const fetchJSearch = async (query, location) => {
+  try {
+    const apiKey = localStorage.getItem('df_rapid_api_key');
+    if (!apiKey) return []; // Silently skip if user hasn't added a RapidAPI key
+
+    const locationQuery = location && location !== 'Global' ? ` in ${location}` : '';
+    const res = await fetch(`https://jsearch.p.rapidapi.com/search?query=${encodeURIComponent(query + locationQuery)}&page=1&num_pages=1`, {
+      method: 'GET',
+      headers: {
+        'X-RapidAPI-Key': apiKey,
+        'X-RapidAPI-Host': 'jsearch.p.rapidapi.com'
+      }
+    });
+    
+    const json = await res.json();
+    if (!json.data?.length) return [];
+
+    return json.data.slice(0, 8).map((job, i) => buildLead({
+      id: `jsearch-${i}-${job.job_id}`,
+      company: job.employer_name || 'Unknown',
+      country: `${job.job_city || ''} ${job.job_country || ''}`.trim() || 'Flexible',
+      title: job.job_title,
+      description: job.job_description?.slice(0, 500),
+      sourceUrl: job.job_apply_link,
+      postedAt: timeAgo(job.job_posted_at_datetime_utc),
+      sourceName: 'JSearch (Indeed/LinkedIn)',
+    }));
+  } catch { return []; }
+};
+
 // ── Main Aggregator ────────────────────────────────────────────
 export const scanAllSources = async (query, location, onSourceUpdate) => {
 
@@ -235,6 +294,8 @@ export const scanAllSources = async (query, location, onSourceUpdate) => {
     { source: SOURCES[3],  fn: () => fetchTheMuse(query, location) },
     { source: SOURCES[10], fn: () => fetchFindWork(query, location) },
     { source: SOURCES[11], fn: () => fetchHimalayas(query, location) },
+    { source: SOURCES[12], fn: () => fetchJSearch(query, location) },
+    { source: SOURCES[13], fn: () => fetchHasjob(query, location) },
   ];
 
   const passiveSources = SOURCES.filter(s => !fetchers.find(f => f.source.id === s.id));
