@@ -17,7 +17,6 @@ function Dashboard() {
   const [isScanning, setIsScanning] = useState(false);
   const [scanStatus, setScanStatus] = useState('');
   const [highIntentOnly, setHighIntentOnly] = useState(false);
-  const [highIntentOnly, setHighIntentOnly] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [aiOutreach, setAiOutreach] = useState<{[key: string]: string}>({});
   const [generatingId, setGeneratingId] = useState<string | null>(null);
@@ -31,6 +30,9 @@ function Dashboard() {
   }, []);
 
   useEffect(() => {
+    if (mounted) localStorage.setItem('dealfinder_leads', JSON.stringify(leads));
+  }, [leads, mounted]);
+
   const timeAgo = (dateString: string) => {
     if (!dateString) return 'Recently';
     const days = Math.floor((new Date().getTime() - new Date(dateString).getTime()) / (1000 * 60 * 60 * 24));
