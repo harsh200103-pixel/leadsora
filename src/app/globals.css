@@ -124,6 +124,7 @@ button {
   box-shadow: var(--glow);
   position: relative;
 }
+.ai-text-mobile { padding-right: 5.5rem; }
 
 .glass-card:hover {
   transform: translateY(-5px);
@@ -475,6 +476,12 @@ footer {
   .dashboard-body { padding: 1rem; }
   .dashboard-header { flex-wrap: wrap; gap: 0.5rem; }
   .intent-score { width: 100%; justify-content: center; margin-top: 1rem; }
+  .hide-on-mobile { display: none !important; }
+  .dashboard-controls-mobile { flex-direction: column !important; align-items: stretch !important; gap: 0.75rem !important; margin-top: 1rem; }
+  .dashboard-controls-mobile > * { width: 100% !important; justify-content: center !important; }
+  .ai-box-mobile { padding-right: 1rem !important; display: flex; flex-direction: column; gap: 0.75rem; }
+  .ai-text-mobile { padding-right: 0 !important; }
+  .ai-actions-mobile { position: relative !important; top: 0 !important; right: 0 !important; justify-content: flex-end; width: 100%; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 0.75rem; }
 
   /* Container padding */
   .container { padding: 0 1rem; }
