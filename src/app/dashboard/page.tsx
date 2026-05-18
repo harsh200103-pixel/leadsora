@@ -79,7 +79,7 @@ function Dashboard() {
     e.preventDefault(); if (!searchQuery) return;
     setIsScanning(true); setLeads([]); setScanStatus('Initializing multi-source scan...');
     try {
-      const results = await scanAllSources(searchQuery, location, (update: any) => {
+      const results = await scanAllSources(searchQuery, location, userPersona, (update: any) => {
         if (update.status === 'scanning') setScanStatus(`Scanning ${update.source.name}...`);
         else if (update.status === 'done') setScanStatus(`Found ${update.count} leads from ${update.source.name}`);
       });

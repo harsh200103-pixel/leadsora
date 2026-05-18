@@ -64,44 +64,16 @@ async function generateWithAnthropic(company, role, signal) {
 }
 
 // ============================================================
-// FALLBACK TEMPLATES — for AI software solutions companies
-// pitching to businesses that need AI capabilities built
+// DYNAMIC FALLBACK TEMPLATE
 // ============================================================
 
-const FALLBACK_TEMPLATES = [
-  (company, role) =>
-    `Hey! Saw that ${company} is hiring a ${role} — a clear signal you need serious AI capabilities. Instead of a 6-month hiring cycle, our team can design and ship the exact AI system you need in weeks. We've built production-ready AI for companies just like yours. Worth a 15-min call?`,
-  (company, role) =>
-    `Hi — noticed ${company} posted a ${role} role. Building an in-house AI team is expensive and slow. We're an AI solutions company that delivers custom ML models, automation systems, and intelligent platforms end-to-end. You get the AI shipped, not just a hire. Happy to share a case study?`,
-  (company, role) =>
-    `Quick note — saw ${company}'s ${role} opening. We built a very similar AI system for a company in your space and had it in production in 8 weeks flat. Full stack: model training, API, deployment. Open to exploring the build-vs-hire route? I'd love to connect.`,
-  (company, role) =>
-    `${company} hiring a ${role} tells me you're serious about AI. We specialize in exactly that — building the custom AI infrastructure you need without you assembling a whole internal team. Let me send you a 2-minute walkthrough of something we shipped for a similar company.`,
-  (company, role) =>
-    `Hey! Came across ${company}'s ${role} listing — we've solved this exact problem for other companies. Rather than a long recruitment cycle, we can deliver a fully working AI system in your stack within weeks. Our last 3 clients went from brief to production in under 60 days. Interested?`,
-  (company, role) =>
-    `Hi there — ${company}'s search for a ${role} is a strong buying signal for us. We're a specialist AI engineering company; we build, train, and deploy the exact AI systems companies like you need. No recruitment risk, no ramp-up time — just working AI. Can I send over a quick overview?`,
-  (company, role) =>
-    `Saw ${company} is looking for a ${role}. We've built nearly identical solutions for 15+ companies and can usually move faster and cheaper than a full-time hire + infrastructure build. Our stack covers everything from fine-tuned LLMs to production APIs. Want a no-pitch, 10-min walkthrough?`,
-  (company, role) =>
-    `Quick one — ${company}'s ${role} opening stood out. We're an AI product studio that builds exactly what you're hiring for — but as a fully delivered system, not a headcount. If speed and cost matter, it's worth a conversation. Happy to share what we've shipped.`,
-  (company, role) =>
-    `Hi! ${company} posting for a ${role} tells me you have a real AI gap to fill. We close that gap by building the system instead of the team — custom models, integrations, deployment. We've done this for companies from Series A to Fortune 500. Would love to show you a quick example.`,
-  (company, role) =>
-    `Hey — noticed ${company} is hiring for ${role}. That search usually takes 3-6 months and $200k+ in first-year cost. We deliver the same capability as a finished AI system in a fraction of the time. Happy to share a relevant project we shipped recently. Worth 10 minutes?`,
-];
-
 /**
- * Select a fallback template deterministically by company name hash.
+ * Generate a dynamic placeholder outreach based on the user's persona.
  */
-function selectFallbackTemplate(company, role = '') {
-  const seed = company + role;
-  let hash = 0;
-  for (let i = 0; i < seed.length; i++) {
-    hash = ((hash << 5) - hash) + seed.charCodeAt(i);
-    hash |= 0;
-  }
-  return Math.abs(hash) % FALLBACK_TEMPLATES.length;
+export function generateOutreachSync(company, role, persona) {
+  const cleanRole = role.replace(/^Hiring:\s*/i, '');
+  const p = persona || 'B2B agency';
+  return `Hi — noticed ${company} is looking for a ${cleanRole}. We're a ${p} that helps companies exactly like yours achieve these specific goals without the massive overhead of a long hiring cycle. Happy to share a quick case study if you're open to exploring?`;
 }
 
 // ============================================================
@@ -109,23 +81,13 @@ function selectFallbackTemplate(company, role = '') {
 // ============================================================
 
 /**
- * Generate personalized outreach for a lead.
- * Tries Anthropic AI first, falls back to 4 varied AI-solutions templates.
+ * Generate personalized outreach for a lead using Anthropic.
+ * (Now largely superseded by the Gemini endpoint in Next.js backend)
  */
 export async function generateOutreach(company, role, signal) {
   const cleanRole = role.replace(/^Hiring:\s*/i, '');
   const aiMessage = await generateWithAnthropic(company, cleanRole, signal || `Hiring: ${cleanRole}`);
   if (aiMessage) return { message: aiMessage, source: 'ai' };
 
-  const idx = selectFallbackTemplate(company);
-  return { message: FALLBACK_TEMPLATES[idx](company, cleanRole), source: 'template' };
-}
-
-/**
- * Sync version — used during batch lead generation.
- */
-export function generateOutreachSync(company, role) {
-  const cleanRole = role.replace(/^Hiring:\s*/i, '');
-  const idx = selectFallbackTemplate(company);
-  return FALLBACK_TEMPLATES[idx](company, cleanRole);
+  return { message: generateOutreachSync(company, cleanRole, 'B2B agency'), source: 'template' };
 }

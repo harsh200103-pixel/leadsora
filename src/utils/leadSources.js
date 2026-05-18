@@ -77,7 +77,6 @@ const matchesLocation = (locationStr, filter) => {
 function buildLead({ id, company, country, title, description, sourceUrl, postedAt, sourceName, contactName, contactEmail, contactLinkedIn }) {
   const fullText = `${title || ''} ${description || ''}`;
   const intentScore = calcIntentScore(fullText, postedAt);
-  const outreach = generateOutreachSync(company, title);
 
   return {
     id,
@@ -85,7 +84,6 @@ function buildLead({ id, company, country, title, description, sourceUrl, posted
     country: country || 'Global',
     intentScore,
     problem: `Hiring: ${title}`,
-    outreach,
     sourceUrl: sourceUrl || '',
     postedAt: postedAt || 'Recently',
     source: sourceName,
@@ -288,7 +286,7 @@ const fetchJSearch = async (query, location) => {
 };
 
 // ── Main Aggregator ────────────────────────────────────────────
-export const scanAllSources = async (query, location, onSourceUpdate) => {
+export const scanAllSources = async (query, location, persona, onSourceUpdate) => {
 
   // FIX: Correct SOURCES index references (Apify is index 15)
   const fetchers = [
@@ -341,7 +339,12 @@ export const scanAllSources = async (query, location, onSourceUpdate) => {
   });
 
   // Sort by intent score, return top 20
-  return Array.from(seen.values())
+  const finalLeads = Array.from(seen.values())
     .sort((a, b) => b.intentScore - a.intentScore)
     .slice(0, 20);
+
+  return finalLeads.map(lead => {
+    lead.outreach = generateOutreachSync(lead.company, lead.problem, persona);
+    return lead;
+  });
 };
