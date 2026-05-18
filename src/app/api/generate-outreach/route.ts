@@ -22,7 +22,18 @@ export async function POST(request: NextRequest) {
     const userPersona = persona || 'B2B agency';
     
     let prompt = '';
-    if (isFollowUp) {
+    
+    if (scanMode === 'layoff') {
+      prompt = `You are a founder of a ${userPersona}. Write a highly professional, tactful, and empathetic cold email for a company called "${company}" that recently went through restructuring/layoffs affecting their team.${contactPart}
+      Format it exactly like a real email with line breaks. 
+      1. Start with a respectful greeting (e.g. Hi [Name],)
+      2. Acknowledge the recent news/restructuring delicately. Do not be overly aggressive.
+      3. Explain that if they need to maintain output or cover the gap left by the reduction in force without the risk and overhead of hiring full-time headcount again, your ${userPersona} can step in as a highly flexible, fractional resource.
+      4. Keep the body to 2 concise paragraphs max.
+      5. End with a soft, no-pressure call to action (e.g., "If you're open to exploring a flexible setup, let me know.") and a professional sign-off. 
+      Do NOT include a subject line in the output.`;
+    }
+    else if (isFollowUp) {
       prompt = `You are a founder of a ${userPersona}. Write a highly professional, short follow-up cold email for a company called "${company}" that you contacted a few days ago regarding their open "${title}" role.${contactPart}
       Format it exactly like a real email with line breaks. 
       1. Start with a greeting (e.g. Hi [Name],)

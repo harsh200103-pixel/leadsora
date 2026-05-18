@@ -68,11 +68,17 @@ async function generateWithAnthropic(company, role, signal) {
 // ============================================================
 
 /**
- * Generate a dynamic placeholder outreach based on the user's persona.
+ * Generate a dynamic placeholder outreach based on the user's persona and mode.
  */
-export function generateOutreachSync(company, role, persona) {
-  const cleanRole = role.replace(/^Hiring:\s*/i, '');
+export function generateOutreachSync(company, role, persona, scanMode = 'hiring') {
   const p = persona || 'B2B agency';
+  
+  if (scanMode === 'layoff') {
+    const dept = role.replace(/Layoffs:.*in\s/, '').replace(/\sdepartment.*/, '') || 'your';
+    return `Hi — I saw the news regarding the recent restructuring at ${company}. If you are looking for ways to maintain the output of your ${dept} team without taking on full-time headcount risk again, my ${p} can step in as a flexible, fractional resource. Open to a quick chat?`;
+  }
+  
+  const cleanRole = role.replace(/^Hiring:\s*/i, '');
   return `Hi — noticed ${company} is looking for a ${cleanRole}. We're a ${p} that helps companies exactly like yours achieve these specific goals without the massive overhead of a long hiring cycle. Happy to share a quick case study if you're open to exploring?`;
 }
 

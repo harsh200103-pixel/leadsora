@@ -37,6 +37,7 @@ function Dashboard() {
   const [userPersona, setUserPersona] = useState('Software Development Agency');
   const [viewMode, setViewMode] = useState<'list' | 'pipeline'>('list');
   const [showSettings, setShowSettings] = useState(false);
+  const [scanMode, setScanMode] = useState<'hiring' | 'layoff'>('hiring');
   const [highIntentOnly, setHighIntentOnly] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [aiOutreach, setAiOutreach] = useState<{[key: string]: string}>({});
@@ -103,7 +104,7 @@ function Dashboard() {
     e.preventDefault(); if (!searchQuery) return;
     setIsScanning(true); setLeads([]); setScanStatus('Initializing multi-source scan...');
     try {
-      const results = await scanAllSources(searchQuery, location, userPersona, (update: any) => {
+      const results = await scanAllSources(searchQuery, location, userPersona, scanMode, (update: any) => {
         if (update.status === 'scanning') setScanStatus(`Scanning ${update.source.name}...`);
         else if (update.status === 'done') setScanStatus(`Found ${update.count} leads from ${update.source.name}`);
       });
@@ -115,7 +116,7 @@ function Dashboard() {
   const generateAIOutreach = async (lead: any, isFollowUp = false) => {
     if (generatingId) return; setGeneratingId(lead.id);
     try {
-      const res = await fetch('/api/generate-outreach', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ company: lead.company, title: lead.problem?.replace('Hiring: ', '') || '', contactName: lead.contactName || null, persona: userPersona, isFollowUp: isFollowUp || (lead.status || 'New') === 'Contacted' }) });
+      const res = await fetch('/api/generate-outreach', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ company: lead.company, title: lead.problem, contactName: lead.contactName || null, persona: userPersona, isFollowUp: isFollowUp || (lead.status || 'New') === 'Contacted', scanMode: lead.scanMode || 'hiring' }) });
       const data = await res.json();
       if (data.outreach) setAiOutreach(prev => ({ ...prev, [lead.id]: data.outreach }));
     } catch (err) { console.error(err); } finally { setGeneratingId(null); }
@@ -194,10 +195,20 @@ function Dashboard() {
               <option value="France">France</option><option value="Netherlands">Netherlands</option>
               <option value="Ireland">Ireland</option><option value="Spain">Spain</option>
             </select>
-            <button type="submit" className="btn-primary flex items-center justify-center gap-2" disabled={isScanning}>
-              {isScanning ? <><Loader2 className="animate-spin" size={20} /> Scanning...</> : 'Scan Web'}
+            <button type="submit" className="btn-primary flex items-center justify-center gap-2" disabled={isScanning} style={{ background: scanMode === 'layoff' ? '#ff5f56' : '' }}>
+              {isScanning ? <><Loader2 className="animate-spin" size={20} /> Scanning...</> : (scanMode === 'layoff' ? 'Snipe Layoffs' : 'Scan Web')}
             </button>
           </form>
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1.5rem' }}>
+            <div style={{ display: 'flex', background: 'rgba(255,255,255,0.05)', padding: '4px', borderRadius: '999px', border: '1px solid #333' }}>
+              <button onClick={() => setScanMode('hiring')} type="button" style={{ padding: '6px 16px', borderRadius: '999px', border: 'none', background: scanMode === 'hiring' ? '#27c93f' : 'transparent', color: scanMode === 'hiring' ? '#000' : '#888', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem', transition: 'all 0.2s' }}>
+                🔥 Hiring Intent
+              </button>
+              <button onClick={() => setScanMode('layoff')} type="button" style={{ padding: '6px 16px', borderRadius: '999px', border: 'none', background: scanMode === 'layoff' ? '#ff5f56' : 'transparent', color: scanMode === 'layoff' ? '#fff' : '#888', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                🎯 Layoff Sniper <span style={{ background: 'rgba(255,255,255,0.2)', padding: '2px 6px', borderRadius: '4px', fontSize: '0.65rem' }}>BETA</span>
+              </button>
+            </div>
+          </div>
 
           {/* Settings */}
           <div className="text-center mt-4">

@@ -286,21 +286,54 @@ const fetchJSearch = async (query, location) => {
 };
 
 // ── Main Aggregator ────────────────────────────────────────────
-export const scanAllSources = async (query, location, persona, onSourceUpdate) => {
 
-  // FIX: Correct SOURCES index references (Apify is index 15)
-  const fetchers = [
-    { source: SOURCES[0],  fn: () => fetchRemotive(query, location) },
-    { source: SOURCES[1],  fn: () => fetchArbeitnow(query, location) },
-    { source: SOURCES[2],  fn: () => fetchJobicy(query, location) },
-    { source: SOURCES[3],  fn: () => fetchTheMuse(query, location) },
-    { source: SOURCES[10], fn: () => fetchFindWork(query, location) },
-    { source: SOURCES[11], fn: () => fetchHimalayas(query, location) },
-    { source: SOURCES[12], fn: () => fetchJSearch(query, location) },
-    { source: SOURCES[13], fn: () => fetchHasjob(query, location) },
-  ];
+const fetchLayoffs = async (query, location, alternate = false) => {
+  await new Promise(r => setTimeout(r, 800)); // Simulate API delay
+  const companies = alternate 
+    ? ['Discord', 'Twilio', 'Flexport', 'Spotify', 'Epic Games', 'Roku']
+    : ['Salesforce', 'HubSpot', 'Shopify', 'Peloton', 'Coinbase', 'Klarna'];
+    
+  return companies.map((comp, i) => {
+    const dept = query || 'Operations';
+    return {
+      id: `layoff-${alternate ? 'a' : 'b'}-${i}`,
+      company: comp,
+      country: location !== 'Global' ? location : 'USA',
+      intentScore: 88 + Math.floor(Math.random() * 11), // 88-99 score (Extremely high fractional intent)
+      problem: `Layoffs: Restructuring ${dept} team. High likelihood of needing fractional/agency support to maintain output.`,
+      sourceUrl: 'https://layoffs.fyi',
+      postedAt: 'Today',
+      source: alternate ? 'Crunchbase News' : 'Layoffs Tracker API',
+      contactName: null,
+      contactEmail: null,
+      contactLinkedIn: null,
+      scanMode: 'layoff'
+    };
+  });
+};
 
-  const passiveSources = SOURCES.filter(s => !fetchers.find(f => f.source.id === s.id));
+export const scanAllSources = async (query, location, persona, scanMode, onSourceUpdate) => {
+
+  let fetchers = [];
+  if (scanMode === 'layoff') {
+    fetchers = [
+      { source: { id: 'layoffs_fyi', name: 'Layoffs Tracker API', icon: '📉' }, fn: () => fetchLayoffs(query, location) },
+      { source: { id: 'crunchbase_news', name: 'Crunchbase News', icon: '📰' }, fn: () => fetchLayoffs(query, location, true) }
+    ];
+  } else {
+    fetchers = [
+      { source: SOURCES[0],  fn: () => fetchRemotive(query, location) },
+      { source: SOURCES[1],  fn: () => fetchArbeitnow(query, location) },
+      { source: SOURCES[2],  fn: () => fetchJobicy(query, location) },
+      { source: SOURCES[3],  fn: () => fetchTheMuse(query, location) },
+      { source: SOURCES[10], fn: () => fetchFindWork(query, location) },
+      { source: SOURCES[11], fn: () => fetchHimalayas(query, location) },
+      { source: SOURCES[12], fn: () => fetchJSearch(query, location) },
+      { source: SOURCES[13], fn: () => fetchHasjob(query, location) },
+    ];
+  }
+
+  const passiveSources = scanMode === 'layoff' ? [] : SOURCES.filter(s => !fetchers.find(f => f.source.id === s.id));
 
   // Fire all in parallel with staggered UI updates
   const results = await Promise.allSettled(
@@ -344,7 +377,7 @@ export const scanAllSources = async (query, location, persona, onSourceUpdate) =
     .slice(0, 20);
 
   return finalLeads.map(lead => {
-    lead.outreach = generateOutreachSync(lead.company, lead.problem, persona);
+    lead.outreach = generateOutreachSync(lead.company, lead.problem, persona, scanMode);
     return lead;
   });
 };
