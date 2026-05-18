@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { company, title, contactName, persona } = body;
+    const { company, title, contactName, persona, isFollowUp } = body;
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
@@ -20,13 +20,24 @@ export async function POST(request: NextRequest) {
 
     const contactPart = contactName ? ` Address the email to ${contactName}.` : ' Address the email to the Hiring Team.';
     const userPersona = persona || 'B2B agency';
-    const prompt = `You are a founder of a ${userPersona}. Write a highly professional, well-structured cold email for a company called "${company}" that is hiring for "${title}".${contactPart} 
-    Format it exactly like a real email with line breaks. 
-    1. Start with a greeting (e.g. Hi [Name],)
-    2. Mention you saw they are hiring for the role and explain how your specific ${userPersona} services can help them achieve the same goals faster, cheaper, or without the overhead of an in-house hire.
-    3. Keep the body to 2-3 concise paragraphs.
-    4. End with a professional sign-off (e.g. Best regards,\n[Your Name]). 
-    Do NOT include a subject line in the output.`;
+    
+    let prompt = '';
+    if (isFollowUp) {
+      prompt = `You are a founder of a ${userPersona}. Write a highly professional, short follow-up cold email for a company called "${company}" that you contacted a few days ago regarding their open "${title}" role.${contactPart}
+      Format it exactly like a real email with line breaks. 
+      1. Start with a greeting (e.g. Hi [Name],)
+      2. Keep it extremely brief (2-3 sentences max). Ask if they have made any progress on the hire, or if they would be open to a quick chat this week about how your ${userPersona} services can solve their problem faster and cheaper.
+      3. End with a professional sign-off (e.g. Best regards,\n[Your Name]). 
+      Do NOT include a subject line in the output.`;
+    } else {
+      prompt = `You are a founder of a ${userPersona}. Write a highly professional, well-structured cold email for a company called "${company}" that is hiring for "${title}".${contactPart} 
+      Format it exactly like a real email with line breaks. 
+      1. Start with a greeting (e.g. Hi [Name],)
+      2. Mention you saw they are hiring for the role and explain how your specific ${userPersona} services can help them achieve the same goals faster, cheaper, or without the overhead of an in-house hire.
+      3. Keep the body to 2-3 concise paragraphs.
+      4. End with a professional sign-off (e.g. Best regards,\n[Your Name]). 
+      Do NOT include a subject line in the output.`;
+    }
 
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 

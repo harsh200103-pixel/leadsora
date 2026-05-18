@@ -96,10 +96,10 @@ function Dashboard() {
     finally { setIsScanning(false); setScanStatus(''); }
   };
 
-  const generateAIOutreach = async (lead: any) => {
+  const generateAIOutreach = async (lead: any, isFollowUp = false) => {
     if (generatingId) return; setGeneratingId(lead.id);
     try {
-      const res = await fetch('/api/generate-outreach', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ company: lead.company, title: lead.problem?.replace('Hiring: ', '') || '', contactName: lead.contactName || null, persona: userPersona }) });
+      const res = await fetch('/api/generate-outreach', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ company: lead.company, title: lead.problem?.replace('Hiring: ', '') || '', contactName: lead.contactName || null, persona: userPersona, isFollowUp: isFollowUp || (lead.status || 'New') === 'Contacted' }) });
       const data = await res.json();
       if (data.outreach) setAiOutreach(prev => ({ ...prev, [lead.id]: data.outreach }));
     } catch (err) { console.error(err); } finally { setGeneratingId(null); }
@@ -267,7 +267,7 @@ function Dashboard() {
                           {aiOutreach[lead.id] && <span style={{ position: 'absolute', top: '-10px', left: '12px', background: 'linear-gradient(135deg,#7c3aed,#4facfe)', color: '#fff', fontSize: '0.65rem', padding: '2px 8px', borderRadius: '999px', fontWeight: 700 }}>✨ AI Generated</span>}
                           <p className="ai-text-mobile" style={{ fontSize: '0.875rem', color: aiOutreach[lead.id] ? '#e2e8f0' : '#aaa' }}><em>"{aiOutreach[lead.id] || lead.outreach}"</em></p>
                           <div className="ai-actions-mobile" style={{ position: 'absolute', top: '0.75rem', right: '0.75rem', display: 'flex', gap: '0.75rem' }}>
-                            <button onClick={() => generateAIOutreach(lead)} disabled={!!generatingId} style={{ background: 'none', border: 'none', cursor: generatingId ? 'not-allowed' : 'pointer', color: aiOutreach[lead.id] ? '#a78bfa' : '#555', padding: 0 }} title="Generate AI Outreach">
+                            <button onClick={() => generateAIOutreach(lead)} disabled={!!generatingId} style={{ background: 'none', border: 'none', cursor: generatingId ? 'not-allowed' : 'pointer', color: (lead.status || 'New') === 'Contacted' ? '#ffbd2e' : (aiOutreach[lead.id] ? '#a78bfa' : '#555'), padding: 0 }} title={(lead.status || 'New') === 'Contacted' ? "Generate Follow-Up Pitch" : "Generate AI Outreach"}>
                               {generatingId === lead.id ? <Loader2 size={18} className="animate-spin" /> : <Sparkles size={18} />}
                             </button>
                             <a href={`https://mail.google.com/mail/?view=cm&fs=1&to=${foundEmails[lead.id]?.[0]?.value || lead.contactEmail || ''}&su=${encodeURIComponent(`Exploring synergies: ${lead.problem?.replace('Hiring: ', '') || 'Open Role'} at ${lead.company}`)}&body=${encodeURIComponent(aiOutreach[lead.id] || lead.outreach)}`} target="_blank" rel="noreferrer" style={{ color: '#4facfe', padding: 0 }} title="Open in Gmail"><Mail size={18} /></a>
@@ -352,6 +352,9 @@ function Dashboard() {
                                 {fetchingEmailsFor === lead.id ? '...' : 'Find Email'}
                               </button>
                               <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                <button onClick={() => generateAIOutreach(lead)} disabled={!!generatingId} style={{ background: 'none', border: 'none', cursor: 'pointer', color: col === 'Contacted' ? '#ffbd2e' : '#a78bfa', padding: '4px' }} title={col === 'Contacted' ? "Generate AI Follow-Up" : "Generate AI Outreach"}>
+                                  {generatingId === lead.id ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
+                                </button>
                                 {foundEmails[lead.id]?.[0]?.value && (
                                   <a href={`https://mail.google.com/mail/?view=cm&fs=1&to=${foundEmails[lead.id]?.[0]?.value}&su=${encodeURIComponent(`Exploring synergies at ${lead.company}`)}&body=${encodeURIComponent(aiOutreach[lead.id] || lead.outreach)}`} target="_blank" rel="noreferrer" style={{ color: '#4facfe', background: 'rgba(79, 172, 254, 0.1)', padding: '4px 8px', borderRadius: '4px' }} title="Open in Gmail"><Mail size={14} /></a>
                                 )}
