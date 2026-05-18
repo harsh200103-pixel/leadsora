@@ -261,7 +261,10 @@ function Dashboard() {
                                       <strong style={{ color: '#fff' }}>{em.first_name} {em.last_name}</strong> {em.position && <span style={{ color: '#888' }}>- {em.position}</span>}
                                     </div>
                                     <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                                      <a href={`mailto:${em.value}`} style={{ color: '#4facfe', textDecoration: 'none' }}>{em.value}</a>
+                                      <a href={`mailto:${em.value}?subject=${encodeURIComponent(`Exploring synergies: ${lead.problem?.replace('Hiring: ', '') || 'Open Role'} at ${lead.company}`)}&body=${encodeURIComponent(aiOutreach[lead.id] || lead.outreach)}`} style={{ color: '#4facfe', textDecoration: 'none' }} title="Send Pitch">
+                                        <Mail size={14} style={{ marginRight: '4px', display: 'inline-block', verticalAlign: 'middle' }}/> 
+                                        {em.value}
+                                      </a>
                                       <button onClick={() => handleCopy(`em-${idx}-${em.value}`, em.value)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: copiedId === `em-${idx}-${em.value}` ? '#27c93f' : '#666', padding: '0 4px' }} title="Copy Email">
                                         {copiedId === `em-${idx}-${em.value}` ? <Check size={14} /> : <Copy size={14} />}
                                       </button>
