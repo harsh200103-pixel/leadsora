@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { company, title, contactName, persona, isFollowUp } = body;
+    const { company, title, contactName, persona, isFollowUp, scanMode } = body;
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
