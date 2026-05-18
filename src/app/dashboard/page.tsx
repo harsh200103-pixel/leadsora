@@ -48,7 +48,16 @@ function Dashboard() {
 
   const saveHunterKey = (val: string) => { setHunterKey(val); localStorage.setItem('df_hunter_api_key', val); };
   const saveRapidApiKey = (val: string) => { setRapidApiKey(val); localStorage.setItem('df_rapid_api_key', val); };
-  const savePersona = (val: string) => { setUserPersona(val); localStorage.setItem('df_user_persona', val); };
+  const savePersona = (val: string) => { 
+    setUserPersona(val); 
+    localStorage.setItem('df_user_persona', val); 
+    if (val === 'Software Development Agency') setSearchQuery('Software Engineering');
+    else if (val === 'Marketing & SEO Agency') setSearchQuery('Marketing');
+    else if (val === 'Recruitment & Headhunting Firm') setSearchQuery('Hiring');
+    else if (val === 'B2B SaaS Company') setSearchQuery('Operations');
+    else if (val === 'Freelance Consultant') setSearchQuery('Consultant');
+    else if (val === 'Lead Generation Agency') setSearchQuery('Sales');
+  };
 
   const timeAgo = (dateString: string) => {
     if (!dateString) return 'Recently';
