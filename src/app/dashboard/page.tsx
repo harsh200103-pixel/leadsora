@@ -57,6 +57,14 @@ function Dashboard() {
     else if (val === 'B2B SaaS Company') setSearchQuery('Operations');
     else if (val === 'Freelance Consultant') setSearchQuery('Consultant');
     else if (val === 'Lead Generation Agency') setSearchQuery('Sales');
+    else if (val === 'Design & Branding Agency') setSearchQuery('Design');
+    else if (val === 'Video Production & Editing') setSearchQuery('Video');
+    else if (val === 'Financial & Accounting Services') setSearchQuery('Accounting');
+    else if (val === 'Cybersecurity Firm') setSearchQuery('Security');
+    else if (val === 'Web3 & Blockchain Development') setSearchQuery('Web3');
+    else if (val === 'PR & Communications Agency') setSearchQuery('Public Relations');
+    else if (val === 'HR & Payroll Consultancy') setSearchQuery('HR');
+    else if (val === 'IT Managed Services (MSP)') setSearchQuery('IT Support');
   };
 
   const timeAgo = (dateString: string) => {
@@ -158,6 +166,9 @@ function Dashboard() {
               <option value="B2B SaaS" /><option value="Cybersecurity" /><option value="FinTech" />
               <option value="Recruitment" /><option value="UI/UX Design" /><option value="Copywriting" />
               <option value="Sales" /><option value="E-commerce" /><option value="Video Editing" />
+              <option value="Blockchain" /><option value="Web3" /><option value="Accounting" />
+              <option value="Public Relations" /><option value="HR" /><option value="IT Support" />
+              <option value="DevOps" /><option value="Mobile App Development" /><option value="Content Creation" />
             </datalist>
             <select className="simulator-input" style={{ maxWidth: '150px' }} value={location} onChange={e => setLocation(e.target.value)}>
               <option value="Global">Global</option><option value="USA">USA</option><option value="UK">UK</option>
@@ -196,6 +207,14 @@ function Dashboard() {
                     <option value="B2B SaaS Company">B2B SaaS Company</option>
                     <option value="Freelance Consultant">Freelance Consultant</option>
                     <option value="Lead Generation Agency">Lead Generation Agency</option>
+                    <option value="Design & Branding Agency">Design & Branding Agency</option>
+                    <option value="Video Production & Editing">Video Production & Editing</option>
+                    <option value="Financial & Accounting Services">Financial & Accounting Services</option>
+                    <option value="Cybersecurity Firm">Cybersecurity Firm</option>
+                    <option value="Web3 & Blockchain Development">Web3 & Blockchain Development</option>
+                    <option value="PR & Communications Agency">PR & Communications Agency</option>
+                    <option value="HR & Payroll Consultancy">HR & Payroll Consultancy</option>
+                    <option value="IT Managed Services (MSP)">IT Managed Services (MSP)</option>
                   </select>
                 </div>
               </div>
