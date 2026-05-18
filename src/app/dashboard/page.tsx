@@ -18,6 +18,7 @@ function Dashboard() {
   const [scanStatus, setScanStatus] = useState('');
   const [hunterKey, setHunterKey] = useState('b937eb0f532629a23bc002872195055922026f68'); // Default to provided key
   const [rapidApiKey, setRapidApiKey] = useState('');
+  const [viewMode, setViewMode] = useState<'list' | 'pipeline'>('list');
   const [showSettings, setShowSettings] = useState(false);
   const [highIntentOnly, setHighIntentOnly] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -197,14 +198,19 @@ function Dashboard() {
                   <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
                     <input type="checkbox" checked={highIntentOnly} onChange={e => setHighIntentOnly(e.target.checked)} style={{ accentColor: '#ffbd2e' }} /> High Intent Only (85+)
                   </label>
+                  <div style={{ display: 'flex', background: '#000', border: '1px solid #333', borderRadius: '6px', overflow: 'hidden' }}>
+                    <button onClick={() => setViewMode('list')} style={{ background: viewMode === 'list' ? '#333' : 'transparent', color: viewMode === 'list' ? '#fff' : '#888', border: 'none', padding: '0.25rem 0.75rem', fontSize: '0.8rem', cursor: 'pointer' }}>List View</button>
+                    <button onClick={() => setViewMode('pipeline')} style={{ background: viewMode === 'pipeline' ? '#333' : 'transparent', color: viewMode === 'pipeline' ? '#fff' : '#888', border: 'none', padding: '0.25rem 0.75rem', fontSize: '0.8rem', cursor: 'pointer' }}>Pipeline CRM</button>
+                  </div>
                   <button onClick={exportToCSV} className="btn-secondary" style={{ padding: '0.25rem 0.75rem', fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Download size={14} /> Export CSV</button>
                   <button onClick={() => { if (window.confirm('Clear leads?')) setLeads([]); }} className="btn-secondary" style={{ padding: '0.25rem 0.75rem', fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'transparent', border: '1px solid #333', color: '#888' }}><Trash2 size={14} /> Clear</button>
                 </div>
               </div>
 
               <div className="dashboard-body" style={{ background: '#111' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                  {(highIntentOnly ? leads.filter(l => l.intentScore >= 85) : leads).map(lead => (
+                {viewMode === 'list' ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    {(highIntentOnly ? leads.filter(l => l.intentScore >= 85) : leads).map(lead => (
                     <div key={lead.id} className="glass-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
                       <div style={{ flex: 1, minWidth: '300px' }}>
                         <h4 style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>{lead.company} <span style={{ fontSize: '0.875rem', color: '#888' }}>• {lead.country}</span></h4>
@@ -276,6 +282,42 @@ function Dashboard() {
                     </div>
                   ))}
                 </div>
+              ) : (
+                <div style={{ display: 'flex', gap: '1rem', overflowX: 'auto', paddingBottom: '1rem', minHeight: '600px' }}>
+                  {['New', 'Contacted', 'In Discussion', 'Closed'].map(col => (
+                    <div key={col} 
+                         onDragOver={e => e.preventDefault()} 
+                         onDrop={e => {
+                           const leadId = e.dataTransfer.getData('text/plain');
+                           setLeads(prev => prev.map(l => l.id === leadId ? { ...l, status: col } : l));
+                         }}
+                         style={{ flex: 1, minWidth: '320px', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', padding: '1rem', border: '1px dashed #333' }}>
+                      <h3 style={{ textTransform: 'uppercase', fontSize: '0.8rem', color: '#888', marginBottom: '1rem', letterSpacing: '1px', display: 'flex', justifyContent: 'space-between' }}>
+                        {col} <span style={{ background: '#000', padding: '2px 8px', borderRadius: '12px' }}>{(highIntentOnly ? leads.filter(l => l.intentScore >= 85) : leads).filter(l => (l.status || 'New') === col).length}</span>
+                      </h3>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                        {(highIntentOnly ? leads.filter(l => l.intentScore >= 85) : leads).filter(l => (l.status || 'New') === col).map(lead => (
+                          <div key={lead.id} draggable onDragStart={e => e.dataTransfer.setData('text/plain', lead.id)} className="glass-card" style={{ cursor: 'grab', padding: '1rem', border: '1px solid #222', background: 'rgba(0,0,0,0.4)' }}>
+                            <h4 style={{ fontSize: '1rem', marginBottom: '0.25rem', color: '#fff' }}>{lead.company}</h4>
+                            <p style={{ fontSize: '0.8rem', color: '#a1a1aa', marginBottom: '0.75rem', lineHeight: 1.3 }}>{lead.problem}</p>
+                            
+                            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <button onClick={() => fetchEmailsWithHunter(lead)} disabled={fetchingEmailsFor === lead.id} style={{ fontSize: '0.7rem', color: '#fff', background: '#ffbd2e', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}>
+                                {fetchingEmailsFor === lead.id ? '...' : 'Find Email'}
+                              </button>
+                              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                {foundEmails[lead.id]?.[0]?.value && (
+                                  <a href={`mailto:${foundEmails[lead.id]?.[0]?.value}?subject=${encodeURIComponent(`Exploring synergies at ${lead.company}`)}&body=${encodeURIComponent(aiOutreach[lead.id] || lead.outreach)}`} style={{ color: '#4facfe', background: 'rgba(79, 172, 254, 0.1)', padding: '4px 8px', borderRadius: '4px' }}><Mail size={14} /></a>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
               </div>
             </div>
           )}
