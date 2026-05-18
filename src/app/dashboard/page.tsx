@@ -5,6 +5,22 @@ import { useAuth } from '../context/AuthContext';
 import Logo from '../../components/Logo';
 import { scanAllSources } from '../../utils/leadSources';
 
+const Typewriter = ({ text, delay = 10 }: { text: string, delay?: number }) => {
+  const [currentText, setCurrentText] = useState('');
+  const [currentIndex, setCurrentIndex] = useState(0);
+  useEffect(() => { setCurrentText(''); setCurrentIndex(0); }, [text]);
+  useEffect(() => {
+    if (currentIndex < text.length) {
+      const timeout = setTimeout(() => {
+        setCurrentText(prev => prev + text[currentIndex]);
+        setCurrentIndex(prev => prev + 1);
+      }, delay);
+      return () => clearTimeout(timeout);
+    }
+  }, [currentIndex, text, delay]);
+  return <span>{currentText}</span>;
+};
+
 function Dashboard() {
   const { user, logout, isLoading: authLoading } = useAuth();
 
@@ -265,7 +281,7 @@ function Dashboard() {
                         {/* Outreach Box */}
                         <div className="ai-box-mobile" style={{ background: 'rgba(0,0,0,0.3)', padding: '1rem', borderRadius: '8px', border: `1px solid ${aiOutreach[lead.id] ? '#7c3aed55' : '#333'}`, position: 'relative', marginTop: '1rem' }}>
                           {aiOutreach[lead.id] && <span style={{ position: 'absolute', top: '-10px', left: '12px', background: 'linear-gradient(135deg,#7c3aed,#4facfe)', color: '#fff', fontSize: '0.65rem', padding: '2px 8px', borderRadius: '999px', fontWeight: 700 }}>✨ AI Generated</span>}
-                          <p className="ai-text-mobile" style={{ fontSize: '0.875rem', color: aiOutreach[lead.id] ? '#e2e8f0' : '#aaa' }}><em>"{aiOutreach[lead.id] || lead.outreach}"</em></p>
+                          <p className="ai-text-mobile" style={{ fontSize: '0.875rem', color: aiOutreach[lead.id] ? '#e2e8f0' : '#aaa' }}><em>"{aiOutreach[lead.id] ? <Typewriter text={aiOutreach[lead.id]} /> : lead.outreach}"</em></p>
                           <div className="ai-actions-mobile" style={{ position: 'absolute', top: '0.75rem', right: '0.75rem', display: 'flex', gap: '0.75rem' }}>
                             <button onClick={() => generateAIOutreach(lead)} disabled={!!generatingId} style={{ background: 'none', border: 'none', cursor: generatingId ? 'not-allowed' : 'pointer', color: (lead.status || 'New') === 'Contacted' ? '#ffbd2e' : (aiOutreach[lead.id] ? '#a78bfa' : '#555'), padding: 0 }} title={(lead.status || 'New') === 'Contacted' ? "Generate Follow-Up Pitch" : "Generate AI Outreach"}>
                               {generatingId === lead.id ? <Loader2 size={18} className="animate-spin" /> : <Sparkles size={18} />}
