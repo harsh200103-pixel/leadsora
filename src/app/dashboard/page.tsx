@@ -227,7 +227,7 @@ function Dashboard() {
                             <button onClick={() => generateAIOutreach(lead)} disabled={!!generatingId} style={{ background: 'none', border: 'none', cursor: generatingId ? 'not-allowed' : 'pointer', color: aiOutreach[lead.id] ? '#a78bfa' : '#555', padding: 0 }} title="Generate AI Outreach">
                               {generatingId === lead.id ? <Loader2 size={18} className="animate-spin" /> : <Sparkles size={18} />}
                             </button>
-                            <a href={`mailto:${foundEmails[lead.id]?.[0]?.value || lead.contactEmail || ''}?subject=${encodeURIComponent(`Exploring synergies: ${lead.problem?.replace('Hiring: ', '') || 'Open Role'} at ${lead.company}`)}&body=${encodeURIComponent(aiOutreach[lead.id] || lead.outreach)}`} style={{ color: '#4facfe', padding: 0 }} title="Email"><Mail size={18} /></a>
+                            <a href={`https://mail.google.com/mail/?view=cm&fs=1&to=${foundEmails[lead.id]?.[0]?.value || lead.contactEmail || ''}&su=${encodeURIComponent(`Exploring synergies: ${lead.problem?.replace('Hiring: ', '') || 'Open Role'} at ${lead.company}`)}&body=${encodeURIComponent(aiOutreach[lead.id] || lead.outreach)}`} target="_blank" rel="noreferrer" style={{ color: '#4facfe', padding: 0 }} title="Open in Gmail"><Mail size={18} /></a>
                             <button onClick={() => handleCopy(lead.id, aiOutreach[lead.id] || lead.outreach)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: copiedId === lead.id ? '#27c93f' : '#666', padding: 0 }} title="Copy">{copiedId === lead.id ? <Check size={18} /> : <Copy size={18} />}</button>
                           </div>
                         </div>
@@ -261,7 +261,7 @@ function Dashboard() {
                                       <strong style={{ color: '#fff' }}>{em.first_name} {em.last_name}</strong> {em.position && <span style={{ color: '#888' }}>- {em.position}</span>}
                                     </div>
                                     <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                                      <a href={`mailto:${em.value}?subject=${encodeURIComponent(`Exploring synergies: ${lead.problem?.replace('Hiring: ', '') || 'Open Role'} at ${lead.company}`)}&body=${encodeURIComponent(aiOutreach[lead.id] || lead.outreach)}`} style={{ color: '#4facfe', textDecoration: 'none' }} title="Send Pitch">
+                                      <a href={`https://mail.google.com/mail/?view=cm&fs=1&to=${em.value}&su=${encodeURIComponent(`Exploring synergies: ${lead.problem?.replace('Hiring: ', '') || 'Open Role'} at ${lead.company}`)}&body=${encodeURIComponent(aiOutreach[lead.id] || lead.outreach)}`} target="_blank" rel="noreferrer" style={{ color: '#4facfe', textDecoration: 'none' }} title="Send Pitch in Gmail">
                                         <Mail size={14} style={{ marginRight: '4px', display: 'inline-block', verticalAlign: 'middle' }}/> 
                                         {em.value}
                                       </a>
@@ -310,7 +310,7 @@ function Dashboard() {
                               </button>
                               <div style={{ display: 'flex', gap: '0.5rem' }}>
                                 {foundEmails[lead.id]?.[0]?.value && (
-                                  <a href={`mailto:${foundEmails[lead.id]?.[0]?.value}?subject=${encodeURIComponent(`Exploring synergies at ${lead.company}`)}&body=${encodeURIComponent(aiOutreach[lead.id] || lead.outreach)}`} style={{ color: '#4facfe', background: 'rgba(79, 172, 254, 0.1)', padding: '4px 8px', borderRadius: '4px' }}><Mail size={14} /></a>
+                                  <a href={`https://mail.google.com/mail/?view=cm&fs=1&to=${foundEmails[lead.id]?.[0]?.value}&su=${encodeURIComponent(`Exploring synergies at ${lead.company}`)}&body=${encodeURIComponent(aiOutreach[lead.id] || lead.outreach)}`} target="_blank" rel="noreferrer" style={{ color: '#4facfe', background: 'rgba(79, 172, 254, 0.1)', padding: '4px 8px', borderRadius: '4px' }} title="Open in Gmail"><Mail size={14} /></a>
                                 )}
                               </div>
                             </div>
