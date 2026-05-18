@@ -18,6 +18,7 @@ function Dashboard() {
   const [scanStatus, setScanStatus] = useState('');
   const [hunterKey, setHunterKey] = useState('b937eb0f532629a23bc002872195055922026f68'); // Default to provided key
   const [rapidApiKey, setRapidApiKey] = useState('');
+  const [userPersona, setUserPersona] = useState('Software Development Agency');
   const [viewMode, setViewMode] = useState<'list' | 'pipeline'>('list');
   const [showSettings, setShowSettings] = useState(false);
   const [highIntentOnly, setHighIntentOnly] = useState(false);
@@ -37,6 +38,8 @@ function Dashboard() {
     if (savedHunter) setHunterKey(savedHunter);
     const savedRapid = localStorage.getItem('df_rapid_api_key');
     if (savedRapid) setRapidApiKey(savedRapid);
+    const savedPersona = localStorage.getItem('df_user_persona');
+    if (savedPersona) setUserPersona(savedPersona);
   }, []);
 
   useEffect(() => {
@@ -45,6 +48,7 @@ function Dashboard() {
 
   const saveHunterKey = (val: string) => { setHunterKey(val); localStorage.setItem('df_hunter_api_key', val); };
   const saveRapidApiKey = (val: string) => { setRapidApiKey(val); localStorage.setItem('df_rapid_api_key', val); };
+  const savePersona = (val: string) => { setUserPersona(val); localStorage.setItem('df_user_persona', val); };
 
   const timeAgo = (dateString: string) => {
     if (!dateString) return 'Recently';
@@ -78,7 +82,7 @@ function Dashboard() {
   const generateAIOutreach = async (lead: any) => {
     if (generatingId) return; setGeneratingId(lead.id);
     try {
-      const res = await fetch('/api/generate-outreach', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ company: lead.company, title: lead.problem?.replace('Hiring: ', '') || '', contactName: lead.contactName || null }) });
+      const res = await fetch('/api/generate-outreach', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ company: lead.company, title: lead.problem?.replace('Hiring: ', '') || '', contactName: lead.contactName || null, persona: userPersona }) });
       const data = await res.json();
       if (data.outreach) setAiOutreach(prev => ({ ...prev, [lead.id]: data.outreach }));
     } catch (err) { console.error(err); } finally { setGeneratingId(null); }
@@ -173,6 +177,17 @@ function Dashboard() {
                 <div>
                   <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.5rem', color: '#ccc' }}>RapidAPI Key (JSearch India Leads):</label>
                   <input type="password" value={rapidApiKey} onChange={e => saveRapidApiKey(e.target.value)} placeholder="Enter RapidAPI key..." style={{ width: '280px', padding: '0.5rem', background: '#000', border: '1px solid #333', color: '#fff', borderRadius: '4px' }} />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.5rem', color: '#ccc' }}>Your Business Type (For AI Pitches):</label>
+                  <select value={userPersona} onChange={e => savePersona(e.target.value)} style={{ width: '280px', padding: '0.5rem', background: '#000', border: '1px solid #333', color: '#fff', borderRadius: '4px' }}>
+                    <option value="Software Development Agency">Software Development Agency</option>
+                    <option value="Marketing & SEO Agency">Marketing & SEO Agency</option>
+                    <option value="Recruitment & Headhunting Firm">Recruitment / Headhunting</option>
+                    <option value="B2B SaaS Company">B2B SaaS Company</option>
+                    <option value="Freelance Consultant">Freelance Consultant</option>
+                    <option value="Lead Generation Agency">Lead Generation Agency</option>
+                  </select>
                 </div>
               </div>
             )}
