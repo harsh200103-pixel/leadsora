@@ -11,18 +11,18 @@
  * of points to the final intent score.
  */
 const WEIGHTS = {
-  BASE: 30,                // Every lead starts at 30 (baseline)
-  JOB_RECENCY_TODAY: 24,   // Posted today = extremely hot
-  JOB_RECENCY_1DAY: 18,    // Posted yesterday
-  JOB_RECENCY_2DAY: 12,    // Posted 2 days ago
-  JOB_RECENCY_3DAY: 6,     // Posted 3 days ago
-  URGENCY_KEYWORD: 12,     // "urgent", "ASAP", "immediately"
-  SENIORITY_HIGH: 9,       // "Head of", "Director", "VP", "C-level"
-  SENIORITY_MID: 5,        // "Senior", "Lead", "Principal"
+  BASE: 45,                // Every lead starts at 45 (baseline)
+  JOB_RECENCY_TODAY: 30,   // Posted today = extremely hot
+  JOB_RECENCY_1DAY: 20,    // Posted yesterday
+  JOB_RECENCY_2DAY: 15,    // Posted 2 days ago
+  JOB_RECENCY_3DAY: 10,    // Posted 3 days ago
+  URGENCY_KEYWORD: 15,     // "urgent", "ASAP", "immediately"
+  SENIORITY_HIGH: 12,      // "Head of", "Director", "VP", "C-level"
+  SENIORITY_MID: 8,        // "Senior", "Lead", "Principal"
   COMPANY_GROWTH: 8,       // Series A–D, equity, funding signals
-  CONTRACT_AGENCY: 7,      // "contract", "freelance", "agency"
-  STARTUP_SIGNAL: 4,       // "startup", "fast-paced", "scaling"
-  REMOTE_SIGNAL: 2,        // "remote" (slightly higher urgency)
+  CONTRACT_AGENCY: 15,     // "contract", "freelance", "agency" (Massive signal for B2B)
+  STARTUP_SIGNAL: 6,       // "startup", "fast-paced", "scaling"
+  REMOTE_SIGNAL: 4,        // "remote" (slightly higher urgency)
   MULTIPLE_ROLES: 5,       // Multiple openings mentioned
 };
 
