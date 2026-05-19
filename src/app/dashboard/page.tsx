@@ -380,6 +380,13 @@ function Dashboard() {
                             <h4 style={{ fontSize: '1rem', marginBottom: '0.25rem', color: '#fff' }}>{lead.company}</h4>
                             <p style={{ fontSize: '0.8rem', color: '#a1a1aa', marginBottom: '0.75rem', lineHeight: 1.3 }}>{lead.problem}</p>
                             
+                            {aiOutreach[lead.id] && (
+                              <div style={{ background: 'rgba(124, 58, 237, 0.1)', padding: '0.5rem', borderRadius: '4px', marginBottom: '0.75rem', border: '1px solid rgba(124, 58, 237, 0.3)' }}>
+                                <span style={{ color: '#a78bfa', fontSize: '0.65rem', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '2px', display: 'block' }}>✨ AI Draft</span>
+                                <p style={{ fontSize: '0.75rem', color: '#e2e8f0', margin: 0 }}><em><Typewriter text={aiOutreach[lead.id]} /></em></p>
+                              </div>
+                            )}
+                            
                             <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'space-between', alignItems: 'center' }}>
                               <button onClick={() => fetchEmailsWithHunter(lead)} disabled={fetchingEmailsFor === lead.id} style={{ fontSize: '0.7rem', color: '#fff', background: '#ffbd2e', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}>
                                 {fetchingEmailsFor === lead.id ? '...' : 'Find Email'}
