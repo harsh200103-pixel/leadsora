@@ -45,6 +45,7 @@ function Dashboard() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [aiOutreach, setAiOutreach] = useState<{[key: string]: string}>({});
   const [foundEmails, setFoundEmails] = useState<{[key: string]: any[]}>({});
+  const [hunterData, setHunterData] = useState<{[key: string]: any}>({});
   const [fetchingEmailsFor, setFetchingEmailsFor] = useState<string | null>(null);
   const [generatingId, setGeneratingId] = useState<string | null>(null);
   const [leads, setLeads] = useState<any[]>([]);
@@ -136,6 +137,7 @@ function Dashboard() {
       
       if (data?.data?.emails?.length > 0) {
         setFoundEmails(prev => ({ ...prev, [lead.id]: data.data.emails }));
+        setHunterData(prev => ({ ...prev, [lead.id]: data.data }));
       } else {
         setFoundEmails(prev => ({ ...prev, [lead.id]: [] })); // Found nothing
       }
@@ -332,7 +334,7 @@ function Dashboard() {
                           <p className="ai-text-mobile" style={{ fontSize: '0.875rem', color: aiOutreach[lead.id] ? '#e2e8f0' : '#aaa' }}><em>"{aiOutreach[lead.id] ? <Typewriter text={aiOutreach[lead.id]} /> : lead.outreach}"</em></p>
                           {/* Omnichannel Blitz / AI Actions */}
                           <div className="ai-actions-mobile" style={{ position: 'absolute', top: '0.75rem', right: '0.75rem', display: 'flex', gap: '0.75rem' }}>
-                            <button onClick={() => { setBlitzLead(lead); generateAIOutreach(lead); }} disabled={!!generatingId} style={{ background: 'linear-gradient(135deg, #7c3aed, #4facfe)', color: '#fff', border: 'none', cursor: generatingId ? 'not-allowed' : 'pointer', padding: '4px 12px', borderRadius: '4px', fontWeight: 'bold', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '4px' }} title="Omnichannel Blitz">
+                            <button onClick={() => { setBlitzLead(lead); if(!aiOutreach[lead.id]) generateAIOutreach(lead); if(!foundEmails[lead.id] && hunterKey) fetchEmailsWithHunter(lead); }} disabled={!!generatingId} style={{ background: 'linear-gradient(135deg, #7c3aed, #4facfe)', color: '#fff', border: 'none', cursor: generatingId ? 'not-allowed' : 'pointer', padding: '4px 12px', borderRadius: '4px', fontWeight: 'bold', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '4px' }} title="Omnichannel Blitz">
                               {generatingId === lead.id ? <Loader2 size={14} className="animate-spin" /> : <><Sparkles size={14} /> Blitz</>}
                             </button>
                             <a href={`https://mail.google.com/mail/?view=cm&fs=1&to=${foundEmails[lead.id]?.[0]?.value || lead.contactEmail || ''}&su=${encodeURIComponent(`Exploring synergies: ${lead.problem?.replace('Hiring: ', '') || 'Open Role'} at ${lead.company}`)}&body=${encodeURIComponent(aiOutreach[lead.id] || lead.outreach)}`} target="_blank" rel="noreferrer" style={{ color: '#4facfe', padding: 0 }} title="Open in Gmail"><Mail size={18} /></a>
@@ -424,7 +426,7 @@ function Dashboard() {
                                 {fetchingEmailsFor === lead.id ? '...' : 'Find Email'}
                               </button>
                               <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                <button onClick={() => { setBlitzLead(lead); generateAIOutreach(lead); }} disabled={!!generatingId} style={{ background: 'linear-gradient(135deg, #7c3aed, #4facfe)', color: '#fff', border: 'none', cursor: 'pointer', padding: '4px 8px', borderRadius: '4px', fontSize: '0.7rem', display: 'flex', alignItems: 'center', gap: '4px' }} title="Omnichannel Blitz">
+                                <button onClick={() => { setBlitzLead(lead); if(!aiOutreach[lead.id]) generateAIOutreach(lead); if(!foundEmails[lead.id] && hunterKey) fetchEmailsWithHunter(lead); }} disabled={!!generatingId} style={{ background: 'linear-gradient(135deg, #7c3aed, #4facfe)', color: '#fff', border: 'none', cursor: 'pointer', padding: '4px 8px', borderRadius: '4px', fontSize: '0.7rem', display: 'flex', alignItems: 'center', gap: '4px' }} title="Omnichannel Blitz">
                                   {generatingId === lead.id ? <Loader2 size={12} className="animate-spin" /> : <><Sparkles size={12} /> Blitz</>}
                                 </button>
                                 {foundEmails[lead.id]?.[0]?.value && (
@@ -461,6 +463,9 @@ function Dashboard() {
                 </div>
                 <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem' }}>
                   <a href={`https://mail.google.com/mail/?view=cm&fs=1&to=${foundEmails[blitzLead.id]?.[0]?.value || blitzLead.contactEmail || ''}&su=${encodeURIComponent(`Exploring synergies at ${blitzLead.company}`)}&body=${encodeURIComponent(aiOutreach[blitzLead.id] || '')}`} target="_blank" rel="noreferrer" style={{ background: '#4facfe', color: '#000', padding: '8px 16px', borderRadius: '6px', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px' }}><Mail size={16}/> Open in Gmail</a>
+                  {!foundEmails[blitzLead.id] && hunterKey && (
+                    <span style={{ fontSize: '0.75rem', color: '#888', display: 'flex', alignItems: 'center' }}>Searching for email... <Loader2 size={12} className="animate-spin" style={{ marginLeft: '4px' }} /></span>
+                  )}
                 </div>
               </div>
 
@@ -471,7 +476,14 @@ function Dashboard() {
                   {`Hi! Saw the news about ${blitzLead.company} and wanted to connect. My ${userPersona} helps companies exactly like yours hit their targets faster via fractional execution. Sent you an email with a custom ROI roadmap!`}
                 </div>
                 <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem' }}>
-                  <button onClick={() => { navigator.clipboard.writeText(`Hi! Saw the news about ${blitzLead.company} and wanted to connect. My ${userPersona} helps companies exactly like yours hit their targets faster via fractional execution. Sent you an email with a custom ROI roadmap!`); window.open(`https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(blitzLead.company)}`, '_blank'); }} style={{ background: '#0a66c2', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600 }}>Copy & Search LinkedIn</button>
+                  <button onClick={() => { 
+                    navigator.clipboard.writeText(`Hi! Saw the news about ${blitzLead.company} and wanted to connect. My ${userPersona} helps companies exactly like yours hit their targets faster via fractional execution. Sent you an email with a custom ROI roadmap!`); 
+                    const personLinkedIn = foundEmails[blitzLead.id]?.[0]?.linkedin;
+                    const targetLinkedIn = personLinkedIn || `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(blitzLead.company)}`;
+                    window.open(targetLinkedIn, '_blank'); 
+                  }} style={{ background: '#0a66c2', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600 }}>
+                    {foundEmails[blitzLead.id]?.[0]?.linkedin ? 'Copy & Open Profile' : 'Copy & Search LinkedIn'}
+                  </button>
                 </div>
               </div>
 
@@ -482,7 +494,15 @@ function Dashboard() {
                   {`Huge fan of what you're building at ${blitzLead.company}. Just sent over an email outlining exactly how we can step in and help you hit your scaling targets. Check your inbox!`}
                 </div>
                 <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem' }}>
-                   <button onClick={() => { navigator.clipboard.writeText(`Huge fan of what you're building at ${blitzLead.company}. Just sent over an email outlining exactly how we can step in and help you hit your scaling targets. Check your inbox!`); window.open(`https://twitter.com/search?q=${encodeURIComponent(blitzLead.company)}&src=typed_query&f=user`, '_blank'); }} style={{ background: '#1da1f2', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600 }}>Copy & Search Twitter</button>
+                   <button onClick={() => { 
+                     navigator.clipboard.writeText(`Huge fan of what you're building at ${blitzLead.company}. Just sent over an email outlining exactly how we can step in and help you hit your scaling targets. Check your inbox!`); 
+                     const personTwitter = foundEmails[blitzLead.id]?.[0]?.twitter;
+                     const companyTwitter = hunterData[blitzLead.id]?.twitter;
+                     const targetTwitter = personTwitter ? `https://twitter.com/${personTwitter}` : companyTwitter ? `https://twitter.com/${companyTwitter}` : `https://twitter.com/search?q=${encodeURIComponent(blitzLead.company)}&src=typed_query&f=user`;
+                     window.open(targetTwitter, '_blank'); 
+                   }} style={{ background: '#1da1f2', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600 }}>
+                     {foundEmails[blitzLead.id]?.[0]?.twitter || hunterData[blitzLead.id]?.twitter ? 'Copy & Open Profile' : 'Copy & Search Twitter'}
+                   </button>
                 </div>
               </div>
 
