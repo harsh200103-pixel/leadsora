@@ -36,6 +36,7 @@ function Dashboard() {
   const [rapidApiKey, setRapidApiKey] = useState('');
   const [userPersona, setUserPersona] = useState('Software Development Agency');
   const [viewMode, setViewMode] = useState<'list' | 'pipeline'>('list');
+  const [showSettings, setShowSettings] = useState(false);
   const [scanMode, setScanMode] = useState<'hiring' | 'layoff' | 'vc_whale' | 'stale_job'>('hiring');
   const [searchType, setSearchType] = useState<'keyword' | 'cloner'>('keyword');
   const [ghostModeEnabled, setGhostModeEnabled] = useState(false);
