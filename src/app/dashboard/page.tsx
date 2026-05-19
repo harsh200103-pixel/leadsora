@@ -37,7 +37,7 @@ function Dashboard() {
   const [userPersona, setUserPersona] = useState('Software Development Agency');
   const [viewMode, setViewMode] = useState<'list' | 'pipeline'>('list');
   const [showSettings, setShowSettings] = useState(false);
-  const [scanMode, setScanMode] = useState<'hiring' | 'layoff'>('hiring');
+  const [scanMode, setScanMode] = useState<'hiring' | 'layoff' | 'vc_whale' | 'stale_job'>('hiring');
   const [highIntentOnly, setHighIntentOnly] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [aiOutreach, setAiOutreach] = useState<{[key: string]: string}>({});
@@ -195,17 +195,23 @@ function Dashboard() {
               <option value="France">France</option><option value="Netherlands">Netherlands</option>
               <option value="Ireland">Ireland</option><option value="Spain">Spain</option>
             </select>
-            <button type="submit" className="btn-primary flex items-center justify-center gap-2" disabled={isScanning} style={{ background: scanMode === 'layoff' ? '#ff5f56' : '' }}>
-              {isScanning ? <><Loader2 className="animate-spin" size={20} /> Scanning...</> : (scanMode === 'layoff' ? 'Snipe Layoffs' : 'Scan Web')}
+            <button type="submit" className="btn-primary flex items-center justify-center gap-2" disabled={isScanning} style={{ background: scanMode === 'layoff' ? '#ff5f56' : scanMode === 'vc_whale' ? '#0a66c2' : scanMode === 'stale_job' ? '#ffbd2e' : '' }}>
+              {isScanning ? <><Loader2 className="animate-spin" size={20} /> Scanning...</> : (scanMode === 'layoff' ? 'Snipe Layoffs' : scanMode === 'vc_whale' ? 'Find VC Whales' : scanMode === 'stale_job' ? 'Find Desperate Leads' : 'Scan Web')}
             </button>
           </form>
-          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1.5rem' }}>
-            <div style={{ display: 'flex', background: 'rgba(255,255,255,0.05)', padding: '4px', borderRadius: '999px', border: '1px solid #333' }}>
-              <button onClick={() => setScanMode('hiring')} type="button" style={{ padding: '6px 16px', borderRadius: '999px', border: 'none', background: scanMode === 'hiring' ? '#27c93f' : 'transparent', color: scanMode === 'hiring' ? '#000' : '#888', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem', transition: 'all 0.2s' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1.5rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+            <div style={{ display: 'flex', background: 'rgba(255,255,255,0.05)', padding: '4px', borderRadius: '999px', border: '1px solid #333', overflowX: 'auto', maxWidth: '100%' }}>
+              <button onClick={() => setScanMode('hiring')} type="button" style={{ padding: '6px 16px', borderRadius: '999px', border: 'none', background: scanMode === 'hiring' ? '#27c93f' : 'transparent', color: scanMode === 'hiring' ? '#000' : '#888', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem', transition: 'all 0.2s', whiteSpace: 'nowrap' }}>
                 🔥 Hiring Intent
               </button>
-              <button onClick={() => setScanMode('layoff')} type="button" style={{ padding: '6px 16px', borderRadius: '999px', border: 'none', background: scanMode === 'layoff' ? '#ff5f56' : 'transparent', color: scanMode === 'layoff' ? '#fff' : '#888', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                🎯 Layoff Sniper <span style={{ background: 'rgba(255,255,255,0.2)', padding: '2px 6px', borderRadius: '4px', fontSize: '0.65rem' }}>BETA</span>
+              <button onClick={() => setScanMode('layoff')} type="button" style={{ padding: '6px 16px', borderRadius: '999px', border: 'none', background: scanMode === 'layoff' ? '#ff5f56' : 'transparent', color: scanMode === 'layoff' ? '#fff' : '#888', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}>
+                🎯 Layoffs
+              </button>
+              <button onClick={() => setScanMode('vc_whale')} type="button" style={{ padding: '6px 16px', borderRadius: '999px', border: 'none', background: scanMode === 'vc_whale' ? '#0a66c2' : 'transparent', color: scanMode === 'vc_whale' ? '#fff' : '#888', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}>
+                🐋 VC Whales
+              </button>
+              <button onClick={() => setScanMode('stale_job')} type="button" style={{ padding: '6px 16px', borderRadius: '999px', border: 'none', background: scanMode === 'stale_job' ? '#ffbd2e' : 'transparent', color: scanMode === 'stale_job' ? '#000' : '#888', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}>
+                ⏳ Stale Jobs
               </button>
             </div>
           </div>

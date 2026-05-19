@@ -312,6 +312,52 @@ const fetchLayoffs = async (query, location, alternate = false) => {
   });
 };
 
+const fetchVCWhales = async (query, location, alternate = false) => {
+  await new Promise(r => setTimeout(r, 800));
+  const companies = alternate 
+    ? ['Stripe', 'Rippling', 'Deel', 'Gusto', 'Plaid']
+    : ['Anthropic', 'OpenAI', 'Midjourney', 'Vercel', 'Supabase'];
+    
+  return companies.map((comp, i) => {
+    return {
+      id: `vc-${alternate ? 'a' : 'b'}-${i}`,
+      company: comp,
+      country: location !== 'Global' ? location : 'USA',
+      intentScore: 92 + Math.floor(Math.random() * 7),
+      problem: `Hiring: Head of ${query || 'Growth'}. Recently raised $45M Series B. Hyper-growth phase.`,
+      sourceUrl: 'https://crunchbase.com',
+      postedAt: 'Today',
+      source: alternate ? 'PitchBook' : 'Crunchbase',
+      contactName: null,
+      contactEmail: null,
+      contactLinkedIn: null,
+      scanMode: 'vc_whale'
+    };
+  });
+};
+
+const fetchStaleJobs = async (query, location) => {
+  await new Promise(r => setTimeout(r, 800));
+  const companies = ['Acme Corp', 'TechFlow', 'GlobalNet', 'DataSync', 'CloudNine'];
+    
+  return companies.map((comp, i) => {
+    return {
+      id: `stale-${i}`,
+      company: comp,
+      country: location !== 'Global' ? location : 'USA',
+      intentScore: 85 + Math.floor(Math.random() * 10),
+      problem: `Hiring: Senior ${query || 'Engineer'}. Position unfilled for 62 days. Backlog accumulating.`,
+      sourceUrl: 'https://indeed.com',
+      postedAt: '62 days ago',
+      source: 'Job Board Archives',
+      contactName: null,
+      contactEmail: null,
+      contactLinkedIn: null,
+      scanMode: 'stale_job'
+    };
+  });
+};
+
 export const scanAllSources = async (query, location, persona, scanMode, onSourceUpdate) => {
 
   let fetchers = [];
@@ -319,6 +365,15 @@ export const scanAllSources = async (query, location, persona, scanMode, onSourc
     fetchers = [
       { source: { id: 'layoffs_fyi', name: 'Layoffs Tracker API', icon: '📉' }, fn: () => fetchLayoffs(query, location) },
       { source: { id: 'crunchbase_news', name: 'Crunchbase News', icon: '📰' }, fn: () => fetchLayoffs(query, location, true) }
+    ];
+  } else if (scanMode === 'vc_whale') {
+    fetchers = [
+      { source: { id: 'crunchbase_funding', name: 'Crunchbase Funding', icon: '🐋' }, fn: () => fetchVCWhales(query, location) },
+      { source: { id: 'pitchbook', name: 'PitchBook', icon: '💰' }, fn: () => fetchVCWhales(query, location, true) }
+    ];
+  } else if (scanMode === 'stale_job') {
+    fetchers = [
+      { source: { id: 'old_jobs', name: 'Job Board Archives', icon: '⏳' }, fn: () => fetchStaleJobs(query, location) }
     ];
   } else {
     fetchers = [
@@ -333,7 +388,7 @@ export const scanAllSources = async (query, location, persona, scanMode, onSourc
     ];
   }
 
-  const passiveSources = scanMode === 'layoff' ? [] : SOURCES.filter(s => !fetchers.find(f => f.source.id === s.id));
+  const passiveSources = scanMode === 'hiring' ? SOURCES.filter(s => !fetchers.find(f => f.source.id === s.id)) : [];
 
   // Fire all in parallel with staggered UI updates
   const results = await Promise.allSettled(

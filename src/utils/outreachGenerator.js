@@ -72,13 +72,16 @@ async function generateWithAnthropic(company, role, signal) {
  */
 export function generateOutreachSync(company, role, persona, scanMode = 'hiring') {
   const p = persona || 'B2B agency';
+  const cleanRole = role.replace(/^Hiring:\s*/i, '').replace(/Layoffs:.*\.\s*/, '').replace(/\..*/, '');
   
   if (scanMode === 'layoff') {
-    const dept = role.replace(/Layoffs:.*in\s/, '').replace(/\sdepartment.*/, '') || 'your';
-    return `Hi — I saw the news regarding the recent restructuring at ${company}. If you are looking for ways to maintain the output of your ${dept} team without taking on full-time headcount risk again, my ${p} can step in as a flexible, fractional resource. Open to a quick chat?`;
+    return `Hi — I saw the news regarding the recent restructuring at ${company}. If you are looking for ways to maintain output without taking on full-time headcount risk again, my ${p} can step in as a flexible, fractional resource. Open to a quick chat?`;
+  } else if (scanMode === 'vc_whale') {
+    return `Hi — Congrats on the recent funding! I know the pressure is on to scale ${company} fast. Instead of spending months trying to hire an in-house ${cleanRole}, my ${p} can step in tomorrow to help you hit your targets immediately.`;
+  } else if (scanMode === 'stale_job') {
+    return `Hi — I noticed your ${cleanRole} position has been open for a while. The workload must be piling up. Let my ${p} step in fractionally tomorrow to stop the bleeding while you take your time finding the perfect full-time hire.`;
   }
   
-  const cleanRole = role.replace(/^Hiring:\s*/i, '');
   return `Hi — noticed ${company} is looking for a ${cleanRole}. We're a ${p} that helps companies exactly like yours achieve these specific goals without the massive overhead of a long hiring cycle. Happy to share a quick case study if you're open to exploring?`;
 }
 

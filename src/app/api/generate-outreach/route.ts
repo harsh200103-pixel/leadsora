@@ -33,6 +33,26 @@ export async function POST(request: NextRequest) {
       5. End with a soft, no-pressure call to action (e.g., "If you're open to exploring a flexible setup, let me know.") and a professional sign-off. 
       Do NOT include a subject line in the output.`;
     }
+    else if (scanMode === 'vc_whale') {
+      prompt = `You are a founder of a ${userPersona}. Write a highly professional, high-energy cold email for a startup called "${company}" that just raised a massive funding round and is desperately trying to scale by hiring for "${title}".${contactPart}
+      Format it exactly like a real email with line breaks. 
+      1. Start with a greeting (e.g. Hi [Name],) and congratulate them on the recent funding round.
+      2. Explain that investors expect hyper-growth, but hiring full-time takes 3-6 months.
+      3. Pitch your ${userPersona} as the ultimate 'cheat code' to hit their scaling targets immediately, since you can deploy tomorrow without the overhead of an in-house hire.
+      4. Keep the body to 2-3 concise paragraphs.
+      5. End with a professional sign-off (e.g. Best regards,\n[Your Name]). 
+      Do NOT include a subject line in the output.`;
+    }
+    else if (scanMode === 'stale_job') {
+      prompt = `You are a founder of a ${userPersona}. Write a highly professional, problem-solving cold email for a company called "${company}" that has been trying to hire for "${title}" for over 60 days with no success.${contactPart}
+      Format it exactly like a real email with line breaks. 
+      1. Start with a greeting (e.g. Hi [Name],)
+      2. Mention you noticed their "${title}" position has been sitting open for months, which means the workload must be piling up and hurting the team.
+      3. Pitch your ${userPersona} as a way to "stop the bleeding." Offer to step in fractionally tomorrow so they can maintain output while they take their time finding the perfect full-time hire.
+      4. Keep the body to 2-3 concise paragraphs.
+      5. End with a professional sign-off (e.g. Best regards,\n[Your Name]). 
+      Do NOT include a subject line in the output.`;
+    }
     else if (isFollowUp) {
       prompt = `You are a founder of a ${userPersona}. Write a highly professional, short follow-up cold email for a company called "${company}" that you contacted a few days ago regarding their open "${title}" role.${contactPart}
       Format it exactly like a real email with line breaks. 
