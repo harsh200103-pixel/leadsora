@@ -21,53 +21,49 @@ export async function POST(request: NextRequest) {
     const contactPart = contactName ? ` Address the email to ${contactName}.` : ' Address the email to the Hiring Team.';
     const userPersona = persona || 'B2B agency';
     
+    const companySlug = company.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    const pitchLink = `https://leadsora.com/pitch/${companySlug}`;
+    
     let prompt = '';
     
     if (scanMode === 'layoff') {
       prompt = `You are a founder of a ${userPersona}. Write a highly professional, tactful, and empathetic cold email for a company called "${company}" that recently went through restructuring/layoffs affecting their team.${contactPart}
       Format it exactly like a real email with line breaks. 
-      1. Start with a respectful greeting (e.g. Hi [Name],)
-      2. Acknowledge the recent news/restructuring delicately. Do not be overly aggressive.
-      3. Explain that if they need to maintain output or cover the gap left by the reduction in force without the risk and overhead of hiring full-time headcount again, your ${userPersona} can step in as a highly flexible, fractional resource.
-      4. Keep the body to 2 concise paragraphs max.
-      5. End with a soft, no-pressure call to action (e.g., "If you're open to exploring a flexible setup, let me know.") and a professional sign-off. 
-      Do NOT include a subject line in the output.`;
+      1. Start with a respectful greeting.
+      2. Acknowledge the recent news/restructuring delicately.
+      3. Explain that if they need to maintain output without the risk of hiring full-time headcount again, your ${userPersona} can step in as a fractional resource.
+      4. End with: "I built a custom fractional roadmap for ${company} here: ${pitchLink}"
+      5. Add a professional sign-off. Do NOT include a subject line.`;
     }
     else if (scanMode === 'vc_whale') {
-      prompt = `You are a founder of a ${userPersona}. Write a highly professional, high-energy cold email for a startup called "${company}" that just raised a massive funding round and is desperately trying to scale by hiring for "${title}".${contactPart}
-      Format it exactly like a real email with line breaks. 
-      1. Start with a greeting (e.g. Hi [Name],) and congratulate them on the recent funding round.
+      prompt = `You are a founder of a ${userPersona}. Write a high-energy cold email for a startup called "${company}" that just raised massive funding and is hiring for "${title}".${contactPart}
+      Format it exactly like a real email. 
+      1. Congratulate them on the funding.
       2. Explain that investors expect hyper-growth, but hiring full-time takes 3-6 months.
-      3. Pitch your ${userPersona} as the ultimate 'cheat code' to hit their scaling targets immediately, since you can deploy tomorrow without the overhead of an in-house hire.
-      4. Keep the body to 2-3 concise paragraphs.
-      5. End with a professional sign-off (e.g. Best regards,\n[Your Name]). 
-      Do NOT include a subject line in the output.`;
+      3. Pitch your ${userPersona} as the ultimate 'cheat code' to hit scaling targets immediately.
+      4. End with: "I built a custom scaling roadmap for ${company} here: ${pitchLink}"
+      5. Add a professional sign-off. Do NOT include a subject line.`;
     }
     else if (scanMode === 'stale_job') {
-      prompt = `You are a founder of a ${userPersona}. Write a highly professional, problem-solving cold email for a company called "${company}" that has been trying to hire for "${title}" for over 60 days with no success.${contactPart}
-      Format it exactly like a real email with line breaks. 
-      1. Start with a greeting (e.g. Hi [Name],)
-      2. Mention you noticed their "${title}" position has been sitting open for months, which means the workload must be piling up and hurting the team.
-      3. Pitch your ${userPersona} as a way to "stop the bleeding." Offer to step in fractionally tomorrow so they can maintain output while they take their time finding the perfect full-time hire.
-      4. Keep the body to 2-3 concise paragraphs.
-      5. End with a professional sign-off (e.g. Best regards,\n[Your Name]). 
-      Do NOT include a subject line in the output.`;
+      prompt = `You are a founder of a ${userPersona}. Write a problem-solving cold email for "${company}" that has been trying to hire for "${title}" for over 60 days.${contactPart}
+      Format it exactly like a real email. 
+      1. Mention their "${title}" position has been sitting open for months and the workload must be piling up.
+      2. Pitch your ${userPersona} as a way to "stop the bleeding" fractionally tomorrow.
+      3. End with: "I built a custom fractional execution plan for ${company} here: ${pitchLink}"
+      4. Add a professional sign-off. Do NOT include a subject line.`;
     }
     else if (isFollowUp) {
-      prompt = `You are a founder of a ${userPersona}. Write a highly professional, short follow-up cold email for a company called "${company}" that you contacted a few days ago regarding their open "${title}" role.${contactPart}
-      Format it exactly like a real email with line breaks. 
-      1. Start with a greeting (e.g. Hi [Name],)
-      2. Keep it extremely brief (2-3 sentences max). Ask if they have made any progress on the hire, or if they would be open to a quick chat this week about how your ${userPersona} services can solve their problem faster and cheaper.
-      3. End with a professional sign-off (e.g. Best regards,\n[Your Name]). 
-      Do NOT include a subject line in the output.`;
+      prompt = `You are a founder of a ${userPersona}. Write a short follow-up cold email for "${company}" regarding their open "${title}" role.${contactPart}
+      Format it exactly like a real email. 
+      1. Keep it extremely brief. Ask if they have made any progress on the hire.
+      2. End with: "In the meantime, I updated the custom ROI deck for ${company} here: ${pitchLink}"
+      3. Add a professional sign-off. Do NOT include a subject line.`;
     } else {
-      prompt = `You are a founder of a ${userPersona}. Write a highly professional, well-structured cold email for a company called "${company}" that is hiring for "${title}".${contactPart} 
-      Format it exactly like a real email with line breaks. 
-      1. Start with a greeting (e.g. Hi [Name],)
-      2. Mention you saw they are hiring for the role and explain how your specific ${userPersona} services can help them achieve the same goals faster, cheaper, or without the overhead of an in-house hire.
-      3. Keep the body to 2-3 concise paragraphs.
-      4. End with a professional sign-off (e.g. Best regards,\n[Your Name]). 
-      Do NOT include a subject line in the output.`;
+      prompt = `You are a founder of a ${userPersona}. Write a well-structured cold email for "${company}" that is hiring for "${title}".${contactPart} 
+      Format it exactly like a real email. 
+      1. Explain how your specific ${userPersona} services can help them achieve their goals faster/cheaper.
+      2. End with: "I built a custom ROI pitch deck specifically for ${company} here: ${pitchLink}"
+      3. Add a professional sign-off. Do NOT include a subject line.`;
     }
 
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
