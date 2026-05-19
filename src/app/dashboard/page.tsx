@@ -36,8 +36,10 @@ function Dashboard() {
   const [rapidApiKey, setRapidApiKey] = useState('');
   const [userPersona, setUserPersona] = useState('Software Development Agency');
   const [viewMode, setViewMode] = useState<'list' | 'pipeline'>('list');
-  const [showSettings, setShowSettings] = useState(false);
   const [scanMode, setScanMode] = useState<'hiring' | 'layoff' | 'vc_whale' | 'stale_job'>('hiring');
+  const [searchType, setSearchType] = useState<'keyword' | 'cloner'>('keyword');
+  const [ghostModeEnabled, setGhostModeEnabled] = useState(false);
+  const [blitzLead, setBlitzLead] = useState<any>(null);
   const [highIntentOnly, setHighIntentOnly] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [aiOutreach, setAiOutreach] = useState<{[key: string]: string}>({});
@@ -156,6 +158,18 @@ function Dashboard() {
       <nav style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 2rem', borderBottom: '1px solid #27272a', background: 'rgba(10,10,10,0.8)', backdropFilter: 'blur(10px)', position: 'sticky', top: 0, zIndex: 100 }}>
         <Logo style={{ height: '64px', width: 'auto' }} />
         <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+          
+          {/* Ghost Mode Toggle */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: ghostModeEnabled ? 'rgba(39, 201, 63, 0.1)' : 'rgba(255,255,255,0.05)', padding: '6px 12px', borderRadius: '8px', border: `1px solid ${ghostModeEnabled ? '#27c93f' : '#333'}` }}>
+            <span style={{ fontSize: '0.85rem', color: ghostModeEnabled ? '#27c93f' : '#888', fontWeight: 600 }}>👻 Ghost Mode Auto-Pilot</span>
+            <label style={{ position: 'relative', display: 'inline-block', width: '34px', height: '20px' }}>
+              <input type="checkbox" checked={ghostModeEnabled} onChange={(e) => setGhostModeEnabled(e.target.checked)} style={{ opacity: 0, width: 0, height: 0 }} />
+              <span style={{ position: 'absolute', cursor: 'pointer', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: ghostModeEnabled ? '#27c93f' : '#ccc', transition: '.4s', borderRadius: '34px' }}>
+                <span style={{ position: 'absolute', content: '""', height: '14px', width: '14px', left: '3px', bottom: '3px', backgroundColor: 'white', transition: '.4s', borderRadius: '50%', transform: ghostModeEnabled ? 'translateX(14px)' : 'translateX(0)' }}></span>
+              </span>
+            </label>
+          </div>
+
           <span className="hide-on-mobile" style={{ color: '#a1a1aa', fontSize: '0.9rem' }}>Welcome, <strong style={{ color: '#fff' }}>{user.name}</strong></span>
           <button
             onClick={() => { logout(); window.location.href = '/login'; }}
@@ -175,18 +189,34 @@ function Dashboard() {
       {/* Scanner */}
       <section className="simulator" id="simulator">
         <div className="container">
+          
+          {/* Search Type Tabs */}
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
+            <div style={{ display: 'flex', background: 'rgba(0,0,0,0.4)', borderRadius: '8px', padding: '4px', border: '1px solid #333' }}>
+              <button onClick={() => setSearchType('keyword')} style={{ padding: '8px 24px', background: searchType === 'keyword' ? '#27272a' : 'transparent', color: searchType === 'keyword' ? '#fff' : '#888', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 500, transition: 'all 0.2s' }}>🔍 Keyword Search</button>
+              <button onClick={() => setSearchType('cloner')} style={{ padding: '8px 24px', background: searchType === 'cloner' ? '#27272a' : 'transparent', color: searchType === 'cloner' ? '#fff' : '#888', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 500, transition: 'all 0.2s' }}>🧬 Client Cloner</button>
+            </div>
+          </div>
+
           <form className="simulator-form" onSubmit={handleScan}>
-            <input id="search-input" type="text" className="simulator-input" placeholder="e.g. AI automation, SEO, Web Design" list="niche-options" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
-            <datalist id="niche-options">
-              <option value="AI Automation" /><option value="Software Engineering" /><option value="Marketing" />
-              <option value="SEO" /><option value="Web Design" /><option value="Data Science" />
-              <option value="B2B SaaS" /><option value="Cybersecurity" /><option value="FinTech" />
-              <option value="Recruitment" /><option value="UI/UX Design" /><option value="Copywriting" />
-              <option value="Sales" /><option value="E-commerce" /><option value="Video Editing" />
-              <option value="Blockchain" /><option value="Web3" /><option value="Accounting" />
-              <option value="Public Relations" /><option value="HR" /><option value="IT Support" />
-              <option value="DevOps" /><option value="Mobile App Development" /><option value="Content Creation" />
-            </datalist>
+            {searchType === 'keyword' ? (
+              <>
+                <input id="search-input" type="text" className="simulator-input" placeholder="e.g. AI automation, SEO, Web Design" list="niche-options" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
+                <datalist id="niche-options">
+                  <option value="AI Automation" /><option value="Software Engineering" /><option value="Marketing" />
+                  <option value="SEO" /><option value="Web Design" /><option value="Data Science" />
+                  <option value="B2B SaaS" /><option value="Cybersecurity" /><option value="FinTech" />
+                  <option value="Recruitment" /><option value="UI/UX Design" /><option value="Copywriting" />
+                  <option value="Sales" /><option value="E-commerce" /><option value="Video Editing" />
+                  <option value="Blockchain" /><option value="Web3" /><option value="Accounting" />
+                  <option value="Public Relations" /><option value="HR" /><option value="IT Support" />
+                  <option value="DevOps" /><option value="Mobile App Development" /><option value="Content Creation" />
+                </datalist>
+              </>
+            ) : (
+              <input id="search-input" type="url" className="simulator-input" placeholder="Paste best client's URL (e.g. https://stripe.com)" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} style={{ border: '1px solid #0a66c2' }} />
+            )}
+            
             <select className="simulator-input" style={{ maxWidth: '150px' }} value={location} onChange={e => setLocation(e.target.value)}>
               <option value="Global">Global</option><option value="USA">USA</option><option value="UK">UK</option>
               <option value="Canada">Canada</option><option value="Australia">Australia</option>
@@ -299,9 +329,10 @@ function Dashboard() {
                         <div className="ai-box-mobile" style={{ background: 'rgba(0,0,0,0.3)', padding: '1rem', borderRadius: '8px', border: `1px solid ${aiOutreach[lead.id] ? '#7c3aed55' : '#333'}`, position: 'relative', marginTop: '1rem' }}>
                           {aiOutreach[lead.id] && <span style={{ position: 'absolute', top: '-10px', left: '12px', background: 'linear-gradient(135deg,#7c3aed,#4facfe)', color: '#fff', fontSize: '0.65rem', padding: '2px 8px', borderRadius: '999px', fontWeight: 700 }}>✨ AI Generated</span>}
                           <p className="ai-text-mobile" style={{ fontSize: '0.875rem', color: aiOutreach[lead.id] ? '#e2e8f0' : '#aaa' }}><em>"{aiOutreach[lead.id] ? <Typewriter text={aiOutreach[lead.id]} /> : lead.outreach}"</em></p>
+                          {/* Omnichannel Blitz / AI Actions */}
                           <div className="ai-actions-mobile" style={{ position: 'absolute', top: '0.75rem', right: '0.75rem', display: 'flex', gap: '0.75rem' }}>
-                            <button onClick={() => generateAIOutreach(lead)} disabled={!!generatingId} style={{ background: 'none', border: 'none', cursor: generatingId ? 'not-allowed' : 'pointer', color: (lead.status || 'New') === 'Contacted' ? '#ffbd2e' : (aiOutreach[lead.id] ? '#a78bfa' : '#555'), padding: 0 }} title={(lead.status || 'New') === 'Contacted' ? "Generate Follow-Up Pitch" : "Generate AI Outreach"}>
-                              {generatingId === lead.id ? <Loader2 size={18} className="animate-spin" /> : <Sparkles size={18} />}
+                            <button onClick={() => { setBlitzLead(lead); generateAIOutreach(lead); }} disabled={!!generatingId} style={{ background: 'linear-gradient(135deg, #7c3aed, #4facfe)', color: '#fff', border: 'none', cursor: generatingId ? 'not-allowed' : 'pointer', padding: '4px 12px', borderRadius: '4px', fontWeight: 'bold', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '4px' }} title="Omnichannel Blitz">
+                              {generatingId === lead.id ? <Loader2 size={14} className="animate-spin" /> : <><Sparkles size={14} /> Blitz</>}
                             </button>
                             <a href={`https://mail.google.com/mail/?view=cm&fs=1&to=${foundEmails[lead.id]?.[0]?.value || lead.contactEmail || ''}&su=${encodeURIComponent(`Exploring synergies: ${lead.problem?.replace('Hiring: ', '') || 'Open Role'} at ${lead.company}`)}&body=${encodeURIComponent(aiOutreach[lead.id] || lead.outreach)}`} target="_blank" rel="noreferrer" style={{ color: '#4facfe', padding: 0 }} title="Open in Gmail"><Mail size={18} /></a>
                             <button onClick={() => handleCopy(lead.id, aiOutreach[lead.id] || lead.outreach)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: copiedId === lead.id ? '#27c93f' : '#666', padding: 0 }} title="Copy">{copiedId === lead.id ? <Check size={18} /> : <Copy size={18} />}</button>
@@ -392,8 +423,8 @@ function Dashboard() {
                                 {fetchingEmailsFor === lead.id ? '...' : 'Find Email'}
                               </button>
                               <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                <button onClick={() => generateAIOutreach(lead)} disabled={!!generatingId} style={{ background: 'none', border: 'none', cursor: 'pointer', color: col === 'Contacted' ? '#ffbd2e' : '#a78bfa', padding: '4px' }} title={col === 'Contacted' ? "Generate AI Follow-Up" : "Generate AI Outreach"}>
-                                  {generatingId === lead.id ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
+                                <button onClick={() => { setBlitzLead(lead); generateAIOutreach(lead); }} disabled={!!generatingId} style={{ background: 'linear-gradient(135deg, #7c3aed, #4facfe)', color: '#fff', border: 'none', cursor: 'pointer', padding: '4px 8px', borderRadius: '4px', fontSize: '0.7rem', display: 'flex', alignItems: 'center', gap: '4px' }} title="Omnichannel Blitz">
+                                  {generatingId === lead.id ? <Loader2 size={12} className="animate-spin" /> : <><Sparkles size={12} /> Blitz</>}
                                 </button>
                                 {foundEmails[lead.id]?.[0]?.value && (
                                   <a href={`https://mail.google.com/mail/?view=cm&fs=1&to=${foundEmails[lead.id]?.[0]?.value}&su=${encodeURIComponent(`Exploring synergies at ${lead.company}`)}&body=${encodeURIComponent(aiOutreach[lead.id] || lead.outreach)}`} target="_blank" rel="noreferrer" style={{ color: '#4facfe', background: 'rgba(79, 172, 254, 0.1)', padding: '4px 8px', borderRadius: '4px' }} title="Open in Gmail"><Mail size={14} /></a>
