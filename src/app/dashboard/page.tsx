@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { Activity, Loader2, Download, Check, Copy, Clock, Mail, Trash2, LogOut, Sparkles } from 'lucide-react';
+import { Activity, Loader2, Download, Check, Copy, Clock, Mail, Trash2, LogOut, Sparkles, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import Logo from '../../components/Logo';
 import { scanAllSources } from '../../utils/leadSources';
@@ -122,8 +122,17 @@ function Dashboard() {
     try {
       const res = await fetch('/api/generate-outreach', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ company: lead.company, title: lead.problem, contactName: lead.contactName || null, persona: userPersona, isFollowUp: isFollowUp || (lead.status || 'New') === 'Contacted', scanMode: lead.scanMode || 'hiring' }) });
       const data = await res.json();
-      if (data.outreach) setAiOutreach(prev => ({ ...prev, [lead.id]: data.outreach }));
-    } catch (err) { console.error(err); } finally { setGeneratingId(null); }
+      if (data.outreach) {
+        setAiOutreach(prev => ({ ...prev, [lead.id]: data.outreach }));
+      } else {
+        alert("AI Error: " + (data.error || "Failed to generate outreach."));
+      }
+    } catch (err) { 
+      console.error(err);
+      alert("Network error. Make sure your Gemini API key is configured.");
+    } finally { 
+      setGeneratingId(null); 
+    }
   };
 
   const fetchEmailsWithHunter = async (lead: any) => {
@@ -449,9 +458,11 @@ function Dashboard() {
 
       {/* Omnichannel Blitz Modal */}
       {blitzLead && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(5px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, padding: '1rem' }}>
-          <div style={{ background: '#111', border: '1px solid #333', borderRadius: '12px', padding: '2rem', width: '100%', maxWidth: '800px', maxHeight: '90vh', overflowY: 'auto', position: 'relative' }}>
-            <button onClick={() => setBlitzLead(null)} style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'none', border: 'none', color: '#fff', fontSize: '1.5rem', cursor: 'pointer' }}>&times;</button>
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, padding: '1rem' }}>
+          <div style={{ background: '#111', border: '1px solid #333', borderRadius: '16px', padding: '2.5rem', width: '100%', maxWidth: '800px', maxHeight: '90vh', overflowY: 'auto', position: 'relative', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
+            <button onClick={() => setBlitzLead(null)} style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', padding: '8px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.2s' }} onMouseOver={e => e.currentTarget.style.background = 'rgba(255,0,0,0.5)'} onMouseOut={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'} title="Close">
+              <X size={20} />
+            </button>
             <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: 0, marginBottom: '1.5rem', background: 'linear-gradient(135deg, #7c3aed, #4facfe)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}><Sparkles /> Omnichannel Blitz: {blitzLead.company}</h2>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
