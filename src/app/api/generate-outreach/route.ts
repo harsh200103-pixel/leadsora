@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
       3. Add a professional sign-off. Do NOT include a subject line.`;
     }
 
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
 
     const res = await fetch(apiUrl, {
       method: 'POST',
