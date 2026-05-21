@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { company, title, contactName, persona, isFollowUp, scanMode } = body;
+    const { company, title, contactName, persona, isFollowUp, scanMode, senderName } = body;
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
@@ -20,6 +20,8 @@ export async function POST(request: NextRequest) {
 
     const contactPart = contactName ? ` Address the email to ${contactName}.` : ' Address the email to the Hiring Team.';
     const userPersona = persona || 'B2B agency';
+    const signOffName = senderName ? `Sign off as ${senderName}.` : 'Sign off with [Your Name].';
+
 
     const companySlug = company.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
     const pitchLink = `https://leadsora.vercel.app/pitch/${companySlug}`;
@@ -33,7 +35,7 @@ export async function POST(request: NextRequest) {
       2. Acknowledge the recent news/restructuring delicately.
       3. Explain that if they need to maintain output without the risk of hiring full-time headcount again, your ${userPersona} can step in as a fractional resource.
       4. End with: "I built a custom fractional roadmap for ${company} here: ${pitchLink}"
-      5. Add a professional sign-off. Do NOT include a subject line.`;
+      5. ${signOffName} Do NOT include a subject line.`;
     }
     else if (scanMode === 'vc_whale') {
       prompt = `You are a founder of a ${userPersona}. Write a high-energy cold email for a startup called "${company}" that just raised massive funding and is hiring for "${title}".${contactPart}
@@ -42,7 +44,7 @@ export async function POST(request: NextRequest) {
       2. Explain that investors expect hyper-growth, but hiring full-time takes 3-6 months.
       3. Pitch your ${userPersona} as the ultimate 'cheat code' to hit scaling targets immediately.
       4. End with: "I built a custom scaling roadmap for ${company} here: ${pitchLink}"
-      5. Add a professional sign-off. Do NOT include a subject line.`;
+      5. ${signOffName} Do NOT include a subject line.`;
     }
     else if (scanMode === 'stale_job') {
       prompt = `You are a founder of a ${userPersona}. Write a problem-solving cold email for "${company}" that has been trying to hire for "${title}" for over 60 days.${contactPart}
@@ -50,20 +52,20 @@ export async function POST(request: NextRequest) {
       1. Mention their "${title}" position has been sitting open for months and the workload must be piling up.
       2. Pitch your ${userPersona} as a way to "stop the bleeding" fractionally tomorrow.
       3. End with: "I built a custom fractional execution plan for ${company} here: ${pitchLink}"
-      4. Add a professional sign-off. Do NOT include a subject line.`;
+      4. ${signOffName} Do NOT include a subject line.`;
     }
     else if (isFollowUp) {
       prompt = `You are a founder of a ${userPersona}. Write a short follow-up cold email for "${company}" regarding their open "${title}" role.${contactPart}
       Format it exactly like a real email. 
       1. Keep it extremely brief. Ask if they have made any progress on the hire.
       2. End with: "In the meantime, I updated the custom ROI deck for ${company} here: ${pitchLink}"
-      3. Add a professional sign-off. Do NOT include a subject line.`;
+      3. ${signOffName} Do NOT include a subject line.`;
     } else {
       prompt = `You are a founder of a ${userPersona}. Write a well-structured cold email for "${company}" that is hiring for "${title}".${contactPart} 
       Format it exactly like a real email. 
       1. Explain how your specific ${userPersona} services can help them achieve their goals faster/cheaper.
       2. End with: "I built a custom ROI pitch deck specifically for ${company} here: ${pitchLink}"
-      3. Add a professional sign-off. Do NOT include a subject line.`;
+      3. ${signOffName} Do NOT include a subject line.`;
     }
 
     // Try multiple models in order of preference for maximum reliability

@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { Activity, Loader2, Download, Check, Copy, Clock, Mail, Trash2, LogOut, Sparkles, X } from 'lucide-react';
+import { Activity, Loader2, Download, Check, Copy, Clock, Mail, Trash2, LogOut, Sparkles, X, User, Settings } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import Logo from '../../components/Logo';
 import { scanAllSources } from '../../utils/leadSources';
@@ -51,6 +51,20 @@ function Dashboard() {
   const [leads, setLeads] = useState<any[]>([]);
   const [mounted, setMounted] = useState(false);
 
+  // Business Profile State
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [profileDismissed, setProfileDismissed] = useState(false);
+  const [businessProfile, setBusinessProfile] = useState<{
+    fullName: string; jobTitle: string; companyName: string;
+    email: string; phone: string; website: string; address: string;
+  }>({ fullName: '', jobTitle: '', companyName: '', email: '', phone: '', website: '', address: '' });
+
+  // Ghost Mode Scheduler State
+  const [showGhostConfig, setShowGhostConfig] = useState(false);
+  const [ghostConfig, setGhostConfig] = useState({
+    scanTime: '08:00', leadsPerDay: 10, scanMode: 'hiring' as string, keywords: ''
+  });
+
   useEffect(() => {
     setMounted(true);
     const saved = localStorage.getItem('dealfinder_leads');
@@ -61,6 +75,13 @@ function Dashboard() {
     if (savedRapid) setRapidApiKey(savedRapid);
     const savedPersona = localStorage.getItem('df_user_persona');
     if (savedPersona) setUserPersona(savedPersona);
+    // Load Business Profile
+    const savedProfile = localStorage.getItem('leadsora_business_profile');
+    if (savedProfile) { try { setBusinessProfile(JSON.parse(savedProfile)); } catch (e) {} }
+    else { setShowProfileModal(true); } // Show onboarding on first visit
+    // Load Ghost Config
+    const savedGhost = localStorage.getItem('leadsora_ghost_config');
+    if (savedGhost) { try { setGhostConfig(JSON.parse(savedGhost)); } catch (e) {} }
   }, []);
 
   useEffect(() => {
@@ -69,6 +90,29 @@ function Dashboard() {
 
   const saveHunterKey = (val: string) => { setHunterKey(val); localStorage.setItem('df_hunter_api_key', val); };
   const saveRapidApiKey = (val: string) => { setRapidApiKey(val); localStorage.setItem('df_rapid_api_key', val); };
+
+  const saveBusinessProfile = (profile: typeof businessProfile) => {
+    setBusinessProfile(profile);
+    localStorage.setItem('leadsora_business_profile', JSON.stringify(profile));
+  };
+  const saveGhostConfig = (config: typeof ghostConfig) => {
+    setGhostConfig(config);
+    localStorage.setItem('leadsora_ghost_config', JSON.stringify(config));
+  };
+
+  const buildSignature = () => {
+    const p = businessProfile;
+    if (!p.fullName && !p.companyName) return '';
+    let sig = '\n\n──────────────';
+    if (p.fullName) sig += `\n${p.fullName}`;
+    if (p.jobTitle) sig += ` | ${p.jobTitle}`;
+    if (p.companyName) sig += `\n${p.companyName}`;
+    const contact = [p.email ? `📧 ${p.email}` : '', p.phone ? `📞 ${p.phone}` : ''].filter(Boolean).join(' | ');
+    if (contact) sig += `\n${contact}`;
+    if (p.website) sig += `\n🌐 ${p.website}`;
+    if (p.address) sig += `\n📍 ${p.address}`;
+    return sig;
+  };
   const savePersona = (val: string) => { 
     setUserPersona(val); 
     localStorage.setItem('df_user_persona', val); 
@@ -120,10 +164,11 @@ function Dashboard() {
   const generateAIOutreach = async (lead: any, isFollowUp = false) => {
     if (generatingId) return; setGeneratingId(lead.id);
     try {
-      const res = await fetch('/api/generate-outreach', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ company: lead.company, title: lead.problem, contactName: lead.contactName || null, persona: userPersona, isFollowUp: isFollowUp || (lead.status || 'New') === 'Contacted', scanMode: lead.scanMode || 'hiring' }) });
+      const res = await fetch('/api/generate-outreach', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ company: lead.company, title: lead.problem, contactName: lead.contactName || null, persona: userPersona, isFollowUp: isFollowUp || (lead.status || 'New') === 'Contacted', scanMode: lead.scanMode || 'hiring', senderName: businessProfile.fullName || null }) });
       const data = await res.json();
       if (data.outreach) {
-        setAiOutreach(prev => ({ ...prev, [lead.id]: data.outreach }));
+        const signature = buildSignature();
+        setAiOutreach(prev => ({ ...prev, [lead.id]: data.outreach + signature }));
       } else {
         alert("AI Error: " + (data.error || "Failed to generate outreach."));
       }
@@ -173,14 +218,20 @@ function Dashboard() {
           
           {/* Ghost Mode Toggle */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: ghostModeEnabled ? 'rgba(39, 201, 63, 0.1)' : 'rgba(255,255,255,0.05)', padding: '6px 12px', borderRadius: '8px', border: `1px solid ${ghostModeEnabled ? '#27c93f' : '#333'}` }}>
-            <span style={{ fontSize: '0.85rem', color: ghostModeEnabled ? '#27c93f' : '#888', fontWeight: 600 }}>👻 Ghost Mode Auto-Pilot</span>
+            <span style={{ fontSize: '0.85rem', color: ghostModeEnabled ? '#27c93f' : '#888', fontWeight: 600 }}>👻 Ghost Mode</span>
             <label style={{ position: 'relative', display: 'inline-block', width: '34px', height: '20px' }}>
-              <input type="checkbox" checked={ghostModeEnabled} onChange={(e) => setGhostModeEnabled(e.target.checked)} style={{ opacity: 0, width: 0, height: 0 }} />
+              <input type="checkbox" checked={ghostModeEnabled} onChange={(e) => { setGhostModeEnabled(e.target.checked); if (e.target.checked) setShowGhostConfig(true); }} style={{ opacity: 0, width: 0, height: 0 }} />
               <span style={{ position: 'absolute', cursor: 'pointer', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: ghostModeEnabled ? '#27c93f' : '#ccc', transition: '.4s', borderRadius: '34px' }}>
                 <span style={{ position: 'absolute', content: '""', height: '14px', width: '14px', left: '3px', bottom: '3px', backgroundColor: 'white', transition: '.4s', borderRadius: '50%', transform: ghostModeEnabled ? 'translateX(14px)' : 'translateX(0)' }}></span>
               </span>
             </label>
+            {ghostModeEnabled && <button onClick={() => setShowGhostConfig(true)} style={{ background: 'none', border: 'none', color: '#27c93f', cursor: 'pointer', padding: 0 }}><Settings size={14} /></button>}
           </div>
+
+          {/* Profile Button */}
+          <button onClick={() => setShowProfileModal(true)} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: businessProfile.fullName ? 'rgba(124, 58, 237, 0.1)' : 'rgba(255,189,46,0.1)', border: `1px solid ${businessProfile.fullName ? 'rgba(124, 58, 237, 0.3)' : 'rgba(255,189,46,0.3)'}`, borderRadius: '8px', color: businessProfile.fullName ? '#a78bfa' : '#ffbd2e', fontSize: '0.85rem', cursor: 'pointer', fontWeight: 600 }}>
+            <User size={14} /> {businessProfile.fullName || 'Set Profile'}
+          </button>
 
           <span className="hide-on-mobile" style={{ color: '#a1a1aa', fontSize: '0.9rem' }}>Welcome, <strong style={{ color: '#fff' }}>{user.name}</strong></span>
           <button
@@ -518,6 +569,125 @@ function Dashboard() {
               </div>
 
             </div>
+          </div>
+        </div>
+      )}
+      {/* Business Profile Onboarding Modal */}
+      {showProfileModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, padding: '1rem' }}>
+          <div style={{ background: '#111', border: '1px solid #333', borderRadius: '16px', padding: '2.5rem', width: '100%', maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto', position: 'relative', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
+            <button onClick={() => setShowProfileModal(false)} style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', padding: '8px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onMouseOver={e => e.currentTarget.style.background = 'rgba(255,0,0,0.5)'} onMouseOut={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}><X size={20} /></button>
+
+            <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+              <div style={{ width: '56px', height: '56px', borderRadius: '16px', background: 'linear-gradient(135deg, #7c3aed, #4facfe)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}><User size={28} color="#fff" /></div>
+              <h2 style={{ margin: '0 0 0.5rem 0', fontSize: '1.5rem', background: 'linear-gradient(135deg, #7c3aed, #4facfe)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Your Business Profile</h2>
+              <p style={{ color: '#888', fontSize: '0.9rem', margin: 0 }}>Set up your identity for professional email signatures. All fields are optional.</p>
+            </div>
+
+            {!businessProfile.fullName && !profileDismissed && (
+              <div style={{ background: 'rgba(255,189,46,0.1)', border: '1px solid rgba(255,189,46,0.3)', borderRadius: '8px', padding: '0.75rem 1rem', marginBottom: '1.5rem', fontSize: '0.85rem', color: '#ffbd2e' }}>
+                ⚠️ Without a profile, your AI emails will sign off with generic placeholders like &quot;[Your Name]&quot;.
+              </div>
+            )}
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              {[
+                { key: 'fullName', label: 'Full Name', placeholder: 'e.g. Harsh Bhatia', icon: '👤' },
+                { key: 'jobTitle', label: 'Job Title', placeholder: 'e.g. Founder & CEO', icon: '💼' },
+                { key: 'companyName', label: 'Company Name', placeholder: 'e.g. ISAI Tech Solutions', icon: '🏢' },
+                { key: 'email', label: 'Email Address', placeholder: 'e.g. harsh@isaitech.com', icon: '📧' },
+                { key: 'phone', label: 'Phone Number', placeholder: 'e.g. +91-9876543210', icon: '📞' },
+                { key: 'website', label: 'Website URL', placeholder: 'e.g. isaitech.com', icon: '🌐' },
+                { key: 'address', label: 'Mailing Address', placeholder: 'e.g. Pune, India', icon: '📍' },
+              ].map(field => (
+                <div key={field.key}>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#888', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{field.icon} {field.label}</label>
+                  <input
+                    type="text"
+                    value={(businessProfile as any)[field.key]}
+                    onChange={e => setBusinessProfile(prev => ({ ...prev, [field.key]: e.target.value }))}
+                    placeholder={field.placeholder}
+                    style={{ width: '100%', padding: '10px 14px', background: 'rgba(255,255,255,0.03)', border: '1px solid #333', borderRadius: '8px', color: '#fff', fontSize: '0.95rem', outline: 'none', boxSizing: 'border-box' }}
+                    onFocus={e => e.currentTarget.style.borderColor = '#7c3aed'}
+                    onBlur={e => e.currentTarget.style.borderColor = '#333'}
+                  />
+                </div>
+              ))}
+            </div>
+
+            {/* Signature Preview */}
+            {(businessProfile.fullName || businessProfile.companyName) && (
+              <div style={{ marginTop: '1.5rem', background: 'rgba(255,255,255,0.02)', border: '1px solid #222', borderRadius: '8px', padding: '1rem' }}>
+                <p style={{ fontSize: '0.75rem', color: '#888', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.5rem' }}>Signature Preview</p>
+                <div style={{ fontSize: '0.85rem', color: '#a1a1aa', whiteSpace: 'pre-wrap', fontFamily: 'monospace', lineHeight: 1.6 }}>
+                  ──────────────{'\n'}
+                  {businessProfile.fullName}{businessProfile.jobTitle ? ` | ${businessProfile.jobTitle}` : ''}{'\n'}
+                  {businessProfile.companyName}{'\n'}
+                  {[businessProfile.email ? `📧 ${businessProfile.email}` : '', businessProfile.phone ? `📞 ${businessProfile.phone}` : ''].filter(Boolean).join(' | ')}{'\n'}
+                  {businessProfile.website ? `🌐 ${businessProfile.website}` : ''}{'\n'}
+                  {businessProfile.address ? `📍 ${businessProfile.address}` : ''}
+                </div>
+              </div>
+            )}
+
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
+              <button onClick={() => { saveBusinessProfile(businessProfile); setShowProfileModal(false); }} style={{ flex: 1, padding: '12px', background: 'linear-gradient(135deg, #7c3aed, #4facfe)', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '1rem', fontWeight: 600, cursor: 'pointer' }}>
+                Save Profile
+              </button>
+              <button onClick={() => { setProfileDismissed(true); setShowProfileModal(false); }} style={{ padding: '12px 20px', background: 'transparent', color: '#888', border: '1px solid #333', borderRadius: '8px', fontSize: '0.9rem', cursor: 'pointer' }}>
+                Skip for now
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Ghost Mode Scheduler Modal */}
+      {showGhostConfig && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, padding: '1rem' }}>
+          <div style={{ background: '#111', border: '1px solid #333', borderRadius: '16px', padding: '2.5rem', width: '100%', maxWidth: '550px', position: 'relative', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
+            <button onClick={() => setShowGhostConfig(false)} style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', padding: '8px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onMouseOver={e => e.currentTarget.style.background = 'rgba(255,0,0,0.5)'} onMouseOut={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}><X size={20} /></button>
+
+            <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+              <h2 style={{ margin: '0 0 0.5rem 0', fontSize: '1.5rem', color: '#27c93f' }}>👻 Ghost Mode Configuration</h2>
+              <p style={{ color: '#888', fontSize: '0.9rem', margin: 0 }}>Configure when and how the autonomous engine hunts for leads.</p>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              {/* Scan Time */}
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: '#888', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>⏰ Daily Scan Time</label>
+                <input type="time" value={ghostConfig.scanTime} onChange={e => setGhostConfig(prev => ({ ...prev, scanTime: e.target.value }))} style={{ width: '100%', padding: '10px 14px', background: 'rgba(255,255,255,0.03)', border: '1px solid #333', borderRadius: '8px', color: '#fff', fontSize: '0.95rem', outline: 'none', boxSizing: 'border-box' }} />
+              </div>
+
+              {/* Leads Per Day */}
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: '#888', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>📊 Leads Per Day: <strong style={{ color: '#27c93f' }}>{ghostConfig.leadsPerDay}</strong></label>
+                <input type="range" min="5" max="50" step="5" value={ghostConfig.leadsPerDay} onChange={e => setGhostConfig(prev => ({ ...prev, leadsPerDay: parseInt(e.target.value) }))} style={{ width: '100%', accentColor: '#27c93f' }} />
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: '#555' }}><span>5</span><span>25</span><span>50</span></div>
+              </div>
+
+              {/* Scan Mode */}
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: '#888', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>🎯 Scan Mode</label>
+                <select value={ghostConfig.scanMode} onChange={e => setGhostConfig(prev => ({ ...prev, scanMode: e.target.value }))} style={{ width: '100%', padding: '10px 14px', background: '#0a0a0a', border: '1px solid #333', borderRadius: '8px', color: '#fff', fontSize: '0.95rem', outline: 'none' }}>
+                  <option value="hiring">🔥 Hiring Intent</option>
+                  <option value="layoff">🎯 Layoff Sniper</option>
+                  <option value="vc_whale">🐋 VC Whales</option>
+                  <option value="stale_job">⏳ Stale Jobs</option>
+                </select>
+              </div>
+
+              {/* Keywords */}
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: '#888', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>🔍 Target Keywords</label>
+                <input type="text" value={ghostConfig.keywords} onChange={e => setGhostConfig(prev => ({ ...prev, keywords: e.target.value }))} placeholder="e.g. React Developer, Marketing Manager" style={{ width: '100%', padding: '10px 14px', background: 'rgba(255,255,255,0.03)', border: '1px solid #333', borderRadius: '8px', color: '#fff', fontSize: '0.95rem', outline: 'none', boxSizing: 'border-box' }} />
+              </div>
+            </div>
+
+            <button onClick={() => { saveGhostConfig(ghostConfig); setShowGhostConfig(false); }} style={{ width: '100%', padding: '14px', marginTop: '2rem', background: 'linear-gradient(135deg, #27c93f, #10b981)', color: '#000', border: 'none', borderRadius: '8px', fontSize: '1rem', fontWeight: 700, cursor: 'pointer' }}>
+              👻 Save & Activate Ghost Mode
+            </button>
           </div>
         </div>
       )}
