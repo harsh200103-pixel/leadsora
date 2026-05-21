@@ -20,12 +20,12 @@ export async function POST(request: NextRequest) {
 
     const contactPart = contactName ? ` Address the email to ${contactName}.` : ' Address the email to the Hiring Team.';
     const userPersona = persona || 'B2B agency';
-    
+
     const companySlug = company.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-    const pitchLink = `https://leadsora.com/pitch/${companySlug}`;
-    
+    const pitchLink = `https://leadsora.vercel.app/pitch/${companySlug}`;
+
     let prompt = '';
-    
+
     if (scanMode === 'layoff') {
       prompt = `You are a founder of a ${userPersona}. Write a highly professional, tactful, and empathetic cold email for a company called "${company}" that recently went through restructuring/layoffs affecting their team.${contactPart}
       Format it exactly like a real email with line breaks. 
@@ -66,39 +66,65 @@ export async function POST(request: NextRequest) {
       3. Add a professional sign-off. Do NOT include a subject line.`;
     }
 
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
+    // Try multiple models in order of preference for maximum reliability
+    const models = ['gemini-2.0-flash', 'gemini-2.0-flash-lite', 'gemini-2.5-flash'];
+    
+    let lastError = '';
 
-    const res = await fetch(apiUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          temperature: 0.85,
-          maxOutputTokens: 400,
-          topP: 0.9,
-        },
-      }),
-    });
+    for (const model of models) {
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
-    if (!res.ok) {
-      const errorText = await res.text();
-      console.error('Gemini API error:', res.status, errorText);
-      return NextResponse.json(
-        { error: `Gemini API returned ${res.status}. Check your API key.` },
-        { status: 502 }
-      );
+      try {
+        const res = await fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: {
+              temperature: 0.85,
+              maxOutputTokens: 400,
+              topP: 0.9,
+            },
+          }),
+        });
+
+        if (res.status === 429) {
+          // Rate limited on this model, try the next one
+          lastError = `Rate limited on ${model}. `;
+          continue;
+        }
+
+        if (!res.ok) {
+          const errorText = await res.text();
+          console.error(`Gemini ${model} error:`, res.status, errorText);
+          lastError = `${model} returned ${res.status}. `;
+          continue;
+        }
+
+        const data = await res.json();
+        const outreach = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+
+        if (!outreach) {
+          console.error(`Gemini ${model} returned empty response:`, JSON.stringify(data));
+          lastError = `${model} returned empty. `;
+          continue;
+        }
+
+        // Success!
+        return NextResponse.json({ outreach });
+
+      } catch (fetchErr) {
+        lastError = `${model} network error. `;
+        continue;
+      }
     }
 
-    const data = await res.json();
-    const outreach = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+    // All models failed
+    return NextResponse.json(
+      { error: `All AI models failed. ${lastError} Your free-tier quota may be exhausted for today. Try again in a few minutes or upgrade to a paid Gemini plan.` },
+      { status: 502 }
+    );
 
-    if (!outreach) {
-      console.error('Gemini returned empty response:', JSON.stringify(data));
-      return NextResponse.json({ error: 'Gemini returned no content' }, { status: 502 });
-    }
-
-    return NextResponse.json({ outreach });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error';
     console.error('generate-outreach error:', message);
