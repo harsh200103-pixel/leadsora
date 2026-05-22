@@ -57,7 +57,9 @@ function Dashboard() {
   const [businessProfile, setBusinessProfile] = useState<{
     fullName: string; jobTitle: string; companyName: string;
     email: string; phone: string; website: string; address: string;
-  }>({ fullName: '', jobTitle: '', companyName: '', email: '', phone: '', website: '', address: '' });
+    companyContext?: string;
+  }>({ fullName: '', jobTitle: '', companyName: '', email: '', phone: '', website: '', address: '', companyContext: '' });
+  const [isScrapingWebsite, setIsScrapingWebsite] = useState(false);
 
   // Ghost Mode Scheduler State
   const [showGhostConfig, setShowGhostConfig] = useState(false);
@@ -190,7 +192,7 @@ function Dashboard() {
   const generateAIOutreach = async (lead: any, isFollowUp = false) => {
     if (generatingId) return; setGeneratingId(lead.id);
     try {
-      const res = await fetch('/api/generate-outreach', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ company: lead.company, title: lead.problem, contactName: lead.contactName || null, persona: userPersona, isFollowUp: isFollowUp || (lead.status || 'New') === 'Contacted', scanMode: lead.scanMode || 'hiring', senderName: businessProfile.fullName || null }) });
+      const res = await fetch('/api/generate-outreach', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ company: lead.company, title: lead.problem, contactName: lead.contactName || null, persona: userPersona, isFollowUp: isFollowUp || (lead.status || 'New') === 'Contacted', scanMode: lead.scanMode || 'hiring', senderName: businessProfile.fullName || null, companyContext: businessProfile.companyContext || null }) });
       const data = await res.json();
       if (data.outreach) {
         const signature = buildSignature();
@@ -234,6 +236,27 @@ function Dashboard() {
       <Loader2 className="animate-spin" size={32} color="#fff" />
     </div>
   );
+
+  const scrapeWebsite = async () => {
+    if (!businessProfile.website) return alert('Please enter a website URL first.');
+    setIsScrapingWebsite(true);
+    try {
+      const res = await fetch('/api/scrape-website', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: businessProfile.website })
+      });
+      const data = await res.json();
+      if (data.companyContext) {
+        setBusinessProfile(prev => ({ ...prev, companyContext: data.companyContext }));
+      } else {
+        alert(data.error || 'Failed to extract company context.');
+      }
+    } catch (err) {
+      alert('Network error while scraping website.');
+    }
+    setIsScrapingWebsite(false);
+  };
 
   return (
     <>
@@ -628,17 +651,34 @@ function Dashboard() {
               ].map(field => (
                 <div key={field.key}>
                   <label style={{ display: 'block', fontSize: '0.8rem', color: '#888', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{field.icon} {field.label}</label>
-                  <input
-                    type="text"
-                    value={(businessProfile as any)[field.key]}
-                    onChange={e => setBusinessProfile(prev => ({ ...prev, [field.key]: e.target.value }))}
-                    placeholder={field.placeholder}
-                    style={{ width: '100%', padding: '10px 14px', background: 'rgba(255,255,255,0.03)', border: '1px solid #333', borderRadius: '8px', color: '#fff', fontSize: '0.95rem', outline: 'none', boxSizing: 'border-box' }}
-                    onFocus={e => e.currentTarget.style.borderColor = '#7c3aed'}
-                    onBlur={e => e.currentTarget.style.borderColor = '#333'}
-                  />
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <input
+                      type="text"
+                      value={(businessProfile as any)[field.key]}
+                      onChange={e => setBusinessProfile(prev => ({ ...prev, [field.key]: e.target.value }))}
+                      placeholder={field.placeholder}
+                      style={{ flex: 1, padding: '10px 14px', background: 'rgba(255,255,255,0.03)', border: '1px solid #333', borderRadius: '8px', color: '#fff', fontSize: '0.95rem', outline: 'none', boxSizing: 'border-box' }}
+                      onFocus={e => e.currentTarget.style.borderColor = '#7c3aed'}
+                      onBlur={e => e.currentTarget.style.borderColor = '#333'}
+                    />
+                    {field.key === 'website' && (
+                      <button onClick={scrapeWebsite} disabled={isScrapingWebsite} style={{ background: 'rgba(124, 58, 237, 0.1)', border: '1px solid #7c3aed', color: '#a78bfa', padding: '0 1rem', borderRadius: '8px', cursor: isScrapingWebsite ? 'not-allowed' : 'pointer', fontSize: '0.8rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                        {isScrapingWebsite ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />} Auto-Extract
+                      </button>
+                    )}
+                  </div>
                 </div>
               ))}
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: '#a78bfa', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>✨ Auto-Extracted Value Proposition (AI Context)</label>
+                <textarea
+                  value={businessProfile.companyContext || ''}
+                  onChange={e => setBusinessProfile(prev => ({ ...prev, companyContext: e.target.value }))}
+                  placeholder="Enter your website URL above and click Auto-Extract, or write a short description of your core services and unique value proposition here..."
+                  style={{ width: '100%', minHeight: '80px', padding: '10px 14px', background: 'rgba(124, 58, 237, 0.05)', border: '1px solid #7c3aed55', borderRadius: '8px', color: '#fff', fontSize: '0.85rem', outline: 'none', boxSizing: 'border-box', resize: 'vertical' }}
+                />
+              </div>
             </div>
 
             {/* Signature Preview */}
