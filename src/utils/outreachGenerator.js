@@ -75,14 +75,14 @@ export function generateOutreachSync(company, role, persona, scanMode = 'hiring'
   const cleanRole = role.replace(/^Hiring:\s*/i, '').replace(/Layoffs:.*\.\s*/, '').replace(/\..*/, '');
   
   if (scanMode === 'layoff') {
-    return `Hi — I saw the news regarding the recent restructuring at ${company}. If you are looking for ways to maintain output without taking on full-time headcount risk again, my ${p} can step in as a flexible, fractional resource. Open to a quick chat?`;
+    return `Hi Team,\n\nI was following the recent news surrounding ${company}. Managing transitions while maintaining core product output is always a difficult balance to strike.\n\nIf your operational demands haven't slowed down, my ${p} can act as an elastic, fractional partner to bridge the gap—delivering high-level execution without the permanent headcount liability.\n\nWould a brief conversation make sense this week?`;
   } else if (scanMode === 'vc_whale') {
-    return `Hi — Congrats on the recent funding! I know the pressure is on to scale ${company} fast. Instead of spending months trying to hire an in-house ${cleanRole}, my ${p} can step in tomorrow to help you hit your targets immediately.`;
+    return `Hi Team,\n\nMassive congratulations on the recent funding milestone! I know investors expect rapid deployment, which makes scaling ${company} quickly your top priority right now.\n\nInstead of losing 60+ days hunting for an in-house ${cleanRole}, my ${p} can plug in tomorrow to help you hit those immediate scaling targets and clear the backlog.\n\nAre you open to exploring a fractional partnership to accelerate your roadmap?`;
   } else if (scanMode === 'stale_job') {
-    return `Hi — I noticed your ${cleanRole} position has been open for a while. The workload must be piling up. Let my ${p} step in fractionally tomorrow to stop the bleeding while you take your time finding the perfect full-time hire.`;
+    return `Hi Team,\n\nI saw that your ${cleanRole} position has been sitting open for quite some time now. When critical roles remain unfilled, roadmap execution inevitably slows down.\n\nWhile you continue searching for the perfect full-time fit, my ${p} can step in immediately to clear the backlog and stop the bleeding.\n\nCould we schedule a quick chat to see if a fractional setup makes sense in the interim?`;
   }
   
-  return `Hi — noticed ${company} is looking for a ${cleanRole}. We're a ${p} that helps companies exactly like yours achieve these specific goals without the massive overhead of a long hiring cycle. Happy to share a quick case study if you're open to exploring?`;
+  return `Hi Team,\n\nI noticed ${company} is currently recruiting for a ${cleanRole}. As you know, the hiring process can take months, and onboarding takes even longer.\n\nMy ${p} can step in immediately as a fractional partner to execute your roadmap—bypassing the expensive recruiter fees, training time, and headcount risks.\n\nAre you open to reviewing a quick case study of how we've done this for similar scaling teams?`;
 }
 
 // ============================================================

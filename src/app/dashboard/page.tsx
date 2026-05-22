@@ -69,6 +69,14 @@ function Dashboard() {
     setMounted(true);
     const saved = localStorage.getItem('dealfinder_leads');
     if (saved) { try { setLeads(JSON.parse(saved)); } catch (e) {} }
+    
+    // Load Cached AI Outreach and Emails
+    const savedOutreach = localStorage.getItem('dealfinder_ai_outreach');
+    if (savedOutreach) { try { setAiOutreach(JSON.parse(savedOutreach)); } catch (e) {} }
+    
+    const savedEmails = localStorage.getItem('dealfinder_found_emails');
+    if (savedEmails) { try { setFoundEmails(JSON.parse(savedEmails)); } catch (e) {} }
+
     const savedHunter = localStorage.getItem('df_hunter_api_key');
     if (savedHunter) setHunterKey(savedHunter);
     const savedRapid = localStorage.getItem('df_rapid_api_key');
@@ -87,6 +95,14 @@ function Dashboard() {
   useEffect(() => {
     if (mounted) localStorage.setItem('dealfinder_leads', JSON.stringify(leads));
   }, [leads, mounted]);
+
+  useEffect(() => {
+    if (mounted) localStorage.setItem('dealfinder_ai_outreach', JSON.stringify(aiOutreach));
+  }, [aiOutreach, mounted]);
+
+  useEffect(() => {
+    if (mounted) localStorage.setItem('dealfinder_found_emails', JSON.stringify(foundEmails));
+  }, [foundEmails, mounted]);
 
   const saveHunterKey = (val: string) => { setHunterKey(val); localStorage.setItem('df_hunter_api_key', val); };
   const saveRapidApiKey = (val: string) => { setRapidApiKey(val); localStorage.setItem('df_rapid_api_key', val); };
@@ -112,6 +128,16 @@ function Dashboard() {
     if (p.website) sig += `\n🌐 ${p.website}`;
     if (p.address) sig += `\n📍 ${p.address}`;
     return sig;
+  };
+
+  const getEmailBody = (lead: any) => {
+    if (!lead) return '';
+    const base = aiOutreach[lead.id] || lead.outreach || '';
+    const signature = buildSignature();
+    if (signature && !base.includes(signature)) {
+      return base + signature;
+    }
+    return base;
   };
   const savePersona = (val: string) => { 
     setUserPersona(val); 
@@ -391,14 +417,14 @@ function Dashboard() {
                         {/* Outreach Box */}
                         <div className="ai-box-mobile" style={{ background: 'rgba(0,0,0,0.3)', padding: '1rem', borderRadius: '8px', border: `1px solid ${aiOutreach[lead.id] ? '#7c3aed55' : '#333'}`, position: 'relative', marginTop: '1rem' }}>
                           {aiOutreach[lead.id] && <span style={{ position: 'absolute', top: '-10px', left: '12px', background: 'linear-gradient(135deg,#7c3aed,#4facfe)', color: '#fff', fontSize: '0.65rem', padding: '2px 8px', borderRadius: '999px', fontWeight: 700 }}>✨ AI Generated</span>}
-                          <p className="ai-text-mobile" style={{ fontSize: '0.875rem', color: aiOutreach[lead.id] ? '#e2e8f0' : '#aaa' }}><em>"{aiOutreach[lead.id] ? <Typewriter text={aiOutreach[lead.id]} /> : lead.outreach}"</em></p>
+                          <p className="ai-text-mobile" style={{ fontSize: '0.875rem', color: aiOutreach[lead.id] ? '#e2e8f0' : '#aaa', margin: 0, paddingRight: '100px' }}><em>"{aiOutreach[lead.id] ? <Typewriter text={aiOutreach[lead.id]} /> : lead.outreach}"</em></p>
                           {/* Omnichannel Blitz / AI Actions */}
-                          <div className="ai-actions-mobile" style={{ position: 'absolute', top: '0.75rem', right: '0.75rem', display: 'flex', gap: '0.75rem' }}>
-                            <button onClick={() => { setBlitzLead(lead); if(!aiOutreach[lead.id]) generateAIOutreach(lead); if(!foundEmails[lead.id] && hunterKey) fetchEmailsWithHunter(lead); }} disabled={!!generatingId} style={{ background: 'linear-gradient(135deg, #7c3aed, #4facfe)', color: '#fff', border: 'none', cursor: generatingId ? 'not-allowed' : 'pointer', padding: '4px 12px', borderRadius: '4px', fontWeight: 'bold', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '4px' }} title="Omnichannel Blitz">
-                              {generatingId === lead.id ? <Loader2 size={14} className="animate-spin" /> : <><Sparkles size={14} /> Blitz</>}
+                          <div className="ai-actions-mobile" style={{ position: 'absolute', top: '0.75rem', right: '0.75rem', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                            <button onClick={() => { setBlitzLead(lead); if(!aiOutreach[lead.id]) generateAIOutreach(lead); if(!foundEmails[lead.id] && hunterKey) fetchEmailsWithHunter(lead); }} disabled={!!generatingId} style={{ background: 'linear-gradient(135deg, #7c3aed, #4facfe)', color: '#fff', border: 'none', cursor: generatingId ? 'not-allowed' : 'pointer', padding: '4px 8px', borderRadius: '4px', fontWeight: 'bold', fontSize: '0.7rem', display: 'flex', alignItems: 'center', gap: '4px' }} title="Omnichannel Blitz">
+                              {generatingId === lead.id ? <Loader2 size={12} className="animate-spin" /> : <><Sparkles size={12} /> Blitz</>}
                             </button>
-                            <a href={`https://mail.google.com/mail/?view=cm&fs=1&to=${foundEmails[lead.id]?.[0]?.value || lead.contactEmail || ''}&su=${encodeURIComponent(`Exploring synergies: ${lead.problem?.replace('Hiring: ', '') || 'Open Role'} at ${lead.company}`)}&body=${encodeURIComponent(aiOutreach[lead.id] || lead.outreach)}`} target="_blank" rel="noreferrer" style={{ color: '#4facfe', padding: 0 }} title="Open in Gmail"><Mail size={18} /></a>
-                            <button onClick={() => handleCopy(lead.id, aiOutreach[lead.id] || lead.outreach)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: copiedId === lead.id ? '#27c93f' : '#666', padding: 0 }} title="Copy">{copiedId === lead.id ? <Check size={18} /> : <Copy size={18} />}</button>
+                            <a href={`https://mail.google.com/mail/?view=cm&fs=1&to=${foundEmails[lead.id]?.map((e: any) => e.value).join(',') || lead.contactEmail || ''}&su=${encodeURIComponent(`Exploring synergies: ${lead.problem?.replace('Hiring: ', '') || 'Open Role'} at ${lead.company}`)}&body=${encodeURIComponent(getEmailBody(lead))}`} target="_blank" rel="noreferrer" style={{ color: '#4facfe', display: 'inline-flex', alignItems: 'center' }} title="Open in Gmail"><Mail size={16} /></a>
+                            <button onClick={() => handleCopy(lead.id, getEmailBody(lead))} style={{ background: 'none', border: 'none', cursor: 'pointer', color: copiedId === lead.id ? '#27c93f' : '#666', display: 'inline-flex', alignItems: 'center', padding: 0 }} title="Copy">{copiedId === lead.id ? <Check size={16} /> : <Copy size={16} />}</button>
                           </div>
                         </div>
 
@@ -431,7 +457,7 @@ function Dashboard() {
                                       <strong style={{ color: '#fff' }}>{em.first_name} {em.last_name}</strong> {em.position && <span style={{ color: '#888' }}>- {em.position}</span>}
                                     </div>
                                     <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                                      <a href={`https://mail.google.com/mail/?view=cm&fs=1&to=${em.value}&su=${encodeURIComponent(`Exploring synergies: ${lead.problem?.replace('Hiring: ', '') || 'Open Role'} at ${lead.company}`)}&body=${encodeURIComponent(aiOutreach[lead.id] || lead.outreach)}`} target="_blank" rel="noreferrer" style={{ color: '#4facfe', textDecoration: 'none' }} title="Send Pitch in Gmail">
+                                      <a href={`https://mail.google.com/mail/?view=cm&fs=1&to=${em.value}&su=${encodeURIComponent(`Exploring synergies: ${lead.problem?.replace('Hiring: ', '') || 'Open Role'} at ${lead.company}`)}&body=${encodeURIComponent(getEmailBody(lead))}`} target="_blank" rel="noreferrer" style={{ color: '#4facfe', textDecoration: 'none' }} title="Send Pitch in Gmail">
                                         <Mail size={14} style={{ marginRight: '4px', display: 'inline-block', verticalAlign: 'middle' }}/> 
                                         {em.value}
                                       </a>
@@ -490,7 +516,7 @@ function Dashboard() {
                                   {generatingId === lead.id ? <Loader2 size={12} className="animate-spin" /> : <><Sparkles size={12} /> Blitz</>}
                                 </button>
                                 {foundEmails[lead.id]?.[0]?.value && (
-                                  <a href={`https://mail.google.com/mail/?view=cm&fs=1&to=${foundEmails[lead.id]?.[0]?.value}&su=${encodeURIComponent(`Exploring synergies at ${lead.company}`)}&body=${encodeURIComponent(aiOutreach[lead.id] || lead.outreach)}`} target="_blank" rel="noreferrer" style={{ color: '#4facfe', background: 'rgba(79, 172, 254, 0.1)', padding: '4px 8px', borderRadius: '4px' }} title="Open in Gmail"><Mail size={14} /></a>
+                                  <a href={`https://mail.google.com/mail/?view=cm&fs=1&to=${foundEmails[lead.id]?.map((e: any) => e.value).join(',') || ''}&su=${encodeURIComponent(`Exploring synergies at ${lead.company}`)}&body=${encodeURIComponent(getEmailBody(lead))}`} target="_blank" rel="noreferrer" style={{ color: '#4facfe', background: 'rgba(79, 172, 254, 0.1)', padding: '4px 8px', borderRadius: '4px' }} title="Open in Gmail"><Mail size={14} /></a>
                                 )}
                               </div>
                             </div>
@@ -521,10 +547,10 @@ function Dashboard() {
               <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid #222', borderRadius: '8px', padding: '1rem' }}>
                 <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0 0 1rem 0', color: '#e2e8f0', fontSize: '1rem' }}>📧 Step 1: The Cold Email</h3>
                 <div style={{ background: '#000', padding: '1rem', borderRadius: '6px', fontSize: '0.85rem', color: '#a1a1aa', whiteSpace: 'pre-wrap', fontFamily: 'monospace' }}>
-                  {aiOutreach[blitzLead.id] || "Generating AI Pitch..."}
+                  {generatingId === blitzLead.id && !aiOutreach[blitzLead.id] ? "Generating AI Pitch..." : getEmailBody(blitzLead)}
                 </div>
                 <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem' }}>
-                  <a href={`https://mail.google.com/mail/?view=cm&fs=1&to=${foundEmails[blitzLead.id]?.[0]?.value || blitzLead.contactEmail || ''}&su=${encodeURIComponent(`Exploring synergies at ${blitzLead.company}`)}&body=${encodeURIComponent(aiOutreach[blitzLead.id] || '')}`} target="_blank" rel="noreferrer" style={{ background: '#4facfe', color: '#000', padding: '8px 16px', borderRadius: '6px', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px' }}><Mail size={16}/> Open in Gmail</a>
+                  <a href={`https://mail.google.com/mail/?view=cm&fs=1&to=${foundEmails[blitzLead.id]?.map((e: any) => e.value).join(',') || blitzLead.contactEmail || ''}&su=${encodeURIComponent(`Exploring synergies at ${blitzLead.company}`)}&body=${encodeURIComponent(getEmailBody(blitzLead))}`} target="_blank" rel="noreferrer" style={{ background: '#4facfe', color: '#000', padding: '8px 16px', borderRadius: '6px', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px' }}><Mail size={16}/> Open in Gmail</a>
                   {!foundEmails[blitzLead.id] && hunterKey && (
                     <span style={{ fontSize: '0.75rem', color: '#888', display: 'flex', alignItems: 'center' }}>Searching for email... <Loader2 size={12} className="animate-spin" style={{ marginLeft: '4px' }} /></span>
                   )}

@@ -5,11 +5,12 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { company, title, contactName, persona, isFollowUp, scanMode, senderName } = body;
 
-    const apiKey = process.env.GEMINI_API_KEY;
+    // Using NVIDIA NIM API key instead of Gemini
+    const apiKey = process.env.NVIDIA_API_KEY || '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';
     if (!apiKey) {
-      console.error('GEMINI_API_KEY is not set in environment variables');
+      console.error('NVIDIA_API_KEY is not set in environment variables');
       return NextResponse.json(
-        { error: 'Gemini API key not configured. Add GEMINI_API_KEY in Vercel Environment Variables.' },
+        { error: 'NVIDIA API key not configured. Add NVIDIA_API_KEY in Vercel Environment Variables.' },
         { status: 500 }
       );
     }
@@ -68,47 +69,44 @@ export async function POST(request: NextRequest) {
       3. ${signOffName} Do NOT include a subject line.`;
     }
 
-    // Try multiple models in order of preference for maximum reliability
-    const models = ['gemini-2.0-flash', 'gemini-2.0-flash-lite', 'gemini-2.5-flash'];
+    // Robust NIM Model Failover Loop
+    const apiUrl = 'https://integrate.api.nvidia.com/v1/chat/completions';
+    const models = ['meta/llama-3.1-70b-instruct', 'mistralai/mixtral-8x22b-instruct-v0.1', 'meta/llama3-8b-instruct'];
     
     let lastError = '';
 
     for (const model of models) {
-      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-
       try {
         const res = await fetch(apiUrl, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
+          },
           body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: {
-              temperature: 0.85,
-              maxOutputTokens: 400,
-              topP: 0.9,
-            },
+            model: model,
+            messages: [
+              { role: 'system', content: 'You are an elite B2B sales copywriter. Write a highly converting cold email based strictly on the user prompt. DO NOT include a Subject line. Go straight into the body of the email. Write the complete email, do not stop halfway.' },
+              { role: 'user', content: prompt }
+            ],
+            temperature: 0.7,
+            top_p: 0.9,
           }),
         });
 
-        if (res.status === 429) {
-          // Rate limited on this model, try the next one
-          lastError = `Rate limited on ${model}. `;
-          continue;
-        }
-
         if (!res.ok) {
           const errorText = await res.text();
-          console.error(`Gemini ${model} error:`, res.status, errorText);
+          console.error(`NVIDIA API error on ${model}:`, res.status, errorText);
           lastError = `${model} returned ${res.status}. `;
           continue;
         }
 
         const data = await res.json();
-        const outreach = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+        const outreach = data?.choices?.[0]?.message?.content?.trim();
 
-        if (!outreach) {
-          console.error(`Gemini ${model} returned empty response:`, JSON.stringify(data));
-          lastError = `${model} returned empty. `;
+        if (!outreach || outreach.length < 100) {
+          console.error(`NVIDIA API ${model} returned empty or truncated response:`, outreach);
+          lastError = `${model} returned truncated string. `;
           continue;
         }
 
@@ -116,14 +114,15 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ outreach });
 
       } catch (fetchErr) {
+        console.error(`NVIDIA Network error on ${model}:`, fetchErr);
         lastError = `${model} network error. `;
         continue;
       }
     }
 
-    // All models failed
+    // If all models fail or truncate
     return NextResponse.json(
-      { error: `All AI models failed. ${lastError} Your free-tier quota may be exhausted for today. Try again in a few minutes or upgrade to a paid Gemini plan.` },
+      { error: `All NVIDIA models failed or timed out. ${lastError} Please try again.` },
       { status: 502 }
     );
 
