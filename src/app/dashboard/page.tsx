@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { Activity, Loader2, Download, Check, Copy, Clock, Mail, Trash2, LogOut, Sparkles, X, User, Settings } from 'lucide-react';
+import { Activity, Loader2, Download, Check, Copy, Clock, Mail, Trash2, LogOut, Sparkles, X, User, Settings, AlignLeft, AlignJustify } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import Logo from '../../components/Logo';
 import { scanAllSources } from '../../utils/leadSources';
@@ -42,6 +42,7 @@ function Dashboard() {
   const [ghostModeEnabled, setGhostModeEnabled] = useState(false);
   const [blitzLead, setBlitzLead] = useState<any>(null);
   const [highIntentOnly, setHighIntentOnly] = useState(false);
+  const [emailLength, setEmailLength] = useState<'short' | 'detailed'>('short');
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [aiOutreach, setAiOutreach] = useState<{[key: string]: string}>({});
   const [foundEmails, setFoundEmails] = useState<{[key: string]: any[]}>({});
@@ -83,6 +84,8 @@ function Dashboard() {
     if (savedHunter) setHunterKey(savedHunter);
     const savedRapid = localStorage.getItem('df_rapid_api_key');
     if (savedRapid) setRapidApiKey(savedRapid);
+    const savedLength = localStorage.getItem('df_email_length');
+    if (savedLength) setEmailLength(savedLength as 'short' | 'detailed');
     const savedPersona = localStorage.getItem('df_user_persona');
     if (savedPersona) setUserPersona(savedPersona);
     // Load Business Profile
@@ -192,7 +195,7 @@ function Dashboard() {
   const generateAIOutreach = async (lead: any, isFollowUp = false) => {
     if (generatingId) return; setGeneratingId(lead.id);
     try {
-      const res = await fetch('/api/generate-outreach', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ company: lead.company, title: lead.problem, contactName: lead.contactName || null, persona: userPersona, isFollowUp: isFollowUp || (lead.status || 'New') === 'Contacted', scanMode: lead.scanMode || 'hiring', senderName: businessProfile.fullName || null, companyContext: businessProfile.companyContext || null }) });
+      const res = await fetch('/api/generate-outreach', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ company: lead.company, title: lead.problem, contactName: lead.contactName || null, persona: userPersona, isFollowUp: isFollowUp || (lead.status || 'New') === 'Contacted', scanMode: lead.scanMode || 'hiring', senderName: businessProfile.fullName || null, companyContext: businessProfile.companyContext || null, emailLength }) });
       const data = await res.json();
       if (data.outreach) {
         const signature = buildSignature();
@@ -420,6 +423,9 @@ function Dashboard() {
                     <button onClick={() => setViewMode('list')} style={{ background: viewMode === 'list' ? '#333' : 'transparent', color: viewMode === 'list' ? '#fff' : '#888', border: 'none', padding: '0.25rem 0.75rem', fontSize: '0.8rem', cursor: 'pointer' }}>List View</button>
                     <button onClick={() => setViewMode('pipeline')} style={{ background: viewMode === 'pipeline' ? '#333' : 'transparent', color: viewMode === 'pipeline' ? '#fff' : '#888', border: 'none', padding: '0.25rem 0.75rem', fontSize: '0.8rem', cursor: 'pointer' }}>Pipeline CRM</button>
                   </div>
+                  <button onClick={() => { const newLen = emailLength === 'short' ? 'detailed' : 'short'; setEmailLength(newLen); localStorage.setItem('df_email_length', newLen); }} className="btn-secondary" style={{ padding: '0.25rem 0.75rem', fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: '0.5rem', background: emailLength === 'detailed' ? 'rgba(124, 58, 237, 0.1)' : 'transparent', border: emailLength === 'detailed' ? '1px solid #7c3aed' : '1px solid #333', color: emailLength === 'detailed' ? '#a78bfa' : '#888' }} title="Toggle AI Email Length">
+                    {emailLength === 'detailed' ? <AlignLeft size={14} /> : <AlignJustify size={14} />} {emailLength === 'detailed' ? 'Detailed Pitch' : 'Short & Punchy'}
+                  </button>
                   <button onClick={exportToCSV} className="btn-secondary" style={{ padding: '0.25rem 0.75rem', fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Download size={14} /> Export CSV</button>
                   <button onClick={() => { if (window.confirm('Clear leads?')) setLeads([]); }} className="btn-secondary" style={{ padding: '0.25rem 0.75rem', fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'transparent', border: '1px solid #333', color: '#888' }}><Trash2 size={14} /> Clear</button>
                 </div>

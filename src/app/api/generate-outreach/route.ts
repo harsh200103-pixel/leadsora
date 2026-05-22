@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { company, title, contactName, persona, isFollowUp, scanMode, senderName, companyContext } = body;
+    const { company, title, contactName, persona, isFollowUp, scanMode, senderName, companyContext, emailLength } = body;
 
     // Using NVIDIA NIM API key instead of Gemini
     const apiKey = process.env.NVIDIA_API_KEY || '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';
@@ -79,6 +79,10 @@ export async function POST(request: NextRequest) {
       ? `CRITICAL CONTEXT: You represent a company with this specific profile/value proposition: "${companyContext}". You MUST aggressively weave these specific capabilities and services into the pitch. Do NOT sound generic. Use the specific technologies and services mentioned in the context.`
       : '';
 
+    const lengthInstruction = emailLength === 'detailed' 
+      ? `CRITICAL RULE: Write a comprehensive, detailed email (3-4 paragraphs). Deeply explain the technical value proposition and go into specifics about how you can help them achieve their goals.` 
+      : `CRITICAL RULE: Keep the email extremely short and punchy (under 100 words). Decision makers do not read long emails.`;
+
     for (const model of models) {
       try {
         const res = await fetch(apiUrl, {
@@ -90,7 +94,7 @@ export async function POST(request: NextRequest) {
           body: JSON.stringify({
             model: model,
             messages: [
-              { role: 'system', content: `You are an elite B2B sales copywriter. ${injectedContext} Write a highly converting cold email based strictly on the user prompt. DO NOT include a Subject line. Go straight into the body of the email. Write the complete email, do not stop halfway.` },
+              { role: 'system', content: `You are an elite B2B sales copywriter. ${injectedContext} Write a highly converting cold email based strictly on the user prompt. DO NOT include a Subject line. Go straight into the body of the email. Write the complete email, do not stop halfway. ${lengthInstruction}` },
               { role: 'user', content: prompt }
             ],
             temperature: 0.7,
