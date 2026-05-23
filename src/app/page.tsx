@@ -19,9 +19,11 @@ export default function LandingPage() {
 
       {/* Hero */}
       <section className="hero container text-center">
-        <h1>Find Clients Who Are Already Looking for You</h1>
-        <p>AI-powered lead intelligence that detects real buying intent across the web — before your competitors do.</p>
-        <p className="mb-8" style={{ color: '#fff', opacity: 0.7, fontWeight: 500 }}>"Not another lead tool. This is a decision engine."</p>
+        <h1 className="text-5xl md:text-7xl font-bold tracking-tighter mb-6 text-white text-glow animate-fade-in-up" style={{ lineHeight: 1.1 }}>
+            Find Buying Intent <br/>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">Before Your Competitors Do</span>
+          </h1>
+          <p className="mb-8" style={{ color: '#fff', opacity: 0.7, fontWeight: 500 }}>&quot;Not another lead tool. This is a decision engine.&quot;</p>
         <div className="hero-buttons">
           <button className="btn-primary" onClick={() => router.push('/signup')}>Start Free Analysis</button>
           <button className="btn-secondary" onClick={() => document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' })}>View Demo</button>
@@ -35,12 +37,14 @@ export default function LandingPage() {
           <div className="glass-card text-center">
             <div className="flex justify-center"><Globe className="step-icon" /></div>
             <h3>1. Scan the Internet</h3>
-            <p style={{ color: 'var(--text-secondary)', marginTop: '1rem' }}>Continuous monitoring of LinkedIn, job boards, forums, and company websites for buying intent.</p>
+            <p className="text-gray-400">Scan 25+ global job boards, news sites, and company directories to find exactly who is hiring for your specific service right now.</p>
           </div>
-          <div className="glass-card text-center">
-            <div className="flex justify-center"><Zap className="step-icon" /></div>
-            <h3>2. Detect Buying Signals</h3>
-            <p style={{ color: 'var(--text-secondary)', marginTop: '1rem' }}>Our proprietary NLP AI identifies urgency and clear intent to purchase services in your niche.</p>
+          <div className="p-8 rounded-2xl bg-white/5 border border-white/10 hover:border-purple-500/50 transition-colors">
+              <div className="w-12 h-12 rounded-full bg-pink-500/20 flex items-center justify-center text-pink-400 mb-6">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-3">AI Outreach Generator</h3>
+              <p className="text-gray-400">Click a single button to generate a hyper-personalized email pitch based on the company&apos;s specific hiring needs and your custom persona.</p>
           </div>
           <div className="glass-card text-center">
             <div className="flex justify-center"><Target className="step-icon" /></div>
@@ -88,7 +92,7 @@ export default function LandingPage() {
               <div>
                 <h4 style={{ color: '#fff', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><MessageSquare size={18} color="#27c93f" /> Suggested Outreach</h4>
                 <div className="glass-card" style={{ padding: '1.5rem' }}>
-                  <p style={{ color: '#ccc', fontStyle: 'italic' }}>"Hi John, noticed Smith &amp; Co is exploring AI solutions for contract automation. Our agency recently helped a similar mid-sized firm reduce document review time by 40%. Would love to share the blueprint."</p>
+                  <p style={{ color: '#ccc', fontStyle: 'italic' }}>&quot;Hi John, noticed Smith &amp; Co is exploring AI solutions for contract automation. Our agency recently helped a similar mid-sized firm reduce document review time by 40%. Would love to share the blueprint.&quot;</p>
                   <button className="btn-secondary" style={{ marginTop: '1rem', width: '100%', padding: '0.5rem', fontSize: '0.875rem' }}>Copy to Clipboard</button>
                 </div>
               </div>

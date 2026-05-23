@@ -447,6 +447,10 @@ footer {
   /* Nav */
   .mobile-menu-btn { display: block !important; }
   .desktop-nav-links { display: none !important; }
+  .hide-on-mobile { display: none !important; }
+
+  /* Ghost mode label — show emoji-only version on mobile */
+  .show-on-mobile { display: inline !important; }
 
   /* Typography */
   .hero h1 { font-size: 2.2rem; letter-spacing: -0.01em; }
@@ -454,13 +458,13 @@ footer {
   .section-title { font-size: 1.8rem; margin-bottom: 2rem; }
 
   /* Hero */
-  .hero { padding: 5rem 0 4rem; }
+  .hero { padding: 3rem 0 2rem; }
   .hero-buttons { flex-direction: column; width: 100%; max-width: 320px; }
   .hero-buttons button, .hero-buttons a { width: 100%; text-align: center; }
 
   /* Cards */
   .glass-card { padding: 1.25rem; }
-  .glass-card:hover { transform: translateY(-3px); } /* reduce 3D on mobile */
+  .glass-card:hover { transform: translateY(-3px); }
 
   /* Grids */
   .steps-grid { grid-template-columns: 1fr; }
@@ -475,13 +479,41 @@ footer {
   /* Dashboard */
   .dashboard-body { padding: 1rem; }
   .dashboard-header { flex-wrap: wrap; gap: 0.5rem; }
-  .intent-score { width: 100%; justify-content: center; margin-top: 1rem; }
-  .hide-on-mobile { display: none !important; }
+
+  /* Intent score — stays INSIDE the card on mobile, not a separate block below */
+  .intent-score {
+    width: auto !important;
+    justify-content: flex-start !important;
+    margin-top: 0 !important;
+    position: static !important;
+    display: inline-flex !important;
+  }
+
+  /* Lead card — stack vertically on mobile */
+  .lead-card-row { flex-direction: column !important; gap: 0.75rem !important; }
+  .lead-contact-chips { flex-wrap: wrap; gap: 0.5rem !important; }
+
+  /* Filter tabs — scroll horizontally instead of wrapping */
+  .scan-mode-tabs {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    flex-wrap: nowrap !important;
+  }
+  .scan-mode-tabs::-webkit-scrollbar { display: none; }
+  .scan-mode-tabs button { flex-shrink: 0 !important; white-space: nowrap; }
+
+  /* Controls row */
   .dashboard-controls-mobile { flex-direction: column !important; align-items: stretch !important; gap: 0.75rem !important; margin-top: 1rem; }
   .dashboard-controls-mobile > * { width: 100% !important; justify-content: center !important; }
+
+  /* AI outreach box */
   .ai-box-mobile { padding-right: 1rem !important; display: flex; flex-direction: column; gap: 0.75rem; }
   .ai-text-mobile { padding-right: 0 !important; }
   .ai-actions-mobile { position: relative !important; top: 0 !important; right: 0 !important; justify-content: flex-end; width: 100%; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 0.75rem; }
+
+  /* Source link — don't truncate, wrap instead */
+  .source-link { word-break: break-word; font-size: 0.72rem !important; }
 
   /* Container padding */
   .container { padding: 0 1rem; }
@@ -491,12 +523,11 @@ footer {
   .cta-section { padding: 4rem 0; }
 
   /* Navbar */
-  nav { padding: 0.75rem 1rem !important; }
+  nav { padding: 0.6rem 0.75rem !important; }
   nav .logo-text { font-size: 1rem !important; }
 
-  /* Lead cards on mobile */
-  .lead-card-row { flex-direction: column !important; }
-  .lead-contact-chips { flex-wrap: wrap; }
+  /* Modals */
+  .modal-inner { padding: 1.5rem !important; }
 }
 
 @media (max-width: 480px) {
@@ -506,5 +537,7 @@ footer {
   .btn-primary, .btn-secondary { padding: 0.75rem 1.25rem; font-size: 0.9rem; }
   footer .container > div { flex-direction: column; gap: 1.5rem; text-align: center; }
   footer .container > div > div:nth-child(2) { justify-content: center; }
-}
 
+  /* Extra small phones — shrink scan mode buttons further */
+  .scan-mode-tabs button { font-size: 0.75rem !important; padding: 5px 10px !important; }
+}

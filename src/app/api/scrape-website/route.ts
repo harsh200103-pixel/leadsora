@@ -53,12 +53,13 @@ export async function POST(request: NextRequest) {
         messages: [
           { 
             role: 'system', 
-            content: 'You are an expert business analyst. I will give you the raw text scraped from a company website. Your job is to extract their EXACT value proposition, their specific technical capabilities (e.g., Python, React Native, AI, etc.), and their target audience. Write a 2-3 sentence summary written from the perspective of the company itself (e.g. "We specialize in..."). Keep it punchy and highly professional.' 
+            content: 'You are an expert business analyst. I will give you the raw text scraped from a company website. Your job is to extract their EXACT value proposition AND suggest 3 specific lead targets they should search for based on what they do. Return ONLY a valid JSON object with two keys: "companyContext" (a 2-3 sentence summary written from their perspective, e.g. "We specialize in...") and "suggestedRoles" (an array of 3 concise string keywords for job roles or industries they should target, e.g. ["Frontend Developer", "E-commerce", "Marketing"]). Do not return anything outside the JSON object.' 
           },
           { role: 'user', content: limitedText }
         ],
         temperature: 0.3,
-        max_tokens: 200
+        max_tokens: 300,
+        response_format: { type: "json_object" }
       }),
     });
 
@@ -69,9 +70,19 @@ export async function POST(request: NextRequest) {
     }
 
     const data = await nimResponse.json();
-    const context = data?.choices?.[0]?.message?.content?.trim();
+    let resultContext = data?.choices?.[0]?.message?.content?.trim();
+    let suggestedRoles = [];
 
-    return NextResponse.json({ companyContext: context });
+    try {
+      // Attempt to parse JSON response
+      const parsed = JSON.parse(resultContext);
+      if (parsed.companyContext) resultContext = parsed.companyContext;
+      if (parsed.suggestedRoles && Array.isArray(parsed.suggestedRoles)) suggestedRoles = parsed.suggestedRoles;
+    } catch (e) {
+      console.warn("NIM returned non-JSON format, falling back to raw text:", resultContext);
+    }
+
+    return NextResponse.json({ companyContext: resultContext, suggestedRoles });
 
   } catch (err: any) {
     console.error('Scrape API Error:', err);

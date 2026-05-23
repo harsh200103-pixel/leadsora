@@ -1,6 +1,7 @@
 "use client";
-import React, { useState, useEffect } from 'react';
-import { Activity, Loader2, Download, Check, Copy, Clock, Mail, Trash2, LogOut, Sparkles, X, User, Settings, AlignLeft, AlignJustify } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Activity, Loader2, Download, Check, Copy, Clock, Mail, Trash2, LogOut, Sparkles, X, User, Settings, AlignLeft, AlignJustify, FileText, BarChart2, UserCheck } from 'lucide-react';
+import Link from 'next/link';
 import { useAuth } from '../context/AuthContext';
 import Logo from '../../components/Logo';
 import { scanAllSources } from '../../utils/leadSources';
@@ -33,11 +34,12 @@ function Dashboard() {
   const [isScanning, setIsScanning] = useState(false);
   const [scanStatus, setScanStatus] = useState('');
   const [hunterKey, setHunterKey] = useState('b937eb0f532629a23bc002872195055922026f68'); // Default to provided key
-  const [rapidApiKey, setRapidApiKey] = useState('');
+  const [rapidApiKey, setRapidApiKey] = useState('dce6b2a37amshb9608bc3c001bdfp140418jsnef8c85290652');
   const [userPersona, setUserPersona] = useState('Software Development Agency');
   const [viewMode, setViewMode] = useState<'list' | 'pipeline'>('list');
   const [showSettings, setShowSettings] = useState(false);
-  const [scanMode, setScanMode] = useState<'hiring' | 'layoff' | 'vc_whale' | 'stale_job'>('hiring');
+  const [scanMode, setScanMode] = useState<'hiring' | 'layoff' | 'vc_whale' | 'stale_job' | 'defection_signal'>('hiring');
+  const [followUpModal, setFollowUpModal] = useState<any>(null);
   const [searchType, setSearchType] = useState<'keyword' | 'cloner'>('keyword');
   const [ghostModeEnabled, setGhostModeEnabled] = useState(false);
   const [blitzLead, setBlitzLead] = useState<any>(null);
@@ -52,6 +54,13 @@ function Dashboard() {
   const [leads, setLeads] = useState<any[]>([]);
   const [mounted, setMounted] = useState(false);
 
+  // ── New Feature State ──
+  const [notes, setNotes] = useState<{[key: string]: string}>({});
+  const [showNote, setShowNote] = useState<{[key: string]: boolean}>({});
+  const [emailVerification, setEmailVerification] = useState<{[key: string]: 'valid' | 'risky' | 'invalid' | 'checking'}>({});
+  const [findingManagerFor, setFindingManagerFor] = useState<string | null>(null);
+  const [slackWebhook, setSlackWebhook] = useState('');
+
   // Business Profile State
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [profileDismissed, setProfileDismissed] = useState(false);
@@ -59,7 +68,8 @@ function Dashboard() {
     fullName: string; jobTitle: string; companyName: string;
     email: string; phone: string; website: string; address: string;
     companyContext?: string;
-  }>({ fullName: '', jobTitle: '', companyName: '', email: '', phone: '', website: '', address: '', companyContext: '' });
+    suggestedRoles?: string[];
+  }>({ fullName: '', jobTitle: '', companyName: '', email: '', phone: '', website: '', address: '', companyContext: '', suggestedRoles: [] });
   const [isScrapingWebsite, setIsScrapingWebsite] = useState(false);
 
   // Ghost Mode Scheduler State
@@ -69,56 +79,131 @@ function Dashboard() {
   });
 
   useEffect(() => {
+    if (!user || authLoading) return;
     setMounted(true);
-    const saved = localStorage.getItem('dealfinder_leads');
+    const prefix = `_${user.email}`;
+    
+    const saved = localStorage.getItem(`dealfinder_leads${prefix}`);
     if (saved) { try { setLeads(JSON.parse(saved)); } catch (e) {} }
     
-    // Load Cached AI Outreach and Emails
-    const savedOutreach = localStorage.getItem('dealfinder_ai_outreach');
+    const savedOutreach = localStorage.getItem(`dealfinder_ai_outreach${prefix}`);
     if (savedOutreach) { try { setAiOutreach(JSON.parse(savedOutreach)); } catch (e) {} }
     
-    const savedEmails = localStorage.getItem('dealfinder_found_emails');
+    const savedEmails = localStorage.getItem(`dealfinder_found_emails${prefix}`);
     if (savedEmails) { try { setFoundEmails(JSON.parse(savedEmails)); } catch (e) {} }
 
+    // API keys are platform-level, so they are not scoped to the user email
     const savedHunter = localStorage.getItem('df_hunter_api_key');
     if (savedHunter) setHunterKey(savedHunter);
     const savedRapid = localStorage.getItem('df_rapid_api_key');
     if (savedRapid) setRapidApiKey(savedRapid);
-    const savedLength = localStorage.getItem('df_email_length');
+    
+    const savedLength = localStorage.getItem(`df_email_length${prefix}`);
     if (savedLength) setEmailLength(savedLength as 'short' | 'detailed');
-    const savedPersona = localStorage.getItem('df_user_persona');
+    
+    const savedPersona = localStorage.getItem(`df_user_persona${prefix}`);
     if (savedPersona) setUserPersona(savedPersona);
-    // Load Business Profile
-    const savedProfile = localStorage.getItem('leadsora_business_profile');
+    
+    const savedProfile = localStorage.getItem(`leadsora_business_profile${prefix}`);
     if (savedProfile) { try { setBusinessProfile(JSON.parse(savedProfile)); } catch (e) {} }
-    else { setShowProfileModal(true); } // Show onboarding on first visit
-    // Load Ghost Config
-    const savedGhost = localStorage.getItem('leadsora_ghost_config');
+    else if (user) { 
+      setBusinessProfile(prev => ({ ...prev, fullName: user.name || '', email: user.email || '' }));
+      setShowProfileModal(true); 
+    }
+    
+    const savedGhost = localStorage.getItem(`leadsora_ghost_config${prefix}`);
     if (savedGhost) { try { setGhostConfig(JSON.parse(savedGhost)); } catch (e) {} }
-  }, []);
+
+    const savedNotes = localStorage.getItem(`leadsora_notes${prefix}`);
+    if (savedNotes) { try { setNotes(JSON.parse(savedNotes)); } catch (e) {} }
+
+    const savedSlack = localStorage.getItem('df_slack_webhook');
+    if (savedSlack) setSlackWebhook(savedSlack);
+  }, [user, authLoading]);
 
   useEffect(() => {
-    if (mounted) localStorage.setItem('dealfinder_leads', JSON.stringify(leads));
-  }, [leads, mounted]);
+    if (mounted && user) localStorage.setItem(`dealfinder_leads_${user.email}`, JSON.stringify(leads));
+  }, [leads, mounted, user]);
 
   useEffect(() => {
-    if (mounted) localStorage.setItem('dealfinder_ai_outreach', JSON.stringify(aiOutreach));
-  }, [aiOutreach, mounted]);
+    if (mounted && user) localStorage.setItem(`dealfinder_ai_outreach_${user.email}`, JSON.stringify(aiOutreach));
+  }, [aiOutreach, mounted, user]);
 
   useEffect(() => {
-    if (mounted) localStorage.setItem('dealfinder_found_emails', JSON.stringify(foundEmails));
-  }, [foundEmails, mounted]);
+    if (mounted && user) localStorage.setItem(`dealfinder_found_emails_${user.email}`, JSON.stringify(foundEmails));
+  }, [foundEmails, mounted, user]);
 
   const saveHunterKey = (val: string) => { setHunterKey(val); localStorage.setItem('df_hunter_api_key', val); };
   const saveRapidApiKey = (val: string) => { setRapidApiKey(val); localStorage.setItem('df_rapid_api_key', val); };
+  const saveSlackWebhook = (val: string) => { setSlackWebhook(val); localStorage.setItem('df_slack_webhook', val); };
+
+  const saveNote = (leadId: string, text: string) => {
+    const updated = { ...notes, [leadId]: text };
+    setNotes(updated);
+    if (user) localStorage.setItem(`leadsora_notes_${user.email}`, JSON.stringify(updated));
+  };
+
+  const sendSlackNotification = async (lead: any, type: 'new_lead' | 'follow_up') => {
+    if (!slackWebhook) return;
+    try {
+      await fetch('/api/slack-notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ webhookUrl: slackWebhook, lead, type }),
+      });
+    } catch (e) { console.error('Slack notify failed', e); }
+  };
+
+  const findHiringManager = async (lead: any) => {
+    if (!hunterKey) return alert('Add your Hunter.io API key in settings first!');
+    setFindingManagerFor(lead.id);
+    try {
+      const res = await fetch('/api/find-hiring-manager', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ company: lead.company, sourceUrl: lead.sourceUrl || '', hunterKey }),
+      });
+      const data = await res.json();
+      if (data.found && data.email) {
+        setLeads(prev => prev.map(l => l.id === lead.id
+          ? { ...l, contactName: data.name || l.contactName, contactEmail: data.email, contactLinkedIn: data.linkedin || l.contactLinkedIn }
+          : l
+        ));
+        alert(`✅ Hiring Manager Found!\n\nName: ${data.name}\nTitle: ${data.title}\nEmail: ${data.email}\n\nThe AI pitch will now address ${data.name} directly.`);
+      } else {
+        alert(`No senior contacts found for ${lead.company} (domain: ${data.domain || 'unknown'}).\n\nTry using the "Find Emails" button instead.`);
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setFindingManagerFor(null);
+    }
+  };
+
+  const verifyEmail = async (email: string, leadId: string) => {
+    if (!hunterKey || emailVerification[`${leadId}_${email}`]) return;
+    setEmailVerification(prev => ({ ...prev, [`${leadId}_${email}`]: 'checking' }));
+    try {
+      const res = await fetch(`https://api.hunter.io/v2/email-verifier?email=${encodeURIComponent(email)}&api_key=${hunterKey}`);
+      const data = await res.json();
+      const status = data?.data?.status;
+      const score = data?.data?.score || 0;
+      let badge: 'valid' | 'risky' | 'invalid' = 'risky';
+      if (status === 'valid' || score >= 70) badge = 'valid';
+      else if (score < 40 || status === 'invalid') badge = 'invalid';
+      setEmailVerification(prev => ({ ...prev, [`${leadId}_${email}`]: badge }));
+    } catch {
+      setEmailVerification(prev => ({ ...prev, [`${leadId}_${email}`]: 'risky' }));
+    }
+  };
 
   const saveBusinessProfile = (profile: typeof businessProfile) => {
     setBusinessProfile(profile);
-    localStorage.setItem('leadsora_business_profile', JSON.stringify(profile));
+    if(user) localStorage.setItem(`leadsora_business_profile_${user.email}`, JSON.stringify(profile));
   };
   const saveGhostConfig = (config: typeof ghostConfig) => {
     setGhostConfig(config);
-    localStorage.setItem('leadsora_ghost_config', JSON.stringify(config));
+    if(user) localStorage.setItem(`leadsora_ghost_config_${user.email}`, JSON.stringify(config));
   };
 
   const buildSignature = () => {
@@ -146,7 +231,7 @@ function Dashboard() {
   };
   const savePersona = (val: string) => { 
     setUserPersona(val); 
-    localStorage.setItem('df_user_persona', val); 
+    if(user) localStorage.setItem(`df_user_persona_${user.email}`, val); 
     if (val === 'Software Development Agency') setSearchQuery('Software Engineering');
     else if (val === 'Marketing & SEO Agency') setSearchQuery('Marketing');
     else if (val === 'Recruitment & Headhunting Firm') setSearchQuery('Hiring');
@@ -188,6 +273,11 @@ function Dashboard() {
         else if (update.status === 'done') setScanStatus(`Found ${update.count} leads from ${update.source.name}`);
       });
       setLeads(results);
+      // Fire Slack notification for highest-scoring lead >= 90
+      if (slackWebhook) {
+        const hotLead = results.find((l: any) => (l.intentScore || 0) >= 90);
+        if (hotLead) sendSlackNotification(hotLead, 'new_lead');
+      }
     } catch (err) { console.error(err); alert('Error fetching leads.'); }
     finally { setIsScanning(false); setScanStatus(''); }
   };
@@ -195,7 +285,7 @@ function Dashboard() {
   const generateAIOutreach = async (lead: any, isFollowUp = false) => {
     if (generatingId) return; setGeneratingId(lead.id);
     try {
-      const res = await fetch('/api/generate-outreach', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ company: lead.company, title: lead.problem, contactName: lead.contactName || null, persona: userPersona, isFollowUp: isFollowUp || (lead.status || 'New') === 'Contacted', scanMode: lead.scanMode || 'hiring', senderName: businessProfile.fullName || null, companyContext: businessProfile.companyContext || null, emailLength }) });
+      const res = await fetch('/api/generate-outreach', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ company: lead.company, title: lead.problem, contactName: lead.contactName || null, persona: userPersona, isFollowUp: isFollowUp || (lead.status || 'New') === 'Contacted', scanMode: lead.scanMode || 'hiring', senderName: businessProfile.fullName || null, companyContext: businessProfile.companyContext || null, emailLength, senderEmail: businessProfile.email || null, senderPhone: businessProfile.phone || null, location: lead.location || location }) });
       const data = await res.json();
       if (data.outreach) {
         const signature = buildSignature();
@@ -223,6 +313,10 @@ function Dashboard() {
       if (data?.data?.emails?.length > 0) {
         setFoundEmails(prev => ({ ...prev, [lead.id]: data.data.emails }));
         setHunterData(prev => ({ ...prev, [lead.id]: data.data }));
+        // Auto-verify the top 3 found emails
+        data.data.emails.slice(0, 3).forEach((em: any) => {
+          if (em.value) verifyEmail(em.value, lead.id);
+        });
       } else {
         setFoundEmails(prev => ({ ...prev, [lead.id]: [] })); // Found nothing
       }
@@ -233,6 +327,34 @@ function Dashboard() {
       setFetchingEmailsFor(null);
     }
   };
+
+  // 🚀 AUTOMATED FOLLOW-UP ENGINE
+  useEffect(() => {
+    if (!mounted || leads.length === 0) return;
+    const now = Date.now();
+    const fourDaysInMs = 4 * 24 * 60 * 60 * 1000;
+    
+    let needsUpdate = false;
+    const updatedLeads = leads.map(lead => {
+      // If lead is in Contacted, has a timestamp, and 4 days have passed
+      if ((lead.status === 'Contacted') && lead.lastContactedAt && (now - lead.lastContactedAt > fourDaysInMs)) {
+        if (!lead.followUpGenerated) {
+          needsUpdate = true;
+          // Fire the AI generation sequence for the follow-up
+          generateAIOutreach(lead, true);
+          // Show a polished modal instead of an ugly alert
+          setTimeout(() => { setFollowUpModal(lead); sendSlackNotification(lead, 'follow_up'); }, 600);
+          return { ...lead, followUpGenerated: true };
+        }
+      }
+      return lead;
+    });
+
+    if (needsUpdate) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setLeads(updatedLeads);
+    }
+  }, [leads, mounted]);
 
   if (authLoading || !user) return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -251,7 +373,14 @@ function Dashboard() {
       });
       const data = await res.json();
       if (data.companyContext) {
-        setBusinessProfile(prev => ({ ...prev, companyContext: data.companyContext }));
+        setBusinessProfile(prev => ({ 
+          ...prev, 
+          companyContext: data.companyContext,
+          suggestedRoles: data.suggestedRoles || prev.suggestedRoles 
+        }));
+        if (data.suggestedRoles && data.suggestedRoles.length > 0 && !searchQuery) {
+          setSearchQuery(data.suggestedRoles[0]);
+        }
       } else {
         alert(data.error || 'Failed to extract company context.');
       }
@@ -260,38 +389,40 @@ function Dashboard() {
     }
     setIsScrapingWebsite(false);
   };
-
   return (
     <>
       {/* Navbar */}
-      <nav style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 2rem', borderBottom: '1px solid #27272a', background: 'rgba(10,10,10,0.8)', backdropFilter: 'blur(10px)', position: 'sticky', top: 0, zIndex: 100 }}>
-        <Logo style={{ height: '64px', width: 'auto' }} />
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+      <nav style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 1rem', borderBottom: '1px solid #27272a', background: 'rgba(10,10,10,0.95)', backdropFilter: 'blur(10px)', position: 'sticky', top: 0, zIndex: 100, flexWrap: 'nowrap', gap: '0.5rem' }}>
+        <Logo style={{ height: '48px', width: 'auto', flexShrink: 0 }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'nowrap', overflow: 'hidden' }}>
           
-          {/* Ghost Mode Toggle */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: ghostModeEnabled ? 'rgba(39, 201, 63, 0.1)' : 'rgba(255,255,255,0.05)', padding: '6px 12px', borderRadius: '8px', border: `1px solid ${ghostModeEnabled ? '#27c93f' : '#333'}` }}>
-            <span style={{ fontSize: '0.85rem', color: ghostModeEnabled ? '#27c93f' : '#888', fontWeight: 600 }}>👻 Ghost Mode</span>
-            <label style={{ position: 'relative', display: 'inline-block', width: '34px', height: '20px' }}>
+          {/* Ghost Mode Toggle — label hidden on mobile */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: ghostModeEnabled ? 'rgba(39, 201, 63, 0.1)' : 'rgba(255,255,255,0.05)', padding: '5px 8px', borderRadius: '8px', border: `1px solid ${ghostModeEnabled ? '#27c93f' : '#333'}`, flexShrink: 0 }}>
+            <span style={{ fontSize: '0.8rem', color: ghostModeEnabled ? '#27c93f' : '#888', fontWeight: 600, whiteSpace: 'nowrap' }}>
+              <span className="hide-on-mobile">👻 Ghost Mode</span>
+              <span className="show-on-mobile" style={{ display: 'none' }}>👻</span>
+            </span>
+            <label style={{ position: 'relative', display: 'inline-block', width: '30px', height: '18px', flexShrink: 0 }}>
               <input type="checkbox" checked={ghostModeEnabled} onChange={(e) => { setGhostModeEnabled(e.target.checked); if (e.target.checked) setShowGhostConfig(true); }} style={{ opacity: 0, width: 0, height: 0 }} />
-              <span style={{ position: 'absolute', cursor: 'pointer', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: ghostModeEnabled ? '#27c93f' : '#ccc', transition: '.4s', borderRadius: '34px' }}>
-                <span style={{ position: 'absolute', content: '""', height: '14px', width: '14px', left: '3px', bottom: '3px', backgroundColor: 'white', transition: '.4s', borderRadius: '50%', transform: ghostModeEnabled ? 'translateX(14px)' : 'translateX(0)' }}></span>
+              <span style={{ position: 'absolute', cursor: 'pointer', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: ghostModeEnabled ? '#27c93f' : '#555', transition: '.4s', borderRadius: '34px' }}>
+                <span style={{ position: 'absolute', height: '12px', width: '12px', left: '3px', bottom: '3px', backgroundColor: 'white', transition: '.4s', borderRadius: '50%', transform: ghostModeEnabled ? 'translateX(12px)' : 'translateX(0)' }}></span>
               </span>
             </label>
-            {ghostModeEnabled && <button onClick={() => setShowGhostConfig(true)} style={{ background: 'none', border: 'none', color: '#27c93f', cursor: 'pointer', padding: 0 }}><Settings size={14} /></button>}
+            {ghostModeEnabled && <button onClick={() => setShowGhostConfig(true)} style={{ background: 'none', border: 'none', color: '#27c93f', cursor: 'pointer', padding: 0, flexShrink: 0 }}><Settings size={13} /></button>}
           </div>
 
           {/* Profile Button */}
-          <button onClick={() => setShowProfileModal(true)} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: businessProfile.fullName ? 'rgba(124, 58, 237, 0.1)' : 'rgba(255,189,46,0.1)', border: `1px solid ${businessProfile.fullName ? 'rgba(124, 58, 237, 0.3)' : 'rgba(255,189,46,0.3)'}`, borderRadius: '8px', color: businessProfile.fullName ? '#a78bfa' : '#ffbd2e', fontSize: '0.85rem', cursor: 'pointer', fontWeight: 600 }}>
-            <User size={14} /> {businessProfile.fullName || 'Set Profile'}
+          <button onClick={() => setShowProfileModal(true)} style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '5px 8px', background: businessProfile.fullName ? 'rgba(124, 58, 237, 0.1)' : 'rgba(255,189,46,0.1)', border: `1px solid ${businessProfile.fullName ? 'rgba(124, 58, 237, 0.3)' : 'rgba(255,189,46,0.3)'}`, borderRadius: '8px', color: businessProfile.fullName ? '#a78bfa' : '#ffbd2e', fontSize: '0.78rem', cursor: 'pointer', fontWeight: 600, flexShrink: 0, maxWidth: '110px', overflow: 'hidden' }}>
+            <User size={13} style={{ flexShrink: 0 }} />
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{businessProfile.fullName?.split(' ')[0] || 'Profile'}</span>
           </button>
 
-          <span className="hide-on-mobile" style={{ color: '#a1a1aa', fontSize: '0.9rem' }}>Welcome, <strong style={{ color: '#fff' }}>{user.name}</strong></span>
           <button
             onClick={() => { logout(); window.location.href = '/login'; }}
-            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', background: 'transparent', border: '1px solid #333', borderRadius: '8px', color: '#888', fontSize: '0.85rem', cursor: 'pointer', fontFamily: "'Inter', sans-serif", transition: 'all 0.2s' }}
+            style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '5px 8px', background: 'transparent', border: '1px solid #333', borderRadius: '8px', color: '#888', fontSize: '0.78rem', cursor: 'pointer', fontFamily: "'Inter', sans-serif", flexShrink: 0, whiteSpace: 'nowrap' }}
             onMouseOver={e => { (e.currentTarget as HTMLElement).style.borderColor = '#ff5f56'; (e.currentTarget as HTMLElement).style.color = '#ff5f56'; }}
             onMouseOut={e => { (e.currentTarget as HTMLElement).style.borderColor = '#333'; (e.currentTarget as HTMLElement).style.color = '#888'; }}
-          ><LogOut size={14} /> Sign Out</button>
+          ><LogOut size={13} /> <span className="hide-on-mobile">Sign Out</span></button>
         </div>
       </nav>
 
@@ -305,34 +436,30 @@ function Dashboard() {
       <section className="simulator" id="simulator">
         <div className="container">
           
-          {/* Search Type Tabs */}
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
-            <div style={{ display: 'flex', background: 'rgba(0,0,0,0.4)', borderRadius: '8px', padding: '4px', border: '1px solid #333' }}>
-              <button onClick={() => setSearchType('keyword')} style={{ padding: '8px 24px', background: searchType === 'keyword' ? '#27272a' : 'transparent', color: searchType === 'keyword' ? '#fff' : '#888', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 500, transition: 'all 0.2s' }}>🔍 Keyword Search</button>
-              <button onClick={() => setSearchType('cloner')} style={{ padding: '8px 24px', background: searchType === 'cloner' ? '#27272a' : 'transparent', color: searchType === 'cloner' ? '#fff' : '#888', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 500, transition: 'all 0.2s' }}>🧬 Client Cloner</button>
-            </div>
-          </div>
+          {/* Deprecated Search Type Tabs Removed */}
 
-          <form className="simulator-form" onSubmit={handleScan}>
-            {searchType === 'keyword' ? (
-              <>
-                <input id="search-input" type="text" className="simulator-input" placeholder="e.g. AI automation, SEO, Web Design" list="niche-options" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
-                <datalist id="niche-options">
-                  <option value="AI Automation" /><option value="Software Engineering" /><option value="Marketing" />
-                  <option value="SEO" /><option value="Web Design" /><option value="Data Science" />
-                  <option value="B2B SaaS" /><option value="Cybersecurity" /><option value="FinTech" />
-                  <option value="Recruitment" /><option value="UI/UX Design" /><option value="Copywriting" />
-                  <option value="Sales" /><option value="E-commerce" /><option value="Video Editing" />
-                  <option value="Blockchain" /><option value="Web3" /><option value="Accounting" />
-                  <option value="Public Relations" /><option value="HR" /><option value="IT Support" />
-                  <option value="DevOps" /><option value="Mobile App Development" /><option value="Content Creation" />
-                </datalist>
-              </>
-            ) : (
-              <input id="search-input" type="url" className="simulator-input" placeholder="Paste best client's URL (e.g. https://stripe.com)" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} style={{ border: '1px solid #0a66c2' }} />
-            )}
+          <form className="simulator-form" onSubmit={handleScan} style={{ marginBottom: '1rem' }}>
+            {/* The Unified Search Bar */}
+            <input id="search-input" type="text" className="simulator-input w-full" placeholder="Search target role (e.g. 'React Developer', 'Software Engineer', 'DevOps')" list="industry-roles" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} style={{ border: '1px solid #0a66c2' }} />
+            <datalist id="industry-roles">
+              <option value="React Developer" />
+              <option value="Software Engineer" />
+              <option value="Full Stack Developer" />
+              <option value="Frontend Engineer" />
+              <option value="Backend Developer" />
+              <option value="DevOps Engineer" />
+              <option value="Mobile Developer" />
+              <option value="iOS Developer" />
+              <option value="Android Developer" />
+              <option value="UI/UX Designer" />
+              <option value="Data Scientist" />
+              <option value="Machine Learning Engineer" />
+              <option value="Cloud Architect" />
+              <option value="Technical Lead" />
+              <option value="Mobile App Development" />
+            </datalist>
             
-            <select className="simulator-input" style={{ maxWidth: '150px' }} value={location} onChange={e => setLocation(e.target.value)}>
+            <select className="simulator-input w-full sm:w-auto" style={{ maxWidth: '100%', minWidth: '120px' }} value={location} onChange={e => setLocation(e.target.value)}>
               <option value="Global">Global</option><option value="USA">USA</option><option value="UK">UK</option>
               <option value="Canada">Canada</option><option value="Australia">Australia</option>
               <option value="India">India</option><option value="Germany">Germany</option>
@@ -341,32 +468,64 @@ function Dashboard() {
               <option value="Ireland">Ireland</option><option value="Spain">Spain</option>
             </select>
             <button type="submit" className="btn-primary flex items-center justify-center gap-2" disabled={isScanning} style={{ background: scanMode === 'layoff' ? '#ff5f56' : scanMode === 'vc_whale' ? '#0a66c2' : scanMode === 'stale_job' ? '#ffbd2e' : '' }}>
-              {isScanning ? <><Loader2 className="animate-spin" size={20} /> Scanning...</> : (scanMode === 'layoff' ? 'Snipe Layoffs' : scanMode === 'vc_whale' ? 'Find VC Whales' : scanMode === 'stale_job' ? 'Find Desperate Leads' : 'Scan Web')}
+              {isScanning ? <><Loader2 className="animate-spin" size={20} /> Scanning...</> : 'Scan Market'}
             </button>
           </form>
-          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1.5rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-            <div style={{ display: 'flex', background: 'rgba(255,255,255,0.05)', padding: '4px', borderRadius: '999px', border: '1px solid #333', overflowX: 'auto', maxWidth: '100%' }}>
+
+          {/* Dynamic Keyword Suggestions from Auto-Extract */}
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
+            {businessProfile?.suggestedRoles && businessProfile.suggestedRoles.length > 0 ? (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center', justifyContent: 'center' }}>
+                <span className="text-xs text-[#888] uppercase tracking-wider font-semibold">AI Target Suggestions:</span>
+                {businessProfile.suggestedRoles.map((role, idx) => (
+                  <button key={idx} type="button" onClick={() => setSearchQuery(role)} style={{ fontSize: '0.75rem', background: 'rgba(124,58,237,0.1)', color: '#a78bfa', border: '1px solid #7c3aed', padding: '0.375rem 0.75rem', borderRadius: '9999px', cursor: 'pointer', fontWeight: 600, boxShadow: '0 0 10px rgba(124,58,237,0.2)' }}>
+                    {role}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center', justifyContent: 'center' }}>
+                <span className="text-xs text-[#888] uppercase tracking-wider font-semibold">Popular Targets:</span>
+                {['React Developer', 'Software Engineer', 'Full Stack', 'DevOps', 'Mobile'].map((kw) => (
+                  <button key={kw} type="button" onClick={() => setSearchQuery(kw)} style={{ fontSize: '0.75rem', background: 'rgba(255,255,255,0.05)', color: '#aaa', border: '1px solid rgba(255,255,255,0.1)', padding: '0.375rem 0.75rem', borderRadius: '9999px', cursor: 'pointer' }}>
+                    {kw}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1.5rem', padding: '0 0.5rem' }}>
+            <div className="scan-mode-tabs" style={{ display: 'flex', background: 'rgba(255,255,255,0.05)', padding: '4px', borderRadius: '999px', border: '1px solid #333', overflowX: 'auto', maxWidth: '100%' }}>
               <button onClick={() => setScanMode('hiring')} type="button" style={{ padding: '6px 16px', borderRadius: '999px', border: 'none', background: scanMode === 'hiring' ? '#27c93f' : 'transparent', color: scanMode === 'hiring' ? '#000' : '#888', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem', transition: 'all 0.2s', whiteSpace: 'nowrap' }}>
-                🔥 Hiring Intent
-              </button>
-              <button onClick={() => setScanMode('layoff')} type="button" style={{ padding: '6px 16px', borderRadius: '999px', border: 'none', background: scanMode === 'layoff' ? '#ff5f56' : 'transparent', color: scanMode === 'layoff' ? '#fff' : '#888', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}>
-                🎯 Layoffs
+                👔 Actively Hiring
               </button>
               <button onClick={() => setScanMode('vc_whale')} type="button" style={{ padding: '6px 16px', borderRadius: '999px', border: 'none', background: scanMode === 'vc_whale' ? '#0a66c2' : 'transparent', color: scanMode === 'vc_whale' ? '#fff' : '#888', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}>
-                🐋 VC Whales
+                💸 Recently Funded
               </button>
               <button onClick={() => setScanMode('stale_job')} type="button" style={{ padding: '6px 16px', borderRadius: '999px', border: 'none', background: scanMode === 'stale_job' ? '#ffbd2e' : 'transparent', color: scanMode === 'stale_job' ? '#000' : '#888', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}>
-                ⏳ Stale Jobs
+                🚨 Urgent Needs (Stale)
+              </button>
+              <button onClick={() => setScanMode('layoff')} type="button" style={{ padding: '6px 16px', borderRadius: '999px', border: 'none', background: scanMode === 'layoff' ? '#ff5f56' : 'transparent', color: scanMode === 'layoff' ? '#fff' : '#888', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}>
+                📉 Restructuring
+              </button>
+              <button onClick={() => setScanMode('defection_signal')} type="button" style={{ padding: '6px 16px', borderRadius: '999px', border: 'none', background: scanMode === 'defection_signal' ? '#7c3aed' : 'transparent', color: scanMode === 'defection_signal' ? '#fff' : '#888', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}>
+                🕵️ Defection Signals (Beta)
               </button>
             </div>
           </div>
 
           {/* Settings */}
-          <div className="text-center mt-4">
+          {/* Settings & Nav */}
+          <div className="text-center mt-4" style={{ display: 'flex', justifyContent: 'center', gap: '1rem', alignItems: 'center' }}>
+            <Link href="/analytics" style={{ color: '#7c3aed', textDecoration: 'none', fontSize: '0.875rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <BarChart2 size={16} /> View Analytics Dashboard
+            </Link>
+            <span style={{ color: '#333' }}>|</span>
             <button onClick={() => setShowSettings(!showSettings)} style={{ background: 'none', border: 'none', color: '#666', cursor: 'pointer', textDecoration: 'underline', fontSize: '0.875rem' }}>
-              {showSettings ? 'Hide API Settings' : 'API Settings (Hunter.io)'}
+              {showSettings ? 'Hide Settings' : 'API & Integrations Settings'}
             </button>
-            {showSettings && (
+          </div>
+          {showSettings && (
               <div style={{ marginTop: '1rem', background: 'rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '8px', display: 'flex', gap: '1rem', justifyContent: 'center', textAlign: 'left', flexWrap: 'wrap' }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.5rem', color: '#ccc' }}>Hunter.io API Key (Email Discovery):</label>
@@ -377,27 +536,12 @@ function Dashboard() {
                   <input type="password" value={rapidApiKey} onChange={e => saveRapidApiKey(e.target.value)} placeholder="Enter RapidAPI key..." style={{ width: '280px', padding: '0.5rem', background: '#000', border: '1px solid #333', color: '#fff', borderRadius: '4px' }} />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.5rem', color: '#ccc' }}>Your Business Type (For AI Pitches):</label>
-                  <select value={userPersona} onChange={e => savePersona(e.target.value)} style={{ width: '280px', padding: '0.5rem', background: '#000', border: '1px solid #333', color: '#fff', borderRadius: '4px' }}>
-                    <option value="Software Development Agency">Software Development Agency</option>
-                    <option value="Marketing & SEO Agency">Marketing & SEO Agency</option>
-                    <option value="Recruitment & Headhunting Firm">Recruitment / Headhunting</option>
-                    <option value="B2B SaaS Company">B2B SaaS Company</option>
-                    <option value="Freelance Consultant">Freelance Consultant</option>
-                    <option value="Lead Generation Agency">Lead Generation Agency</option>
-                    <option value="Design & Branding Agency">Design & Branding Agency</option>
-                    <option value="Video Production & Editing">Video Production & Editing</option>
-                    <option value="Financial & Accounting Services">Financial & Accounting Services</option>
-                    <option value="Cybersecurity Firm">Cybersecurity Firm</option>
-                    <option value="Web3 & Blockchain Development">Web3 & Blockchain Development</option>
-                    <option value="PR & Communications Agency">PR & Communications Agency</option>
-                    <option value="HR & Payroll Consultancy">HR & Payroll Consultancy</option>
-                    <option value="IT Managed Services (MSP)">IT Managed Services (MSP)</option>
-                  </select>
+                  <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.5rem', color: '#ccc' }}>Slack Webhook URL (Alerts):</label>
+                  <input type="password" value={slackWebhook} onChange={e => saveSlackWebhook(e.target.value)} placeholder="https://hooks.slack.com/..." style={{ width: '280px', padding: '0.5rem', background: '#000', border: '1px solid #333', color: '#fff', borderRadius: '4px' }} />
                 </div>
+
               </div>
             )}
-          </div>
 
           {isScanning && (
             <div className="text-center" style={{ padding: '2rem', color: 'var(--text-secondary)' }}>
@@ -423,7 +567,7 @@ function Dashboard() {
                     <button onClick={() => setViewMode('list')} style={{ background: viewMode === 'list' ? '#333' : 'transparent', color: viewMode === 'list' ? '#fff' : '#888', border: 'none', padding: '0.25rem 0.75rem', fontSize: '0.8rem', cursor: 'pointer' }}>List View</button>
                     <button onClick={() => setViewMode('pipeline')} style={{ background: viewMode === 'pipeline' ? '#333' : 'transparent', color: viewMode === 'pipeline' ? '#fff' : '#888', border: 'none', padding: '0.25rem 0.75rem', fontSize: '0.8rem', cursor: 'pointer' }}>Pipeline CRM</button>
                   </div>
-                  <button onClick={() => { const newLen = emailLength === 'short' ? 'detailed' : 'short'; setEmailLength(newLen); localStorage.setItem('df_email_length', newLen); }} className="btn-secondary" style={{ padding: '0.25rem 0.75rem', fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: '0.5rem', background: emailLength === 'detailed' ? 'rgba(124, 58, 237, 0.1)' : 'transparent', border: emailLength === 'detailed' ? '1px solid #7c3aed' : '1px solid #333', color: emailLength === 'detailed' ? '#a78bfa' : '#888' }} title="Toggle AI Email Length">
+                  <button onClick={() => { const newLen = emailLength === 'short' ? 'detailed' : 'short'; setEmailLength(newLen); if(user) localStorage.setItem(`df_email_length_${user.email}`, newLen); }} className="btn-secondary" style={{ padding: '0.25rem 0.75rem', fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: '0.5rem', background: emailLength === 'detailed' ? 'rgba(124, 58, 237, 0.1)' : 'transparent', border: emailLength === 'detailed' ? '1px solid #7c3aed' : '1px solid #333', color: emailLength === 'detailed' ? '#a78bfa' : '#888' }} title="Toggle AI Email Length">
                     {emailLength === 'detailed' ? <AlignLeft size={14} /> : <AlignJustify size={14} />} {emailLength === 'detailed' ? 'Detailed Pitch' : 'Short & Punchy'}
                   </button>
                   <button onClick={exportToCSV} className="btn-secondary" style={{ padding: '0.25rem 0.75rem', fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Download size={14} /> Export CSV</button>
@@ -466,12 +610,27 @@ function Dashboard() {
                           >
                             {fetchingEmailsFor === lead.id ? <Loader2 size={12} className="animate-spin" /> : '🎯'} Find Emails
                           </button>
+
+                          <button 
+                            onClick={() => findHiringManager(lead)} 
+                            disabled={findingManagerFor === lead.id}
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.78rem', color: '#fff', background: '#4facfe', border: 'none', padding: '4px 12px', borderRadius: '999px', cursor: findingManagerFor === lead.id ? 'not-allowed' : 'pointer', fontWeight: 600 }}
+                          >
+                            {findingManagerFor === lead.id ? <Loader2 size={12} className="animate-spin" /> : <UserCheck size={12} />} Hiring Manager
+                          </button>
+
+                          <button 
+                            onClick={() => setShowNote(prev => ({ ...prev, [lead.id]: !prev[lead.id] }))} 
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.78rem', color: '#ccc', background: 'rgba(255,255,255,0.05)', border: '1px solid #333', padding: '4px 12px', borderRadius: '999px', cursor: 'pointer', fontWeight: 600 }}
+                          >
+                            <FileText size={12} /> Notes
+                          </button>
                           
                           {lead.contactLinkedIn
                             ? <a href={lead.contactLinkedIn} target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', fontSize: '0.78rem', color: '#fff', background: '#0a66c2', padding: '4px 12px', borderRadius: '999px', textDecoration: 'none' }}>in LinkedIn</a>
                             : <a href={`https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(lead.company + ' hiring')}`} target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', fontSize: '0.78rem', color: '#94a3b8', background: 'rgba(255,255,255,0.05)', padding: '4px 12px', borderRadius: '999px', textDecoration: 'none' }}>🔍 LinkedIn</a>
                           }
-                          {lead.sourceUrl && <a href={lead.sourceUrl} target="_blank" rel="noreferrer" style={{ fontSize: '0.78rem', color: '#ffbd2e', textDecoration: 'underline', marginLeft: 'auto' }}>View Source ↗</a>}
+                          {lead.sourceUrl && <a href={lead.sourceUrl} target="_blank" rel="noreferrer" style={{ fontSize: '0.78rem', color: '#ffbd2e', textDecoration: 'underline', marginLeft: 'auto' }}>View on {lead.source || 'Source'} ↗</a>}
                         </div>
 
                         {/* Display Found Emails */}
@@ -486,15 +645,22 @@ function Dashboard() {
                                       <strong style={{ color: '#fff' }}>{em.first_name} {em.last_name}</strong> {em.position && <span style={{ color: '#888' }}>- {em.position}</span>}
                                     </div>
                                     <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                                      <a href={`https://mail.google.com/mail/?view=cm&fs=1&to=${em.value}&su=${encodeURIComponent(`Exploring synergies: ${lead.problem?.replace('Hiring: ', '') || 'Open Role'} at ${lead.company}`)}&body=${encodeURIComponent(getEmailBody(lead))}`} target="_blank" rel="noreferrer" style={{ color: '#4facfe', textDecoration: 'none' }} title="Send Pitch in Gmail">
-                                        <Mail size={14} style={{ marginRight: '4px', display: 'inline-block', verticalAlign: 'middle' }}/> 
+                                      <a href={`https://mail.google.com/mail/?view=cm&fs=1&to=${em.value}&su=${encodeURIComponent(`Exploring synergies: ${lead.problem?.replace('Hiring: ', '') || 'Open Role'} at ${lead.company}`)}&body=${encodeURIComponent(getEmailBody(lead))}`} target="_blank" rel="noreferrer" style={{ color: '#4facfe', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px' }} title="Send Pitch in Gmail">
+                                        <Mail size={14} /> 
                                         {em.value}
+                                        {emailVerification[`${lead.id}_${em.value}`] === 'valid' && <span title="Verified Safe" style={{ color: '#27c93f', fontSize: '10px' }}>✅</span>}
+                                        {emailVerification[`${lead.id}_${em.value}`] === 'risky' && <span title="Accept-All / Risky" style={{ color: '#ffbd2e', fontSize: '10px' }}>⚠️</span>}
+                                        {emailVerification[`${lead.id}_${em.value}`] === 'invalid' && <span title="Invalid Email" style={{ color: '#ff5f56', fontSize: '10px' }}>❌</span>}
+                                        {emailVerification[`${lead.id}_${em.value}`] === 'checking' && <Loader2 size={10} className="animate-spin" style={{ color: '#888' }} />}
                                       </a>
                                       <button onClick={() => handleCopy(`em-${idx}-${em.value}`, em.value)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: copiedId === `em-${idx}-${em.value}` ? '#27c93f' : '#666', padding: '0 4px' }} title="Copy Email">
                                         {copiedId === `em-${idx}-${em.value}` ? <Check size={14} /> : <Copy size={14} />}
                                       </button>
                                       {em.sources?.[0]?.uri?.includes('linkedin') && (
                                         <a href={em.sources[0].uri} target="_blank" rel="noreferrer" style={{ color: '#0a66c2', marginLeft: '4px' }} title="LinkedIn Profile">in</a>
+                                      )}
+                                      {!emailVerification[`${lead.id}_${em.value}`] && (
+                                        <button onClick={() => verifyEmail(em.value, lead.id)} style={{ fontSize: '0.65rem', background: 'rgba(255,255,255,0.05)', border: '1px solid #333', color: '#888', borderRadius: '4px', padding: '2px 6px', cursor: 'pointer' }}>Verify</button>
                                       )}
                                     </div>
                                   </div>
@@ -503,6 +669,22 @@ function Dashboard() {
                             ) : (
                               <p style={{ fontSize: '0.85rem', color: '#888', margin: 0 }}>No direct emails found for {lead.company}. Try manual LinkedIn search.</p>
                             )}
+                          </div>
+                        )}
+
+                        {/* Notes Section */}
+                        {showNote[lead.id] && (
+                          <div style={{ marginTop: '1rem', padding: '0.75rem', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid #27272a' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                              <h5 style={{ fontSize: '0.75rem', color: '#888', margin: 0, textTransform: 'uppercase', letterSpacing: '1px' }}>Internal Notes</h5>
+                              <button onClick={() => setShowNote(prev => ({ ...prev, [lead.id]: false }))} style={{ background: 'none', border: 'none', color: '#555', cursor: 'pointer', padding: 0 }}><X size={14} /></button>
+                            </div>
+                            <textarea
+                              value={notes[lead.id] || ''}
+                              onChange={(e) => saveNote(lead.id, e.target.value)}
+                              placeholder="Add a note about this lead... (Saved automatically)"
+                              style={{ width: '100%', minHeight: '80px', background: '#000', border: '1px solid #333', borderRadius: '4px', color: '#fff', padding: '0.5rem', fontSize: '0.85rem', resize: 'vertical', fontFamily: "'Inter', sans-serif" }}
+                            />
                           </div>
                         )}
                       </div>
@@ -517,12 +699,24 @@ function Dashboard() {
                          onDragOver={e => e.preventDefault()} 
                          onDrop={e => {
                            const leadId = e.dataTransfer.getData('text/plain');
-                           setLeads(prev => prev.map(l => l.id === leadId ? { ...l, status: col } : l));
+                           setLeads(prev => prev.map(l => l.id === leadId ? { ...l, status: col, lastContactedAt: col === 'Contacted' ? Date.now() : l.lastContactedAt } : l));
                          }}
                          style={{ flex: 1, minWidth: '320px', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', padding: '1rem', border: '1px dashed #333' }}>
-                      <h3 style={{ textTransform: 'uppercase', fontSize: '0.8rem', color: '#888', marginBottom: '1rem', letterSpacing: '1px', display: 'flex', justifyContent: 'space-between' }}>
+                      <h3 onDoubleClick={() => {
+                           if (col === 'Contacted') {
+                             setLeads(prev => prev.map(l => l.status === 'Contacted' ? { ...l, lastContactedAt: Date.now() - (5 * 24 * 60 * 60 * 1000), followUpGenerated: false } : l));
+                           }
+                         }}
+                         style={{ textTransform: 'uppercase', fontSize: '0.8rem', color: '#888', marginBottom: col === 'Contacted' ? '0.4rem' : '1rem', letterSpacing: '1px', display: 'flex', justifyContent: 'space-between', cursor: col === 'Contacted' ? 'pointer' : 'default' }}>
                         {col} <span style={{ background: '#000', padding: '2px 8px', borderRadius: '12px' }}>{(highIntentOnly ? leads.filter(l => l.intentScore >= 85) : leads).filter(l => (l.status || 'New') === col).length}</span>
                       </h3>
+                      {col === 'Contacted' && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '1rem', background: 'rgba(39,201,63,0.08)', border: '1px solid rgba(39,201,63,0.2)', borderRadius: '6px', padding: '4px 8px' }}>
+                          <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#27c93f', display: 'inline-block', boxShadow: '0 0 6px #27c93f', animation: 'pulse 2s infinite' }}></span>
+                          <span style={{ fontSize: '0.65rem', color: '#27c93f', fontWeight: 600 }}>INBOX SYNC ACTIVE</span>
+                          <span style={{ fontSize: '0.6rem', color: '#555', marginLeft: 'auto' }}>↓↓ double-click to time-travel</span>
+                        </div>
+                      )}
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                         {(highIntentOnly ? leads.filter(l => l.intentScore >= 85) : leads).filter(l => (l.status || 'New') === col).map(lead => (
                           <div key={lead.id} draggable onDragStart={e => e.dataTransfer.setData('text/plain', lead.id)} className="glass-card" style={{ cursor: 'grab', padding: '1rem', border: '1px solid #222', background: 'rgba(0,0,0,0.4)' }}>
@@ -536,19 +730,44 @@ function Dashboard() {
                               </div>
                             )}
                             
-                            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'space-between', alignItems: 'center' }}>
-                              <button onClick={() => fetchEmailsWithHunter(lead)} disabled={fetchingEmailsFor === lead.id} style={{ fontSize: '0.7rem', color: '#fff', background: '#ffbd2e', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}>
-                                {fetchingEmailsFor === lead.id ? '...' : 'Find Email'}
-                              </button>
+                            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap' }}>
+                              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                <button onClick={() => fetchEmailsWithHunter(lead)} disabled={fetchingEmailsFor === lead.id} style={{ fontSize: '0.7rem', color: '#fff', background: '#ffbd2e', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}>
+                                  {fetchingEmailsFor === lead.id ? '...' : 'Find Email'}
+                                </button>
+                                <button onClick={() => findHiringManager(lead)} disabled={findingManagerFor === lead.id} style={{ fontSize: '0.7rem', color: '#fff', background: '#4facfe', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}>
+                                  {findingManagerFor === lead.id ? '...' : 'Hiring Manager'}
+                                </button>
+                                <button onClick={() => setShowNote(prev => ({ ...prev, [lead.id]: !prev[lead.id] }))} style={{ fontSize: '0.7rem', color: '#ccc', background: 'rgba(255,255,255,0.05)', border: '1px solid #333', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}>
+                                  Notes
+                                </button>
+                              </div>
                               <div style={{ display: 'flex', gap: '0.5rem' }}>
                                 <button onClick={() => { setBlitzLead(lead); if(!aiOutreach[lead.id]) generateAIOutreach(lead); if(!foundEmails[lead.id] && hunterKey) fetchEmailsWithHunter(lead); }} disabled={!!generatingId} style={{ background: 'linear-gradient(135deg, #7c3aed, #4facfe)', color: '#fff', border: 'none', cursor: 'pointer', padding: '4px 8px', borderRadius: '4px', fontSize: '0.7rem', display: 'flex', alignItems: 'center', gap: '4px' }} title="Omnichannel Blitz">
                                   {generatingId === lead.id ? <Loader2 size={12} className="animate-spin" /> : <><Sparkles size={12} /> Blitz</>}
                                 </button>
                                 {foundEmails[lead.id]?.[0]?.value && (
-                                  <a href={`https://mail.google.com/mail/?view=cm&fs=1&to=${foundEmails[lead.id]?.map((e: any) => e.value).join(',') || ''}&su=${encodeURIComponent(`Exploring synergies at ${lead.company}`)}&body=${encodeURIComponent(getEmailBody(lead))}`} target="_blank" rel="noreferrer" style={{ color: '#4facfe', background: 'rgba(79, 172, 254, 0.1)', padding: '4px 8px', borderRadius: '4px' }} title="Open in Gmail"><Mail size={14} /></a>
+                                  <a href={`https://mail.google.com/mail/?view=cm&fs=1&to=${foundEmails[lead.id]?.map((e: any) => e.value).join(',') || ''}&su=${encodeURIComponent(`Exploring synergies at ${lead.company}`)}&body=${encodeURIComponent(getEmailBody(lead))}`} target="_blank" rel="noreferrer" style={{ color: '#4facfe', background: 'rgba(79, 172, 254, 0.1)', padding: '4px 8px', borderRadius: '4px', display: 'flex', alignItems: 'center', gap: '4px' }} title="Open in Gmail">
+                                    <Mail size={14} />
+                                    {emailVerification[`${lead.id}_${foundEmails[lead.id][0].value}`] === 'valid' && <span style={{fontSize:'10px'}}>✅</span>}
+                                    {emailVerification[`${lead.id}_${foundEmails[lead.id][0].value}`] === 'risky' && <span style={{fontSize:'10px'}}>⚠️</span>}
+                                  </a>
                                 )}
                               </div>
                             </div>
+
+                            {/* Pipeline Notes Section */}
+                            {showNote[lead.id] && (
+                              <div style={{ marginTop: '0.75rem' }}>
+                                <textarea
+                                  value={notes[lead.id] || ''}
+                                  onChange={(e) => saveNote(lead.id, e.target.value)}
+                                  placeholder="Add a note..."
+                                  style={{ width: '100%', minHeight: '60px', background: 'rgba(0,0,0,0.5)', border: '1px solid #333', borderRadius: '4px', color: '#fff', padding: '0.5rem', fontSize: '0.75rem', resize: 'vertical' }}
+                                />
+                              </div>
+                            )}
+
                           </div>
                         ))}
                       </div>
@@ -561,6 +780,50 @@ function Dashboard() {
           )}
         </div>
       </section>
+
+      {/* 🤖 Auto-Follow-Up Engine Modal */}
+      {followUpModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.9)', backdropFilter: 'blur(10px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 99999, padding: '1rem' }}>
+          <div style={{ background: 'linear-gradient(135deg, #0a0a0a, #111827)', border: '1px solid rgba(39,201,63,0.4)', borderRadius: '20px', padding: '2.5rem', width: '100%', maxWidth: '580px', position: 'relative', boxShadow: '0 0 60px rgba(39,201,63,0.15), 0 25px 50px -12px rgba(0,0,0,0.8)' }}>
+            {/* Pulsing Header */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'rgba(39,201,63,0.15)', border: '2px solid #27c93f', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', animation: 'pulse 1.5s infinite' }}>🤖</div>
+              <div>
+                <div style={{ fontSize: '0.65rem', color: '#27c93f', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '2px' }}>⚡ Autonomous Engine Triggered</div>
+                <h2 style={{ margin: 0, fontSize: '1.3rem', color: '#fff' }}>Follow-Up #1 Drafted for <span style={{ color: '#27c93f' }}>{followUpModal.company}</span></h2>
+              </div>
+            </div>
+            
+            {/* Detection Summary */}
+            <div style={{ background: 'rgba(39,201,63,0.05)', border: '1px solid rgba(39,201,63,0.15)', borderRadius: '10px', padding: '1rem', marginBottom: '1.5rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', fontSize: '0.8rem' }}>
+                <div><span style={{ color: '#555' }}>📅 Last Contacted:</span><br /><span style={{ color: '#fff', fontWeight: 600 }}>4+ days ago</span></div>
+                <div><span style={{ color: '#555' }}>📭 Reply Status:</span><br /><span style={{ color: '#ff5f56', fontWeight: 600 }}>No Reply Detected</span></div>
+                <div><span style={{ color: '#555' }}>🧠 Action:</span><br /><span style={{ color: '#27c93f', fontWeight: 600 }}>AI Follow-Up Generated</span></div>
+                <div><span style={{ color: '#555' }}>🎯 Lead Score:</span><br /><span style={{ color: '#ffbd2e', fontWeight: 600 }}>{followUpModal.intentScore || 90}🔥</span></div>
+              </div>
+            </div>
+
+            {/* AI Draft Preview */}
+            <div style={{ background: '#000', border: '1px solid #1a1a1a', borderRadius: '8px', padding: '1rem', marginBottom: '1.5rem', fontSize: '0.82rem', color: '#a1a1aa', whiteSpace: 'pre-wrap', fontFamily: 'monospace', maxHeight: '180px', overflowY: 'auto' }}>
+              {aiOutreach[followUpModal.id] || 'Generating follow-up email via AI... ✨'}
+            </div>
+
+            {/* Action Buttons */}
+            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+              <a href={`https://mail.google.com/mail/?view=cm&fs=1&su=${encodeURIComponent(`Following up – ${followUpModal.company}`)}&body=${encodeURIComponent(aiOutreach[followUpModal.id] || 'Following up on my previous message...')}`} target="_blank" rel="noreferrer" onClick={() => setFollowUpModal(null)} style={{ flex: 1, background: 'linear-gradient(135deg, #27c93f, #0a8a21)', color: '#000', padding: '12px 20px', borderRadius: '10px', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', minWidth: '160px' }}>
+                📧 Send in Gmail
+              </a>
+              <button onClick={() => { setBlitzLead(followUpModal); setFollowUpModal(null); }} style={{ flex: 1, background: 'linear-gradient(135deg, #7c3aed, #4facfe)', color: '#fff', border: 'none', padding: '12px 20px', borderRadius: '10px', fontSize: '0.9rem', fontWeight: 700, cursor: 'pointer', minWidth: '160px' }}>
+                ⚡ Full Blitz Mode
+              </button>
+              <button onClick={() => setFollowUpModal(null)} style={{ background: 'rgba(255,255,255,0.05)', color: '#888', border: '1px solid #333', padding: '12px 16px', borderRadius: '10px', fontSize: '0.85rem', cursor: 'pointer' }}>
+                Dismiss
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Omnichannel Blitz Modal */}
       {blitzLead && (
@@ -647,13 +910,13 @@ function Dashboard() {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {[
-                { key: 'fullName', label: 'Full Name', placeholder: 'e.g. Harsh Bhatia', icon: '👤' },
+                { key: 'fullName', label: 'Full Name', placeholder: 'e.g. John Doe', icon: '👤' },
                 { key: 'jobTitle', label: 'Job Title', placeholder: 'e.g. Founder & CEO', icon: '💼' },
-                { key: 'companyName', label: 'Company Name', placeholder: 'e.g. ISAI Tech Solutions', icon: '🏢' },
-                { key: 'email', label: 'Email Address', placeholder: 'e.g. harsh@isaitech.com', icon: '📧' },
-                { key: 'phone', label: 'Phone Number', placeholder: 'e.g. +91-9876543210', icon: '📞' },
-                { key: 'website', label: 'Website URL', placeholder: 'e.g. isaitech.com', icon: '🌐' },
-                { key: 'address', label: 'Mailing Address', placeholder: 'e.g. Pune, India', icon: '📍' },
+                { key: 'companyName', label: 'Company Name', placeholder: 'e.g. Acme Corp', icon: '🏢' },
+                { key: 'email', label: 'Email Address', placeholder: 'e.g. john@acmecorp.com', icon: '📧' },
+                { key: 'phone', label: 'Phone Number', placeholder: 'e.g. +1 (555) 000-0000', icon: '📞' },
+                { key: 'website', label: 'Website URL', placeholder: 'e.g. acmecorp.com', icon: '🌐' },
+                { key: 'address', label: 'Mailing Address', placeholder: 'e.g. New York, USA', icon: '📍' },
               ].map(field => (
                 <div key={field.key}>
                   <label style={{ display: 'block', fontSize: '0.8rem', color: '#888', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{field.icon} {field.label}</label>

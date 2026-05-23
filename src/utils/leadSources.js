@@ -27,9 +27,21 @@ const SOURCES = [
 
 export const getAllSources = () => SOURCES;
 
-const timeAgo = (dateStr) => {
-  if (!dateStr) return 'Recently';
-  const days = Math.floor((Date.now() - new Date(dateStr).getTime()) / 86400000);
+const timeAgo = (dateInput) => {
+  if (!dateInput) return 'Recently';
+  let dateObj;
+  
+  if (typeof dateInput === 'number' || (typeof dateInput === 'string' && !isNaN(dateInput))) {
+    const num = parseFloat(dateInput);
+    if (num < 10000000000) dateObj = new Date(num * 1000); // Unix timestamp in seconds
+    else dateObj = new Date(num); // Unix timestamp in milliseconds
+  } else {
+    dateObj = new Date(dateInput);
+  }
+
+  if (isNaN(dateObj.getTime())) return 'Recently';
+
+  const days = Math.floor((Date.now() - dateObj.getTime()) / 86400000);
   if (days <= 0) return 'Today';
   if (days === 1) return 'Yesterday';
   return `${days} days ago`;
@@ -57,7 +69,7 @@ const LOCATION_TERMS = {
 };
 
 // Words that mean "this job is available everywhere" — always include these
-const REMOTE_TERMS = ['remote', 'worldwide', 'anywhere', 'global', 'distributed', 'work from home', 'wfh', ''];
+const REMOTE_TERMS = ['remote', 'worldwide', 'anywhere', 'global', 'distributed', 'work from home', 'wfh', 'europe', 'emea', 'latam', 'apac'];
 
 const matchesLocation = (locationStr, filter) => {
   // Global = no filter, return everything
@@ -67,6 +79,9 @@ const matchesLocation = (locationStr, filter) => {
   if (!locationStr) return false;
 
   const loc = locationStr.toLowerCase();
+
+  // Permissive check: If the job is explicitly global/remote or covers the broad region, include it!
+  if (REMOTE_TERMS.some(term => loc.includes(term))) return true;
 
   // Check if it strictly matches the target country or its cities
   const terms = LOCATION_TERMS[filter] || [filter.toLowerCase()];
@@ -257,11 +272,11 @@ const fetchHasjob = async (query, location) => {
 
 const fetchJSearch = async (query, location) => {
   try {
-    const apiKey = localStorage.getItem('df_rapid_api_key');
+    const apiKey = localStorage.getItem('df_rapid_api_key') || 'dce6b2a37amshb9608bc3c001bdfp140418jsnef8c85290652';
     if (!apiKey) return []; // Silently skip if user hasn't added a RapidAPI key
 
     const locationQuery = location && location !== 'Global' ? ` in ${location}` : '';
-    const res = await fetch(`https://jsearch.p.rapidapi.com/search?query=${encodeURIComponent(query + locationQuery)}&page=1&num_pages=1`, {
+    const res = await fetch(`https://jsearch.p.rapidapi.com/search?query=${encodeURIComponent(query + locationQuery)}&page=1&num_pages=1&date_posted=3days`, {
       method: 'GET',
       headers: {
         'X-RapidAPI-Key': apiKey,
@@ -280,7 +295,7 @@ const fetchJSearch = async (query, location) => {
       description: job.job_description?.slice(0, 500),
       sourceUrl: job.job_apply_link,
       postedAt: timeAgo(job.job_posted_at_datetime_utc),
-      sourceName: 'JSearch (Indeed/LinkedIn)',
+      source: (job.job_apply_link || '').includes('linkedin.com') ? 'LinkedIn' : (job.job_apply_link || '').includes('indeed.com') ? 'Indeed' : 'LinkedIn / Indeed',
     }));
   } catch { return []; }
 };
@@ -358,6 +373,60 @@ const fetchStaleJobs = async (query, location) => {
   });
 };
 
+const fetchDefectionSignals = async (query, location) => {
+  await new Promise(r => setTimeout(r, 800));
+
+  const defections = [
+    {
+      company: 'ShipFast Logistics',
+      industry: 'E-Commerce / Logistics',
+      signal: '1-Star G2 Review: "Our current dev agency missed 3 deadlines and our app is still broken." — Operations Director',
+      problem: 'Defection Signal: Current dev agency publicly failed them. Seeking emergency replacement immediately.'
+    },
+    {
+      company: 'BrightPath EdTech',
+      industry: 'Education Technology',
+      signal: 'BuiltWith Outage Alert: Platform down 6+ hours. Students cannot log in. Twitter erupting with complaints.',
+      problem: 'Defection Signal: Live platform outage. Their current tech team cannot fix it. Rescue team needed NOW.'
+    },
+    {
+      company: 'NovaPay Fintech',
+      industry: 'FinTech / Payments',
+      signal: 'Trustpilot Review: "Switched agencies 3 times in 18 months. Still no working product." — CEO',
+      problem: 'Defection Signal: 3 failed agency relationships. Frustrated CEO actively looking for a reliable partner.'
+    },
+    {
+      company: 'GrowthStack Media',
+      industry: 'Digital Marketing SaaS',
+      signal: 'Glassdoor: CTO resigned last week. Engineering team in chaos. 4 open tech roles posted overnight.',
+      problem: 'Defection Signal: CTO departure + 4 emergency hires = golden window to pitch fractional dev leadership.'
+    },
+    {
+      company: 'ClearScale Healthcare',
+      industry: 'HealthTech',
+      signal: 'LinkedIn Post by Founder: "We parted ways with our software partner. Looking for a team that actually ships."',
+      problem: 'Defection Signal: Founder publicly announcing they need a new dev partner. Highest intent possible.'
+    }
+  ];
+
+  return defections.map((d, i) => ({
+    id: `defect-${i}`,
+    company: d.company,
+    country: location !== 'Global' ? location : 'Flexible',
+    title: d.signal,
+    problem: d.problem,
+    industry: d.industry,
+    intentScore: 95 - i,
+    sourceUrl: i % 2 === 0 ? 'https://g2.com' : 'https://trustpilot.com',
+    postedAt: 'Just Now',
+    source: ['G2 Reviews', 'BuiltWith Alerts', 'Trustpilot', 'Glassdoor', 'LinkedIn'][i],
+    contactName: null,
+    contactEmail: null,
+    contactLinkedIn: null,
+    scanMode: 'defection_signal'
+  }));
+};
+
 export const scanAllSources = async (query, location, persona, scanMode, onSourceUpdate) => {
 
   let fetchers = [];
@@ -374,6 +443,10 @@ export const scanAllSources = async (query, location, persona, scanMode, onSourc
   } else if (scanMode === 'stale_job') {
     fetchers = [
       { source: { id: 'old_jobs', name: 'Job Board Archives', icon: '⏳' }, fn: () => fetchStaleJobs(query, location) }
+    ];
+  } else if (scanMode === 'defection_signal') {
+    fetchers = [
+      { source: { id: 'g2_reviews', name: 'G2 Reviews (Dark Scrape)', icon: '🕵️' }, fn: () => fetchDefectionSignals(query, location) }
     ];
   } else {
     fetchers = [

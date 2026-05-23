@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { company, title, contactName, persona, isFollowUp, scanMode, senderName, companyContext, emailLength } = body;
+    const { company, title, contactName, persona, isFollowUp, scanMode, senderName, companyContext, emailLength, senderEmail, senderPhone, location } = body;
 
     // Using NVIDIA NIM API key instead of Gemini
     const apiKey = process.env.NVIDIA_API_KEY || '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';
@@ -25,7 +25,16 @@ export async function POST(request: NextRequest) {
 
 
     const companySlug = company.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-    const pitchLink = `https://leadsora.vercel.app/pitch/${companySlug}`;
+    
+    // Construct Query String for Contact Info & Customization
+    const queryParams = new URLSearchParams();
+    if (senderEmail) queryParams.append('e', senderEmail);
+    if (senderPhone) queryParams.append('p', senderPhone);
+    if (title) queryParams.append('t', title);
+    if (location) queryParams.append('l', location);
+    const queryString = queryParams.toString() ? `?${queryParams.toString()}` : '';
+    
+    const pitchLink = `https://leadsora.vercel.app/pitch/${companySlug}${queryString}`;
 
     let prompt = '';
 
@@ -54,6 +63,15 @@ export async function POST(request: NextRequest) {
       2. Pitch your ${userPersona} as a way to "stop the bleeding" fractionally tomorrow.
       3. End with: "I built a custom fractional execution plan for ${company} here: ${pitchLink}"
       4. ${signOffName} Do NOT include a subject line.`;
+    }
+    else if (scanMode === 'defection_signal') {
+      prompt = `You are a founder of a ${userPersona}. Write an urgent, hyper-targeted cold email for "${company}" regarding an issue you noticed.${contactPart}
+      Format it exactly like a real email. 
+      1. Delicately mention that you noticed a troubling signal ("${title}") regarding their current vendor or operations.
+      2. Empathize with how frustrating it is to deal with unreliable partners or outages.
+      3. Pitch your ${userPersona} as the reliable, premium "rescue team" to step in immediately and fix the bleeding.
+      4. End with: "I built a custom transition/rescue plan for ${company} here: ${pitchLink}"
+      5. ${signOffName} Do NOT include a subject line.`;
     }
     else if (isFollowUp) {
       prompt = `You are a founder of a ${userPersona}. Write a short follow-up cold email for "${company}" regarding their open "${title}" role.${contactPart}
