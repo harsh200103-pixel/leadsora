@@ -26,6 +26,7 @@ body {
   color: var(--text-primary);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
   background-image: 
     linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
@@ -527,7 +528,21 @@ footer {
   nav .logo-text { font-size: 1rem !important; }
 
   /* Modals */
-  .modal-inner { padding: 1.5rem !important; }
+  .modal-inner { padding: 1.5rem !important; overflow-y: auto; max-height: 90vh; }
+
+  /* Dashboard inner containers — prevent flex children overflow */
+  .lead-card-inner { min-width: 0 !important; width: 100% !important; }
+
+  /* Pipeline CRM Kanban — horizontal scroll on mobile */
+  .pipeline-kanban { overflow-x: auto !important; -webkit-overflow-scrolling: touch; padding-bottom: 1rem; }
+  .pipeline-col { min-width: 220px !important; flex-shrink: 0 !important; }
+
+  /* Settings modal — full-width on mobile */
+  .settings-modal { width: calc(100vw - 2rem) !important; max-width: 100% !important; left: 1rem !important; right: 1rem !important; }
+
+  /* Search form row — stack vertically on mobile */
+  .search-form-row { flex-direction: column !important; }
+  .search-form-row > * { width: 100% !important; }
 }
 
 @media (max-width: 480px) {
@@ -540,4 +555,8 @@ footer {
 
   /* Extra small phones — shrink scan mode buttons further */
   .scan-mode-tabs button { font-size: 0.75rem !important; padding: 5px 10px !important; }
+
+  /* Touch-friendly tap targets */
+  .scan-mode-tabs button { min-height: 36px; }
+  button { min-height: 36px; }
 }

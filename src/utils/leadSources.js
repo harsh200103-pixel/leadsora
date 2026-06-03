@@ -18,8 +18,9 @@ const SOURCES = [
   { id: 'adzuna_in', name: 'Adzuna IN',            icon: '🇮🇳', type: 'IN Market' },
   { id: 'findwork',  name: 'FindWork.dev',         icon: '⚡', type: 'Dev Hiring' },
   { id: 'himalayas', name: 'Himalayas',            icon: '🏔️', type: 'Remote-First' },
-  { id: 'jsearch',    name: 'JSearch (LinkedIn/Indeed)', icon: '🇮🇳', type: 'Pro Scraper' },
+  { id: 'jsearch',    name: 'JSearch (Google Jobs)', icon: '🔎', type: 'Pro Scraper' },
   { id: 'hasjob',     name: 'Hasjob.co',               icon: '💻', type: 'Indian Tech' },
+  { id: 'linkedin_jobs', name: 'LinkedIn Jobs (Direct)', icon: '💼', type: 'LinkedIn Only' },
   { id: 'remoteok',  name: 'RemoteOK',             icon: '✅', type: 'Remote Board' },
   { id: 'careerjet', name: 'CareerJet',            icon: '🚀', type: 'Global Scan' },
   { id: 'jooble',    name: 'Jooble',               icon: '🔎', type: 'Meta Search' },
@@ -275,25 +276,18 @@ const fetchJSearch = async (query, location) => {
     const apiKey = localStorage.getItem('df_rapid_api_key') || 'dce6b2a37amshb9608bc3c001bdfp140418jsnef8c85290652';
     if (!apiKey) return [];
 
-    // Map location dropdown to ISO country codes for precise geo-targeting
     const COUNTRY_CODES = {
       'USA': 'us', 'UK': 'gb', 'Canada': 'ca', 'Australia': 'au',
       'India': 'in', 'Germany': 'de', 'UAE': 'ae', 'Singapore': 'sg',
       'France': 'fr', 'Netherlands': 'nl', 'Ireland': 'ie', 'Spain': 'es',
     };
     const countryCode = COUNTRY_CODES[location];
-
-    // Build URL — use country code param instead of appending to query string
     let url = `https://jsearch.p.rapidapi.com/search?query=${encodeURIComponent(query)}&page=1&num_pages=2&date_posted=week&employment_types=FULLTIME,CONTRACTOR`;
     if (countryCode) url += `&country=${countryCode}`;
-    // For Global, no country filter — gets worldwide results
 
     const res = await fetch(url, {
       method: 'GET',
-      headers: {
-        'X-RapidAPI-Key': apiKey,
-        'X-RapidAPI-Host': 'jsearch.p.rapidapi.com'
-      }
+      headers: { 'X-RapidAPI-Key': apiKey, 'X-RapidAPI-Host': 'jsearch.p.rapidapi.com' }
     });
 
     if (!res.ok) return [];
@@ -309,6 +303,48 @@ const fetchJSearch = async (query, location) => {
       sourceUrl: job.job_apply_link,
       postedAt: timeAgo(job.job_posted_at_datetime_utc),
       sourceName: (job.job_apply_link || '').includes('linkedin.com') ? 'LinkedIn' : (job.job_apply_link || '').includes('indeed.com') ? 'Indeed' : 'LinkedIn / Indeed',
+    }));
+  } catch { return []; }
+};
+
+// ── LinkedIn Jobs Direct Scraper via RapidAPI ──────────────────────
+const fetchLinkedInJobs = async (query, location) => {
+  try {
+    const apiKey = localStorage.getItem('df_rapid_api_key') || 'dce6b2a37amshb9608bc3c001bdfp140418jsnef8c85290652';
+    if (!apiKey) return [];
+
+    // Map to LinkedIn's geolocation codes for top markets
+    const GEO_IDS = {
+      'USA': '103644278', 'UK': '101165590', 'Canada': '101174742',
+      'Australia': '101452733', 'India': '102713980', 'Germany': '101282230',
+      'UAE': '104305776', 'Singapore': '102454443', 'France': '105015875',
+    };
+    const geoId = GEO_IDS[location] || GEO_IDS['USA'];
+
+    const res = await fetch(
+      `https://linkedin-jobs-search.p.rapidapi.com/?query=${encodeURIComponent(query)}&location=${encodeURIComponent(location !== 'Global' ? location : 'Worldwide')}&geoId=${geoId}&dateSincePosted=pastWeek&start=0`,
+      {
+        method: 'GET',
+        headers: {
+          'X-RapidAPI-Key': apiKey,
+          'X-RapidAPI-Host': 'linkedin-jobs-search.p.rapidapi.com'
+        }
+      }
+    );
+
+    if (!res.ok) return [];
+    const json = await res.json();
+    if (!Array.isArray(json) || !json.length) return [];
+
+    return json.slice(0, 8).map((job, i) => buildLead({
+      id: `linkedin-${i}-${job.id || i}`,
+      company: job.company || 'Unknown',
+      country: job.location || (location !== 'Global' ? location : 'Global'),
+      title: job.title || 'Open Role',
+      description: job.description?.slice(0, 500) || '',
+      sourceUrl: job.applyUrl || job.url || `https://linkedin.com/jobs`,
+      postedAt: job.ago || 'Recently',
+      sourceName: 'LinkedIn',
     }));
   } catch { return []; }
 };
@@ -554,6 +590,7 @@ export const scanAllSources = async (query, location, persona, scanMode, onSourc
       { source: SOURCES[11], fn: () => fetchHimalayas(query, location) },
       { source: SOURCES[12], fn: () => fetchJSearch(query, location) },
       { source: SOURCES[13], fn: () => fetchHasjob(query, location) },
+      { source: { id: 'linkedin_jobs', name: 'LinkedIn Jobs (Direct)', icon: '💼' }, fn: () => fetchLinkedInJobs(query, location) },
     ];
   }
 
