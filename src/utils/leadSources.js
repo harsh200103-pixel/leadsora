@@ -92,13 +92,14 @@ const matchesLocation = (locationStr, filter) => {
 // ── Lead Builder ───────────────────────────────────────────────
 function buildLead({ id, company, country, title, description, sourceUrl, postedAt, sourceName, contactName, contactEmail, contactLinkedIn }) {
   const fullText = `${title || ''} ${description || ''}`;
-  const intentScore = calcIntentScore(fullText, postedAt);
+  const intentData = calculateIntentScore(fullText, postedAt);
 
   return {
     id,
     company,
     country: country || 'Global',
-    intentScore,
+    intentScore: intentData.score,
+    intentSignals: intentData.signals,
     problem: `Hiring: ${title}`,
     sourceUrl: sourceUrl || '',
     postedAt: postedAt || 'Recently',

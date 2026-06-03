@@ -275,6 +275,16 @@ function Dashboard() {
     return sig;
   };
 
+  const getSubjectLine = (lead: any) => {
+    const role = (lead.title || lead.problem || '').replace('Hiring: ', '').substring(0, 30);
+    const score = lead.intentScore;
+    
+    // Dynamic subject lines based on how hot the lead is
+    if (score >= 90) return `Quick question about the ${role} opening at ${lead.company}`;
+    if (score >= 80) return `Exploring synergies: ${role} at ${lead.company}`;
+    return `${lead.company} <> Engineering Collaboration`;
+  };
+
   const getEmailBody = (lead: any) => {
     if (!lead) return '';
     const base = aiOutreach[lead.id] || lead.outreach || '';
@@ -706,11 +716,15 @@ function Dashboard() {
                           <p className="ai-text-mobile" style={{ fontSize: '0.875rem', color: aiOutreach[lead.id] ? '#e2e8f0' : '#aaa', margin: 0, paddingRight: '100px' }}><em>"{aiOutreach[lead.id] ? <Typewriter text={aiOutreach[lead.id]} /> : lead.outreach}"</em></p>
                           {/* Omnichannel Blitz / AI Actions */}
                           <div className="ai-actions-mobile" style={{ position: 'absolute', top: '0.75rem', right: '0.75rem', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                            <button onClick={() => { setBlitzLead(lead); if(!aiOutreach[lead.id]) generateAIOutreach(lead); if(!foundEmails[lead.id] && hunterKey) fetchEmailsWithHunter(lead); }} disabled={!!generatingId} style={{ background: 'linear-gradient(135deg, #7c3aed, #4facfe)', color: '#fff', border: 'none', cursor: generatingId ? 'not-allowed' : 'pointer', padding: '4px 8px', borderRadius: '4px', fontWeight: 'bold', fontSize: '0.7rem', display: 'flex', alignItems: 'center', gap: '4px' }} title="Omnichannel Blitz">
+                            <button onClick={() => { setBlitzLead(lead); if(!aiOutreach[lead.id]) generateAIOutreach(lead); if(!foundEmails[lead.id] && hunterKey) fetchEmailsWithHunter(lead); }} disabled={!!generatingId} style={{ background: 'linear-gradient(135deg, #7c3aed, #4facfe)', color: '#fff', border: 'none', cursor: generatingId ? 'not-allowed' : 'pointer', padding: '4px 12px', borderRadius: '4px', fontWeight: 'bold', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '6px' }} title="Omnichannel Blitz">
                               {generatingId === lead.id ? <Loader2 size={12} className="animate-spin" /> : <><Sparkles size={12} /> Blitz</>}
                             </button>
-                            <a href={`https://mail.google.com/mail/?view=cm&fs=1&to=${foundEmails[lead.id]?.map((e: any) => e.value).join(',') || lead.contactEmail || ''}&su=${encodeURIComponent(`Exploring synergies: ${lead.problem?.replace('Hiring: ', '') || 'Open Role'} at ${lead.company}`)}&body=${encodeURIComponent(getEmailBody(lead))}`} target="_blank" rel="noreferrer" style={{ color: '#4facfe', display: 'inline-flex', alignItems: 'center' }} title="Open in Gmail"><Mail size={16} /></a>
-                            <button onClick={() => handleCopy(lead.id, getEmailBody(lead))} style={{ background: 'none', border: 'none', cursor: 'pointer', color: copiedId === lead.id ? '#27c93f' : '#666', display: 'inline-flex', alignItems: 'center', padding: 0 }} title="Copy">{copiedId === lead.id ? <Check size={16} /> : <Copy size={16} />}</button>
+                            <a href={`https://mail.google.com/mail/?view=cm&fs=1&to=${foundEmails[lead.id]?.map((e: any) => e.value).join(',') || lead.contactEmail || ''}&su=${encodeURIComponent(getSubjectLine(lead))}&body=${encodeURIComponent(getEmailBody(lead))}`} target="_blank" rel="noreferrer" style={{ background: 'rgba(79, 172, 254, 0.1)', border: '1px solid rgba(79, 172, 254, 0.3)', color: '#4facfe', display: 'inline-flex', alignItems: 'center', padding: '4px 10px', borderRadius: '4px', fontSize: '0.75rem', textDecoration: 'none', gap: '6px' }} title="Send in Gmail">
+                              <Mail size={12} /> Gmail
+                            </a>
+                            <button onClick={() => handleCopy(lead.id, getEmailBody(lead))} style={{ background: copiedId === lead.id ? 'rgba(39, 201, 63, 0.1)' : 'rgba(255,255,255,0.05)', border: `1px solid ${copiedId === lead.id ? '#27c93f' : '#333'}`, cursor: 'pointer', color: copiedId === lead.id ? '#27c93f' : '#ccc', display: 'inline-flex', alignItems: 'center', padding: '4px 10px', borderRadius: '4px', fontSize: '0.75rem', gap: '6px', transition: 'all 0.2s' }} title="Copy to Clipboard">
+                              {copiedId === lead.id ? <><Check size={12} /> Copied</> : <><Copy size={12} /> Copy</>}
+                            </button>
                           </div>
                         </div>
 
@@ -801,7 +815,13 @@ function Dashboard() {
                           </div>
                         )}
                       </div>
-                      <div className="intent-score" style={{ fontSize: '1.25rem', padding: '0.75rem 1.5rem', color: getScoreColor(lead.intentScore), borderColor: getScoreColor(lead.intentScore) }}>{lead.intentScore} 🔥</div>
+                      <div 
+                        className="intent-score" 
+                        title={lead.intentSignals ? lead.intentSignals.join('\n') : 'Score breakdown available on new scans'}
+                        style={{ position: 'relative', cursor: 'help', fontSize: '1.25rem', padding: '0.75rem 1.5rem', color: getScoreColor(lead.intentScore), borderColor: getScoreColor(lead.intentScore) }}
+                      >
+                        {lead.intentScore} 🔥
+                      </div>
                     </div>
                   ))}
                 </div>
