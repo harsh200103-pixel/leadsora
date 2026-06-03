@@ -61,6 +61,13 @@ function Dashboard() {
   const [findingManagerFor, setFindingManagerFor] = useState<string | null>(null);
   const [slackWebhook, setSlackWebhook] = useState('');
 
+  // Tier 2 — Filter, Sort, Presets, Score Explainer
+  const [sortBy, setSortBy] = useState<'score' | 'newest' | 'company'>('score');
+  const [filterScore, setFilterScore] = useState<number>(0); // 0 = show all
+  const [filterSource, setFilterSource] = useState<string>('all');
+  const [savedSearches, setSavedSearches] = useState<{label: string; query: string; location: string; mode: string}[]>([]);
+  const [showScoreExplainer, setShowScoreExplainer] = useState<string | null>(null); // leadId
+
   // Business Profile State
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [profileDismissed, setProfileDismissed] = useState(false);
@@ -119,6 +126,9 @@ function Dashboard() {
 
     const savedSlack = localStorage.getItem('df_slack_webhook');
     if (savedSlack) setSlackWebhook(savedSlack);
+
+    const savedSearchesData = localStorage.getItem(`leadsora_saved_searches${prefix}`);
+    if (savedSearchesData) { try { setSavedSearches(JSON.parse(savedSearchesData)); } catch (e) {} }
   }, [user, authLoading]);
 
   useEffect(() => {
@@ -141,6 +151,42 @@ function Dashboard() {
     const updated = { ...notes, [leadId]: text };
     setNotes(updated);
     if (user) localStorage.setItem(`leadsora_notes_${user.email}`, JSON.stringify(updated));
+  };
+
+  const saveSearch = () => {
+    if (!searchQuery.trim()) return;
+    const label = `${searchQuery} · ${location} · ${scanMode}`;
+    const newSearch = { label, query: searchQuery, location, mode: scanMode };
+    const updated = [newSearch, ...savedSearches.filter(s => s.label !== label)].slice(0, 5);
+    setSavedSearches(updated);
+    if (user) localStorage.setItem(`leadsora_saved_searches_${user.email}`, JSON.stringify(updated));
+  };
+
+  const loadSearch = (s: {label: string; query: string; location: string; mode: string}) => {
+    setSearchQuery(s.query);
+    setLocation(s.location);
+    setScanMode(s.mode as any);
+  };
+
+  const deleteSearch = (label: string) => {
+    const updated = savedSearches.filter(s => s.label !== label);
+    setSavedSearches(updated);
+    if (user) localStorage.setItem(`leadsora_saved_searches_${user.email}`, JSON.stringify(updated));
+  };
+
+  // Compute filtered + sorted leads
+  const getDisplayLeads = (rawLeads: any[]) => {
+    let filtered = rawLeads;
+    if (highIntentOnly) filtered = filtered.filter(l => l.intentScore >= 85);
+    if (filterScore > 0) filtered = filtered.filter(l => l.intentScore >= filterScore);
+    if (filterSource !== 'all') filtered = filtered.filter(l => (l.source || l.sourceName || '').includes(filterSource));
+    if (sortBy === 'score') filtered = [...filtered].sort((a, b) => b.intentScore - a.intentScore);
+    if (sortBy === 'newest') filtered = [...filtered].sort((a, b) => {
+      const parse = (s: string) => { const m = s?.match(/(\d+)\s*days?/i); return m ? parseInt(m[1]) : 0; };
+      return parse(a.postedAt) - parse(b.postedAt);
+    });
+    if (sortBy === 'company') filtered = [...filtered].sort((a, b) => a.company?.localeCompare(b.company));
+    return filtered;
   };
 
   const sendSlackNotification = async (lead: any, type: 'new_lead' | 'follow_up') => {
@@ -470,7 +516,11 @@ function Dashboard() {
             <button type="submit" className="btn-primary flex items-center justify-center gap-2" disabled={isScanning} style={{ background: scanMode === 'layoff' ? '#ff5f56' : scanMode === 'vc_whale' ? '#0a66c2' : scanMode === 'stale_job' ? '#ffbd2e' : '' }}>
               {isScanning ? <><Loader2 className="animate-spin" size={20} /> Scanning...</> : 'Scan Market'}
             </button>
+            <button type="button" onClick={saveSearch} title="Save this search as a preset" style={{ background: 'rgba(124,58,237,0.12)', border: '1px solid rgba(124,58,237,0.3)', color: '#a78bfa', borderRadius: '8px', padding: '0 0.75rem', fontSize: '0.8rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', whiteSpace: 'nowrap' }}>
+              ⭐ Save Search
+            </button>
           </form>
+
 
           {/* Dynamic Keyword Suggestions from Auto-Extract */}
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
@@ -576,9 +626,63 @@ function Dashboard() {
               </div>
 
               <div className="dashboard-body" style={{ background: '#111' }}>
+
+                {/* ── Filter & Sort Bar ── */}
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1rem', padding: '0.75rem 1rem', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid #222', alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.75rem', color: '#666', marginRight: '0.25rem' }}>🎛️ Filter:</span>
+
+                  {/* Score filter */}
+                  <select value={filterScore} onChange={e => setFilterScore(Number(e.target.value))} style={{ background: '#000', border: '1px solid #333', color: filterScore > 0 ? '#a78bfa' : '#888', borderRadius: '4px', padding: '3px 8px', fontSize: '0.75rem', cursor: 'pointer' }}>
+                    <option value={0}>All Scores</option>
+                    <option value={90}>90+ 🔥 Ultra Hot</option>
+                    <option value={85}>85+ ⚡ High Intent</option>
+                    <option value={70}>70+ ✅ Good</option>
+                  </select>
+
+                  {/* Source filter */}
+                  <select value={filterSource} onChange={e => setFilterSource(e.target.value)} style={{ background: '#000', border: '1px solid #333', color: filterSource !== 'all' ? '#a78bfa' : '#888', borderRadius: '4px', padding: '3px 8px', fontSize: '0.75rem', cursor: 'pointer' }}>
+                    <option value="all">All Sources</option>
+                    <option value="LinkedIn">LinkedIn</option>
+                    <option value="Indeed">Indeed</option>
+                    <option value="Remotive">Remotive</option>
+                    <option value="Himalayas">Himalayas</option>
+                    <option value="Layoffs">Layoffs.fyi</option>
+                    <option value="TechCrunch">TechCrunch</option>
+                  </select>
+
+                  {/* Sort */}
+                  <select value={sortBy} onChange={e => setSortBy(e.target.value as any)} style={{ background: '#000', border: '1px solid #333', color: '#888', borderRadius: '4px', padding: '3px 8px', fontSize: '0.75rem', cursor: 'pointer' }}>
+                    <option value="score">Sort: Highest Score</option>
+                    <option value="newest">Sort: Newest First</option>
+                    <option value="company">Sort: Company A–Z</option>
+                  </select>
+
+                  <span style={{ marginLeft: 'auto', fontSize: '0.72rem', color: '#555' }}>
+                    {getDisplayLeads(leads).length} of {leads.length} leads
+                  </span>
+
+                  {/* Reset filters */}
+                  {(filterScore > 0 || filterSource !== 'all' || sortBy !== 'score') && (
+                    <button onClick={() => { setFilterScore(0); setFilterSource('all'); setSortBy('score'); }} style={{ background: 'none', border: '1px solid #333', color: '#888', borderRadius: '4px', padding: '3px 8px', fontSize: '0.72rem', cursor: 'pointer' }}>✕ Reset</button>
+                  )}
+                </div>
+
+                {/* ── Saved Search Presets ── */}
+                {savedSearches.length > 0 && (
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1rem', alignItems: 'center' }}>
+                    <span style={{ fontSize: '0.72rem', color: '#555' }}>⭐ Saved:</span>
+                    {savedSearches.map((s, idx) => (
+                      <div key={idx} style={{ display: 'flex', alignItems: 'center', background: 'rgba(124,58,237,0.08)', border: '1px solid rgba(124,58,237,0.2)', borderRadius: '999px', overflow: 'hidden' }}>
+                        <button onClick={() => loadSearch(s)} style={{ background: 'none', border: 'none', color: '#a78bfa', padding: '3px 10px', fontSize: '0.72rem', cursor: 'pointer', whiteSpace: 'nowrap' }}>{s.label}</button>
+                        <button onClick={() => deleteSearch(s.label)} style={{ background: 'none', border: 'none', color: '#555', padding: '3px 6px 3px 0', fontSize: '0.7rem', cursor: 'pointer' }}>✕</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
                 {viewMode === 'list' ? (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    {(highIntentOnly ? leads.filter(l => l.intentScore >= 85) : leads).map(lead => (
+                    {getDisplayLeads(leads).map(lead => (
                     <div key={lead.id} className="glass-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
                       <div style={{ flex: 1, minWidth: '300px' }}>
                         <h4 style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>{lead.company} <span style={{ fontSize: '0.875rem', color: '#888' }}>• {lead.country}</span></h4>
