@@ -201,7 +201,7 @@ function Dashboard() {
   };
 
   const findHiringManager = async (lead: any) => {
-    if (!hunterKey) return alert('Add your Hunter.io API key in settings first!');
+    if (!hunterKey) return alert('Add your Hunter.io API key in Settings first!');
     setFindingManagerFor(lead.id);
     try {
       const res = await fetch('/api/find-hiring-manager', {
@@ -215,16 +215,25 @@ function Dashboard() {
           ? { ...l, contactName: data.name || l.contactName, contactEmail: data.email, contactLinkedIn: data.linkedin || l.contactLinkedIn }
           : l
         ));
-        alert(`✅ Hiring Manager Found!\n\nName: ${data.name}\nTitle: ${data.title}\nEmail: ${data.email}\n\nThe AI pitch will now address ${data.name} directly.`);
+        alert(`✅ Hiring Manager Found!\n\nName: ${data.name}\nTitle: ${data.title}\nEmail: ${data.email}\nDomain: ${data.domain}\n\nThe AI pitch will now address ${data.name} directly.`);
       } else {
-        alert(`No senior contacts found for ${lead.company} (domain: ${data.domain || 'unknown'}).\n\nTry using the "Find Emails" button instead.`);
+        // Show specific, actionable error messages
+        if (data.errorCode === 'QUOTA_EXCEEDED') {
+          alert(`⚠️ Hunter.io Monthly Quota Reached\n\nYour free plan (25 searches/month) is used up.\n\nFix: Upgrade your Hunter.io plan at hunter.io/pricing\nOr wait until next month when the quota resets.\n\nTip: Use the "Find Emails" button instead — it uses a different Hunter endpoint.`);
+        } else if (data.errorCode === 'INVALID_KEY') {
+          alert(`❌ Invalid Hunter.io API Key\n\nYour key was rejected. Go to Settings and update it.\nGet your key at: hunter.io → Dashboard → API`);
+        } else {
+          alert(`🔍 No Contacts Found for "${lead.company}"\n\nDomain tried: ${data.domain}\n${data.triedDomains?.length > 1 ? `Also tried: ${data.triedDomains.slice(1).join(', ')}` : ''}\n\nWhy this happens:\n• Company too small/new for Hunter.io's database\n• Non-.com domain that Hunter hasn't indexed\n• Startup with fewer than ~10 employees\n\nTry the "Find Emails" button instead for more options.`);
+        }
       }
     } catch (e) {
       console.error(e);
+      alert('Network error. Check your connection and try again.');
     } finally {
       setFindingManagerFor(null);
     }
   };
+
 
   const verifyEmail = async (email: string, leadId: string) => {
     if (!hunterKey || emailVerification[`${leadId}_${email}`]) return;
