@@ -44,6 +44,7 @@ function Dashboard() {
   const [showSettings, setShowSettings] = useState(false);
   const [scanMode, setScanMode] = useState<'hiring' | 'layoff' | 'vc_whale' | 'stale_job' | 'defection_signal'>('hiring');
   const [followUpModal, setFollowUpModal] = useState<any>(null);
+  const [reportModal, setReportModal] = useState<{ lead: any, report: any } | null>(null);
   const [searchType, setSearchType] = useState<'keyword' | 'cloner'>('keyword');
   const [ghostModeEnabled, setGhostModeEnabled] = useState(false);
   const [blitzLead, setBlitzLead] = useState<any>(null);
@@ -263,6 +264,10 @@ function Dashboard() {
   };
 
   const analyzeCompany = async (lead: any) => {
+    if (companyReports[lead.id]) {
+      setReportModal({ lead, report: companyReports[lead.id] });
+      return;
+    }
     setAnalyzingCompanyFor(lead.id);
     try {
       const res = await fetch('/api/analyze-company', {
@@ -275,8 +280,14 @@ function Dashboard() {
         const updated = { ...companyReports, [lead.id]: data.report };
         setCompanyReports(updated);
         if (user) localStorage.setItem(`leadsora_reports_${user.email}`, JSON.stringify(updated));
+        setReportModal({ lead, report: data.report });
+      } else if (data.error) {
+        throw new Error(data.error);
       }
-    } catch (e) { console.error(e); }
+    } catch (e: any) { 
+      console.error(e); 
+      alert('Deep Dive Failed: ' + e.message); 
+    }
     finally { setAnalyzingCompanyFor(null); }
   };
 
@@ -781,26 +792,7 @@ function Dashboard() {
                           </p>
                         </div>
 
-                        {/* Deep Dive Intelligence Report (List View) */}
-                        {companyReports[lead.id] && (
-                          <div style={{ marginTop: '1rem', padding: '1rem', background: 'rgba(124,58,237,0.05)', borderRadius: '8px', border: '1px solid rgba(124,58,237,0.3)' }}>
-                            <h5 style={{ fontSize: '0.75rem', color: '#a78bfa', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '1px', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                              <Sparkles size={12} /> Company Intelligence
-                            </h5>
-                            <p style={{ fontSize: '0.85rem', color: '#fff', marginBottom: '0.5rem', lineHeight: '1.4' }}><strong>Overview:</strong> {companyReports[lead.id].summary}</p>
-                            {companyReports[lead.id].recent_news && (
-                              <p style={{ fontSize: '0.85rem', color: '#ccc', marginBottom: '0.5rem', lineHeight: '1.4' }}><strong>Recent News:</strong> {companyReports[lead.id].recent_news}</p>
-                            )}
-                            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-                              {companyReports[lead.id].tech_stack && (
-                                <p style={{ fontSize: '0.8rem', color: '#888', margin: 0 }}><strong>Tech Stack:</strong> {companyReports[lead.id].tech_stack}</p>
-                              )}
-                              {companyReports[lead.id].ideal_customer && (
-                                <p style={{ fontSize: '0.8rem', color: '#888', margin: 0 }}><strong>Ideal Customer:</strong> {companyReports[lead.id].ideal_customer}</p>
-                              )}
-                            </div>
-                          </div>
-                        )}
+                        {/* Deep Dive Intelligence Report (List View) Removed (Moved to Modal) */}
 
                         {/* Contact Info / Hunter Integration */}
                         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center', marginTop: '1rem' }}>
@@ -974,18 +966,7 @@ function Dashboard() {
                               </div>
                             </div>
                             
-                            {/* Deep Dive Intelligence Report (Pipeline View) */}
-                            {companyReports[lead.id] && (
-                              <div style={{ marginTop: '0.75rem', padding: '0.75rem', background: 'rgba(124,58,237,0.05)', borderRadius: '4px', border: '1px solid rgba(124,58,237,0.3)' }}>
-                                <h5 style={{ fontSize: '0.65rem', color: '#a78bfa', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                                  <Sparkles size={10} style={{marginRight:'4px'}}/> Company Intelligence
-                                </h5>
-                                <p style={{ fontSize: '0.75rem', color: '#fff', marginBottom: '0.5rem', lineHeight: '1.3' }}><strong>Overview:</strong> {companyReports[lead.id].summary}</p>
-                                {companyReports[lead.id].recent_news && (
-                                  <p style={{ fontSize: '0.75rem', color: '#ccc', marginBottom: '0.25rem', lineHeight: '1.3' }}><strong>News:</strong> {companyReports[lead.id].recent_news}</p>
-                                )}
-                              </div>
-                            )}
+                            {/* Deep Dive Intelligence Report (Pipeline View) Removed (Moved to Modal) */}
 
                             {/* Pipeline Notes Section */}
                             {showNote[lead.id] && (
@@ -1254,6 +1235,47 @@ function Dashboard() {
             <button onClick={() => { saveGhostConfig(ghostConfig); setShowGhostConfig(false); }} style={{ width: '100%', padding: '14px', marginTop: '2rem', background: 'linear-gradient(135deg, #27c93f, #10b981)', color: '#000', border: 'none', borderRadius: '8px', fontSize: '1rem', fontWeight: 700, cursor: 'pointer' }}>
               👻 Save & Activate Ghost Mode
             </button>
+          </div>
+        </div>
+      {/* Deep Dive Intelligence Modal */}
+      {reportModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, padding: '1rem' }}>
+          <div style={{ background: '#111', border: '1px solid rgba(124,58,237,0.3)', borderRadius: '16px', padding: '2.5rem', width: '100%', maxWidth: '700px', maxHeight: '90vh', overflowY: 'auto', position: 'relative', boxShadow: '0 25px 50px -12px rgba(124,58,237,0.15)' }}>
+            <button onClick={() => setReportModal(null)} style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', padding: '8px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onMouseOver={e => e.currentTarget.style.background = 'rgba(255,0,0,0.5)'} onMouseOut={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}><X size={20} /></button>
+
+            <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+              <div style={{ width: '56px', height: '56px', borderRadius: '16px', background: 'linear-gradient(135deg, #7c3aed, #4facfe)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}><Sparkles size={28} color="#fff" /></div>
+              <h2 style={{ margin: '0 0 0.5rem 0', fontSize: '1.5rem', background: 'linear-gradient(135deg, #7c3aed, #4facfe)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Company Intelligence</h2>
+              <p style={{ color: '#888', fontSize: '1rem', margin: 0, fontWeight: 500 }}>{reportModal.lead.company}</p>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              <div>
+                <h4 style={{ color: '#a78bfa', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '1px', margin: '0 0 0.5rem 0' }}>Overview & Market Positioning</h4>
+                <div style={{ color: '#fff', fontSize: '0.95rem', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{reportModal.report.summary}</div>
+              </div>
+
+              {reportModal.report.recent_news && (
+                <div style={{ padding: '1rem', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', border: '1px solid #333' }}>
+                  <h4 style={{ color: '#a78bfa', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '1px', margin: '0 0 0.5rem 0' }}>Recent Milestones</h4>
+                  <div style={{ color: '#ccc', fontSize: '0.9rem', lineHeight: '1.5', whiteSpace: 'pre-wrap' }}>{reportModal.report.recent_news}</div>
+                </div>
+              )}
+
+              {reportModal.report.ideal_customer && (
+                <div>
+                  <h4 style={{ color: '#a78bfa', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '1px', margin: '0 0 0.5rem 0' }}>Ideal Customer Profile (ICP)</h4>
+                  <div style={{ color: '#ccc', fontSize: '0.9rem', lineHeight: '1.5', whiteSpace: 'pre-wrap' }}>{reportModal.report.ideal_customer}</div>
+                </div>
+              )}
+
+              {reportModal.report.tech_stack && (
+                <div>
+                  <h4 style={{ color: '#a78bfa', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '1px', margin: '0 0 0.5rem 0' }}>Tech Stack & Infrastructure</h4>
+                  <div style={{ color: '#ccc', fontSize: '0.9rem', lineHeight: '1.5', whiteSpace: 'pre-wrap' }}>{reportModal.report.tech_stack}</div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}

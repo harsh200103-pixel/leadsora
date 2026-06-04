@@ -56,15 +56,15 @@ export async function POST(request: NextRequest) {
         messages: [
           { 
             role: 'system', 
-            content: `You are an expert business analyst. Read the provided search results about a company and output a strict JSON object summarizing them.
+            content: `You are an expert business analyst and intelligence researcher. Read the provided search results about a company and output a strict JSON object summarizing their business.
 Required JSON format:
 {
-  "summary": "1 sentence description of what they do",
-  "recent_news": "1-2 sentences about their latest funding, product launch, or milestone (or null if none)",
-  "tech_stack": "List of technologies they use or focus on (or null)",
-  "ideal_customer": "Who they sell to (or null)"
+  "summary": "A highly detailed 2-3 paragraph analysis of their business model, what they do, their market positioning, and any known competitors.",
+  "recent_news": "A detailed paragraph covering their latest funding rounds, product launches, acquisitions, or key milestones (or null if none found).",
+  "tech_stack": "A comprehensive list or paragraph describing the technologies, frameworks, and infrastructure they use (or null if unknown).",
+  "ideal_customer": "A detailed breakdown of their target audience, buyer personas, and who they sell to (or null if unknown)."
 }
-Return ONLY the raw JSON object, no markdown blocks, no other text.` 
+Return ONLY the raw JSON object. Do not include markdown blocks like \`\`\`json or any conversational text.` 
           },
           { role: 'user', content: `Company: ${company}\nSearch Results:\n${rawContext}` }
         ],
