@@ -35,7 +35,7 @@ function Dashboard() {
   const [scanStatus, setScanStatus] = useState('');
   const [hunterKey, setHunterKey] = useState('b937eb0f532629a23bc002872195055922026f68'); // Default to provided key
   const [rapidApiKey, setRapidApiKey] = useState('dce6b2a37amshb9608bc3c001bdfp140418jsnef8c85290652');
-  const [tavilyKey, setTavilyKey] = useState('');
+  const [tavilyKey, setTavilyKey] = useState('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');
   const [companyReports, setCompanyReports] = useState<{[key: string]: any}>({});
   const [analyzingCompanyFor, setAnalyzingCompanyFor] = useState<string | null>(null);
   
