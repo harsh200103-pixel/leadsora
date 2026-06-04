@@ -35,6 +35,16 @@ export async function POST(request: NextRequest) {
     const queryString = queryParams.toString() ? `?${queryParams.toString()}` : '';
     
     const pitchLink = `https://leadsora.vercel.app/pitch/${companySlug}${queryString}`;
+    
+    let shortLink = pitchLink;
+    try {
+      const urlRes = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(pitchLink)}`);
+      if (urlRes.ok) {
+        shortLink = await urlRes.text();
+      }
+    } catch (e) {
+      console.error('Failed to shorten URL:', e);
+    }
 
     let prompt = '';
 
@@ -44,7 +54,7 @@ export async function POST(request: NextRequest) {
       1. Start with a respectful greeting.
       2. Acknowledge the recent news/restructuring delicately.
       3. Explain that if they need to maintain output without the risk of hiring full-time headcount again, your ${userPersona} can step in as a fractional resource.
-      4. End with: "I built a custom fractional roadmap for ${company} here: ${pitchLink}"
+      4. End with: "I built a custom fractional roadmap for ${company} here: ${shortLink}"
       5. ${signOffName} Do NOT include a subject line.`;
     }
     else if (scanMode === 'vc_whale') {
@@ -53,7 +63,7 @@ export async function POST(request: NextRequest) {
       1. Congratulate them on the funding.
       2. Explain that investors expect hyper-growth, but hiring full-time takes 3-6 months.
       3. Pitch your ${userPersona} as the ultimate 'cheat code' to hit scaling targets immediately.
-      4. End with: "I built a custom scaling roadmap for ${company} here: ${pitchLink}"
+      4. End with: "I built a custom scaling roadmap for ${company} here: ${shortLink}"
       5. ${signOffName} Do NOT include a subject line.`;
     }
     else if (scanMode === 'stale_job') {
@@ -61,7 +71,7 @@ export async function POST(request: NextRequest) {
       Format it exactly like a real email. 
       1. Mention their "${title}" position has been sitting open for months and the workload must be piling up.
       2. Pitch your ${userPersona} as a way to "stop the bleeding" fractionally tomorrow.
-      3. End with: "I built a custom fractional execution plan for ${company} here: ${pitchLink}"
+      3. End with: "I built a custom fractional execution plan for ${company} here: ${shortLink}"
       4. ${signOffName} Do NOT include a subject line.`;
     }
     else if (scanMode === 'defection_signal') {
@@ -70,20 +80,20 @@ export async function POST(request: NextRequest) {
       1. Delicately mention that you noticed a troubling signal ("${title}") regarding their current vendor or operations.
       2. Empathize with how frustrating it is to deal with unreliable partners or outages.
       3. Pitch your ${userPersona} as the reliable, premium "rescue team" to step in immediately and fix the bleeding.
-      4. End with: "I built a custom transition/rescue plan for ${company} here: ${pitchLink}"
+      4. End with: "I built a custom transition/rescue plan for ${company} here: ${shortLink}"
       5. ${signOffName} Do NOT include a subject line.`;
     }
     else if (isFollowUp) {
       prompt = `You are a founder of a ${userPersona}. Write a short follow-up cold email for "${company}" regarding their open "${title}" role.${contactPart}
       Format it exactly like a real email. 
       1. Keep it extremely brief. Ask if they have made any progress on the hire.
-      2. End with: "In the meantime, I updated the custom ROI deck for ${company} here: ${pitchLink}"
+      2. End with: "In the meantime, I updated the custom ROI deck for ${company} here: ${shortLink}"
       3. ${signOffName} Do NOT include a subject line.`;
     } else {
       prompt = `You are a founder of a ${userPersona}. Write a well-structured cold email for "${company}" that is hiring for "${title}".${contactPart} 
       Format it exactly like a real email. 
       1. Explain how your specific ${userPersona} services can help them achieve their goals faster/cheaper.
-      2. End with: "I built a custom ROI pitch deck specifically for ${company} here: ${pitchLink}"
+      2. End with: "I built a custom ROI pitch deck specifically for ${company} here: ${shortLink}"
       3. ${signOffName} Do NOT include a subject line.`;
     }
 
