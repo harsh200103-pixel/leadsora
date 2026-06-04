@@ -132,7 +132,7 @@ function Dashboard() {
     if (savedTavily) setTavilyKey(savedTavily);
 
     const savedReports = localStorage.getItem(`leadsora_reports_${prefix}`);
-    if (savedReports) { try { setCompanyReports(JSON.parse(savedReports)); } catch (e) {} }
+    if (savedReports) { try { setCompanyReports(JSON.parse(savedReports) || {}); } catch (e) {} }
       
     const savedSlack = localStorage.getItem('df_slack_webhook');
     if (savedSlack) setSlackWebhook(savedSlack);
