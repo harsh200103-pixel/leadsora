@@ -3,18 +3,24 @@ import React, { useState, useEffect } from 'react';
 import { TrendingDown, Zap, Clock, CheckCircle2, Calendar } from 'lucide-react';
 import Link from 'next/link';
 
-export default function PitchDeck({ params, searchParams }: { params: Promise<{ company: string }>, searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
+export default function PitchDeck({ params, searchParams }: { params: Promise<{ slug?: string[] }>, searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
   const resolvedParams = React.use(params);
   const resolvedSearch = React.use(searchParams);
   
   const [mounted, setMounted] = useState(false);
   const [showContact, setShowContact] = useState(false);
   
-  const companyName = resolvedParams.company.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  const slugArray = resolvedParams.slug || ['company'];
+  const companySlug = slugArray[0];
+  const companyName = companySlug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  
   const senderEmail = resolvedSearch?.e as string || '';
   const senderPhone = resolvedSearch?.p as string || '';
   
-  const jobTitle = resolvedSearch?.t as string || 'your open role';
+  let jobTitle = resolvedSearch?.t as string || 'your open role';
+  if (slugArray.length > 1) {
+    jobTitle = slugArray.slice(1).join(' ').replace(/-/g, ' ');
+  }
   const roleName = jobTitle.replace(/\b\w/g, l => l.toUpperCase());
 
   useEffect(() => {
