@@ -1,10 +1,13 @@
+import { fetchRemotive } from './src/utils/leadSources.js';
+
 async function test() {
   try {
-    const query = 'React Developer';
-    const res = await fetch(`https://remotive.com/api/remote-jobs?search=${encodeURIComponent(query)}&limit=30`);
-    const data = await res.json();
-    console.log(`Remotive returned ${data.jobs?.length} jobs`);
-  } catch(e) {
+    const leads = await fetchRemotive('React Developer', 'Global');
+    console.log("Leads count:", leads.length);
+    if (leads.length > 0) {
+       console.log("First lead:", leads[0].title);
+    }
+  } catch (e) {
     console.error(e);
   }
 }
