@@ -13,6 +13,7 @@ export async function POST(request: NextRequest) {
     }
 
     const apiKey = process.env.NVIDIA_API_KEY || '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';
+    const serverTavilyKey = process.env.TAVILY_API_KEY || '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';
 
     // 1. Search Tavily for company details
     const searchRes = await fetch('https://api.tavily.com/search', {
@@ -21,7 +22,7 @@ export async function POST(request: NextRequest) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        api_key: tavilyKey,
+        api_key: serverTavilyKey,
         query: `What does the company ${company} do? What is their recent news, funding, tech stack, and target market? ${domain ? `(Website: ${domain})` : ''}`,
         search_depth: 'advanced',
         include_answer: true,

@@ -263,10 +263,9 @@ function Dashboard() {
   };
 
   const analyzeCompany = async (lead: any) => {
-    if (!tavilyKey) return alert('Add Tavily API key in settings.');
     setAnalyzingCompanyFor(lead.id);
     try {
-      const res = await fetch('/api/deep-dive', {
+      const res = await fetch('/api/analyze-company', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ company: lead.company, tavilyKey })
