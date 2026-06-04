@@ -35,6 +35,10 @@ function Dashboard() {
   const [scanStatus, setScanStatus] = useState('');
   const [hunterKey, setHunterKey] = useState('b937eb0f532629a23bc002872195055922026f68'); // Default to provided key
   const [rapidApiKey, setRapidApiKey] = useState('dce6b2a37amshb9608bc3c001bdfp140418jsnef8c85290652');
+  const [tavilyKey, setTavilyKey] = useState('');
+  const [companyReports, setCompanyReports] = useState<{[key: string]: any}>({});
+  const [analyzingCompanyFor, setAnalyzingCompanyFor] = useState<string | null>(null);
+  
   const [userPersona, setUserPersona] = useState('Software Development Agency');
   const [viewMode, setViewMode] = useState<'list' | 'pipeline'>('list');
   const [showSettings, setShowSettings] = useState(false);
@@ -124,6 +128,12 @@ function Dashboard() {
     const savedNotes = localStorage.getItem(`leadsora_notes${prefix}`);
     if (savedNotes) { try { setNotes(JSON.parse(savedNotes)); } catch (e) {} }
 
+    const savedTavily = localStorage.getItem(`leadsora_tavily_${prefix}`);
+    if (savedTavily) setTavilyKey(savedTavily);
+
+    const savedReports = localStorage.getItem(`leadsora_reports_${prefix}`);
+    if (savedReports) { try { setCompanyReports(JSON.parse(savedReports)); } catch (e) {} }
+      
     const savedSlack = localStorage.getItem('df_slack_webhook');
     if (savedSlack) setSlackWebhook(savedSlack);
 
@@ -252,6 +262,25 @@ function Dashboard() {
     }
   };
 
+  const analyzeCompany = async (lead: any) => {
+    if (!tavilyKey) return alert('Add Tavily API key in settings.');
+    setAnalyzingCompanyFor(lead.id);
+    try {
+      const res = await fetch('/api/deep-dive', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ company: lead.company, tavilyKey })
+      });
+      const data = await res.json();
+      if (data.report) {
+        const updated = { ...companyReports, [lead.id]: data.report };
+        setCompanyReports(updated);
+        if (user) localStorage.setItem(`leadsora_reports_${user.email}`, JSON.stringify(updated));
+      }
+    } catch (e) { console.error(e); }
+    finally { setAnalyzingCompanyFor(null); }
+  };
+
   const saveBusinessProfile = (profile: typeof businessProfile) => {
     setBusinessProfile(profile);
     if(user) localStorage.setItem(`leadsora_business_profile_${user.email}`, JSON.stringify(profile));
@@ -350,7 +379,25 @@ function Dashboard() {
   const generateAIOutreach = async (lead: any, isFollowUp = false) => {
     if (generatingId) return; setGeneratingId(lead.id);
     try {
-      const res = await fetch('/api/generate-outreach', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ company: lead.company, title: lead.problem, contactName: lead.contactName || null, persona: userPersona, isFollowUp: isFollowUp || (lead.status || 'New') === 'Contacted', scanMode: lead.scanMode || 'hiring', senderName: businessProfile.fullName || null, companyContext: businessProfile.companyContext || null, emailLength, senderEmail: businessProfile.email || null, senderPhone: businessProfile.phone || null, location: lead.location || location }) });
+      const res = await fetch('/api/generate-outreach', { 
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/json' }, 
+        body: JSON.stringify({ 
+          company: lead.company, 
+          title: lead.problem?.replace('Hiring: ', '') || lead.title || 'Open Role', 
+          contactName: lead.contactName,
+          persona: userPersona,
+          isFollowUp,
+          scanMode,
+          senderName: businessProfile.fullName,
+          senderEmail: businessProfile.email,
+          senderPhone: businessProfile.phone,
+          companyContext: businessProfile.companyContext,
+          emailLength,
+          location: lead.country,
+          deepDiveContext: companyReports[lead.id] || null
+        }) 
+      });
       const data = await res.json();
       if (data.outreach) {
         const signature = buildSignature();
@@ -608,7 +655,10 @@ function Dashboard() {
                   <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.5rem', color: '#ccc' }}>Slack Webhook URL (Alerts):</label>
                   <input type="password" value={slackWebhook} onChange={e => saveSlackWebhook(e.target.value)} placeholder="https://hooks.slack.com/..." style={{ width: '280px', padding: '0.5rem', background: '#000', border: '1px solid #333', color: '#fff', borderRadius: '4px' }} />
                 </div>
-
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.5rem', color: '#ccc' }}>Tavily API Key (Deep Dive):</label>
+                  <input type="password" value={tavilyKey} onChange={e => { setTavilyKey(e.target.value); if(user) localStorage.setItem(`leadsora_tavily_${user.email}`, e.target.value); }} placeholder="tvly-..." style={{ width: '280px', padding: '0.5rem', background: '#000', border: '1px solid #333', color: '#fff', borderRadius: '4px' }} />
+                </div>
               </div>
             )}
 
@@ -732,6 +782,27 @@ function Dashboard() {
                           </p>
                         </div>
 
+                        {/* Deep Dive Intelligence Report (List View) */}
+                        {companyReports[lead.id] && (
+                          <div style={{ marginTop: '1rem', padding: '1rem', background: 'rgba(124,58,237,0.05)', borderRadius: '8px', border: '1px solid rgba(124,58,237,0.3)' }}>
+                            <h5 style={{ fontSize: '0.75rem', color: '#a78bfa', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '1px', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                              <Sparkles size={12} /> Company Intelligence
+                            </h5>
+                            <p style={{ fontSize: '0.85rem', color: '#fff', marginBottom: '0.5rem', lineHeight: '1.4' }}><strong>Overview:</strong> {companyReports[lead.id].summary}</p>
+                            {companyReports[lead.id].recent_news && (
+                              <p style={{ fontSize: '0.85rem', color: '#ccc', marginBottom: '0.5rem', lineHeight: '1.4' }}><strong>Recent News:</strong> {companyReports[lead.id].recent_news}</p>
+                            )}
+                            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                              {companyReports[lead.id].tech_stack && (
+                                <p style={{ fontSize: '0.8rem', color: '#888', margin: 0 }}><strong>Tech Stack:</strong> {companyReports[lead.id].tech_stack}</p>
+                              )}
+                              {companyReports[lead.id].ideal_customer && (
+                                <p style={{ fontSize: '0.8rem', color: '#888', margin: 0 }}><strong>Ideal Customer:</strong> {companyReports[lead.id].ideal_customer}</p>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
                         {/* Contact Info / Hunter Integration */}
                         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center', marginTop: '1rem' }}>
                           <button 
@@ -748,6 +819,14 @@ function Dashboard() {
                             style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.78rem', color: '#fff', background: '#4facfe', border: 'none', padding: '4px 12px', borderRadius: '999px', cursor: findingManagerFor === lead.id ? 'not-allowed' : 'pointer', fontWeight: 600 }}
                           >
                             {findingManagerFor === lead.id ? <Loader2 size={12} className="animate-spin" /> : <UserCheck size={12} />} Hiring Manager
+                          </button>
+
+                          <button 
+                            onClick={() => analyzeCompany(lead)} 
+                            disabled={analyzingCompanyFor === lead.id}
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.78rem', color: '#fff', background: '#7c3aed', border: 'none', padding: '4px 12px', borderRadius: '999px', cursor: analyzingCompanyFor === lead.id ? 'not-allowed' : 'pointer', fontWeight: 600 }}
+                          >
+                            {analyzingCompanyFor === lead.id ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />} Deep Dive
                           </button>
 
                           <button 
@@ -875,6 +954,9 @@ function Dashboard() {
                                 <button onClick={() => findHiringManager(lead)} disabled={findingManagerFor === lead.id} style={{ fontSize: '0.7rem', color: '#fff', background: '#4facfe', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}>
                                   {findingManagerFor === lead.id ? '...' : 'Hiring Manager'}
                                 </button>
+                                <button onClick={() => analyzeCompany(lead)} disabled={analyzingCompanyFor === lead.id} style={{ fontSize: '0.7rem', color: '#fff', background: '#7c3aed', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}>
+                                  {analyzingCompanyFor === lead.id ? '...' : 'Deep Dive'}
+                                </button>
                                 <button onClick={() => setShowNote(prev => ({ ...prev, [lead.id]: !prev[lead.id] }))} style={{ fontSize: '0.7rem', color: '#ccc', background: 'rgba(255,255,255,0.05)', border: '1px solid #333', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}>
                                   Notes
                                 </button>
@@ -892,6 +974,19 @@ function Dashboard() {
                                 )}
                               </div>
                             </div>
+                            
+                            {/* Deep Dive Intelligence Report (Pipeline View) */}
+                            {companyReports[lead.id] && (
+                              <div style={{ marginTop: '0.75rem', padding: '0.75rem', background: 'rgba(124,58,237,0.05)', borderRadius: '4px', border: '1px solid rgba(124,58,237,0.3)' }}>
+                                <h5 style={{ fontSize: '0.65rem', color: '#a78bfa', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                                  <Sparkles size={10} style={{marginRight:'4px'}}/> Company Intelligence
+                                </h5>
+                                <p style={{ fontSize: '0.75rem', color: '#fff', marginBottom: '0.5rem', lineHeight: '1.3' }}><strong>Overview:</strong> {companyReports[lead.id].summary}</p>
+                                {companyReports[lead.id].recent_news && (
+                                  <p style={{ fontSize: '0.75rem', color: '#ccc', marginBottom: '0.25rem', lineHeight: '1.3' }}><strong>News:</strong> {companyReports[lead.id].recent_news}</p>
+                                )}
+                              </div>
+                            )}
 
                             {/* Pipeline Notes Section */}
                             {showNote[lead.id] && (
