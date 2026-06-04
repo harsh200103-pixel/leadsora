@@ -248,10 +248,17 @@ export function calculateIntentScore(text, postedAt) {
   };
 }
 
-/**
- * Quick score — returns just the number for backward compatibility.
- * Used by leadSources.js when building lead objects.
- */
-export function calcIntentScore(text, postedAt) {
-  return calculateIntentScore(text, postedAt).score;
+export function calcIntentScore(textOrObj, postedAt) {
+  let text = textOrObj;
+  let time = postedAt;
+  
+  // Backwards compatibility with leadSources.js calling calcIntentScore({ title, description, company })
+  if (typeof textOrObj === 'object' && textOrObj !== null) {
+    text = `${textOrObj.title || ''} ${textOrObj.description || ''} ${textOrObj.company || ''}`;
+    time = textOrObj.postedAt || postedAt;
+  }
+  
+  // leadSources.js now expects an object with { score, signals } because we updated it earlier, 
+  // so we must return the full object, not just the score!
+  return calculateIntentScore(text, time);
 }
