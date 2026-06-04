@@ -1237,6 +1237,8 @@ function Dashboard() {
             </button>
           </div>
         </div>
+      )}
+
       {/* Deep Dive Intelligence Modal */}
       {reportModal && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, padding: '1rem' }}>
