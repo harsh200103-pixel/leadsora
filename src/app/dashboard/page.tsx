@@ -87,7 +87,7 @@ function Dashboard() {
   // Ghost Mode Scheduler State
   const [showGhostConfig, setShowGhostConfig] = useState(false);
   const [ghostConfig, setGhostConfig] = useState({
-    scanTime: '08:00', leadsPerDay: 10, scanMode: 'hiring' as string, keywords: ''
+    enabled: false, scanTime: '08:00', leadsPerDay: 10, scanMode: 'hiring' as string, keywords: '', slackWebhook: ''
   });
 
   useEffect(() => {
@@ -140,10 +140,43 @@ function Dashboard() {
 
     const savedSearchesData = localStorage.getItem(`leadsora_saved_searches${prefix}`);
     if (savedSearchesData) { try { setSavedSearches(JSON.parse(savedSearchesData)); } catch (e) {} }
+
+    // Sync from Database on load (if they have data saved remotely)
+    fetch(`/api/db/sync?email=${encodeURIComponent(user.email)}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.ghostConfig) {
+          const parsed = JSON.parse(data.ghostConfig);
+          setGhostConfig(parsed);
+          localStorage.setItem(`leadsora_ghost_config${prefix}`, JSON.stringify(parsed));
+        }
+        if (data.savedLeads && data.savedLeads.length > 0) {
+          const parsed = JSON.parse(data.savedLeads);
+          // Merge remotely found ghost leads with local leads
+          setLeads(prev => {
+            const newLeads = [...parsed, ...prev];
+            const unique = Array.from(new Map(newLeads.map(item => [item.id, item])).values());
+            return unique;
+          });
+        }
+      })
+      .catch(e => console.error('Failed to sync from db:', e));
   }, [user, authLoading]);
 
+  const syncToDb = (data: any) => {
+    if (!user?.email) return;
+    fetch('/api/db/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: user.email, ...data })
+    }).catch(console.error);
+  };
+
   useEffect(() => {
-    if (mounted && user) localStorage.setItem(`dealfinder_leads_${user.email}`, JSON.stringify(leads));
+    if (mounted && user) {
+      localStorage.setItem(`dealfinder_leads_${user.email}`, JSON.stringify(leads));
+      syncToDb({ savedLeads: leads });
+    }
   }, [leads, mounted, user]);
 
   useEffect(() => {
@@ -295,9 +328,12 @@ function Dashboard() {
     setBusinessProfile(profile);
     if(user) localStorage.setItem(`leadsora_business_profile_${user.email}`, JSON.stringify(profile));
   };
-  const saveGhostConfig = (config: typeof ghostConfig) => {
+  const saveGhostConfig = (config: any) => {
     setGhostConfig(config);
-    if(user) localStorage.setItem(`leadsora_ghost_config_${user.email}`, JSON.stringify(config));
+    if(user) {
+      localStorage.setItem(`leadsora_ghost_config_${user.email}`, JSON.stringify(config));
+      syncToDb({ ghostConfig: config });
+    }
   };
 
   const buildSignature = () => {
@@ -1235,10 +1271,22 @@ function Dashboard() {
                 <label style={{ display: 'block', fontSize: '0.8rem', color: '#888', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>🔍 Target Keywords</label>
                 <input type="text" value={ghostConfig.keywords} onChange={e => setGhostConfig(prev => ({ ...prev, keywords: e.target.value }))} placeholder="e.g. React Developer, Marketing Manager" style={{ width: '100%', padding: '10px 14px', background: 'rgba(255,255,255,0.03)', border: '1px solid #333', borderRadius: '8px', color: '#fff', fontSize: '0.95rem', outline: 'none', boxSizing: 'border-box' }} />
               </div>
+
+              {/* Slack Webhook */}
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: '#888', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>💬 Slack Webhook URL</label>
+                <input type="url" value={ghostConfig.slackWebhook || ''} onChange={e => setGhostConfig(prev => ({ ...prev, slackWebhook: e.target.value }))} placeholder="https://hooks.slack.com/services/..." style={{ width: '100%', padding: '10px 14px', background: 'rgba(255,255,255,0.03)', border: '1px solid #333', borderRadius: '8px', color: '#fff', fontSize: '0.95rem', outline: 'none', boxSizing: 'border-box' }} />
+              </div>
+
+              {/* Enable Toggle */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '10px' }}>
+                <input type="checkbox" id="ghost-enabled" checked={ghostConfig.enabled} onChange={e => setGhostConfig(prev => ({ ...prev, enabled: e.target.checked }))} style={{ width: '18px', height: '18px', accentColor: '#27c93f' }} />
+                <label htmlFor="ghost-enabled" style={{ color: '#fff', fontSize: '0.95rem', cursor: 'pointer' }}>Enable Background Scanning</label>
+              </div>
             </div>
 
-            <button onClick={() => { saveGhostConfig(ghostConfig); setShowGhostConfig(false); }} style={{ width: '100%', padding: '14px', marginTop: '2rem', background: 'linear-gradient(135deg, #27c93f, #10b981)', color: '#000', border: 'none', borderRadius: '8px', fontSize: '1rem', fontWeight: 700, cursor: 'pointer' }}>
-              👻 Save & Activate Ghost Mode
+            <button onClick={() => { saveGhostConfig(ghostConfig); setShowGhostConfig(false); }} style={{ width: '100%', padding: '14px', marginTop: '2rem', background: ghostConfig.enabled ? 'linear-gradient(135deg, #27c93f, #10b981)' : '#333', color: ghostConfig.enabled ? '#000' : '#888', border: 'none', borderRadius: '8px', fontSize: '1rem', fontWeight: 700, cursor: 'pointer' }}>
+              {ghostConfig.enabled ? '👻 Save & Activate Ghost Mode' : 'Save Config (Disabled)'}
             </button>
           </div>
         </div>
