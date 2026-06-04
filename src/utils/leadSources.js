@@ -2,7 +2,7 @@
 // Multi-Source Lead Aggregator Engine v3.0
 // ============================================================
 
-import { calcIntentScore } from './intentScoring';
+import { calcIntentScore, calculateIntentScore } from './intentScoring';
 import { generateOutreachSync } from './outreachGenerator';
 
 const SOURCES = [
