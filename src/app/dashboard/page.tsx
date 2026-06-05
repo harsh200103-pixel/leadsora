@@ -706,7 +706,7 @@ function Dashboard() {
             )}
           </div>
           <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1.5rem', padding: '0 0.5rem' }}>
-            <div className="scan-mode-tabs" style={{ display: 'flex', background: 'rgba(255,255,255,0.05)', padding: '4px', borderRadius: '999px', border: '1px solid #333', overflowX: 'auto', maxWidth: '100%' }}>
+            <div className="scan-mode-tabs" style={{ display: 'flex', background: 'rgba(255,255,255,0.05)', padding: '4px', borderRadius: '999px', border: '1px solid var(--input-border)', overflowX: 'auto', maxWidth: '100%' }}>
               <button onClick={() => setScanMode('hiring')} type="button" style={{ padding: '6px 16px', borderRadius: '999px', border: 'none', background: scanMode === 'hiring' ? '#27c93f' : 'transparent', color: scanMode === 'hiring' ? '#000' : '#888', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem', transition: 'all 0.2s', whiteSpace: 'nowrap' }}>
                 👔 Actively Hiring
               </button>
@@ -731,8 +731,8 @@ function Dashboard() {
             <Link href="/analytics" style={{ color: '#7c3aed', textDecoration: 'none', fontSize: '0.875rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
               <BarChart2 size={16} /> View Analytics Dashboard
             </Link>
-            <span style={{ color: '#333' }}>|</span>
-            <button onClick={() => setShowSettings(!showSettings)} style={{ background: 'none', border: 'none', color: '#666', cursor: 'pointer', textDecoration: 'underline', fontSize: '0.875rem' }}>
+            <span style={{ color: 'var(--text-muted)' }}>|</span>
+            <button onClick={() => setShowSettings(!showSettings)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', textDecoration: 'underline', fontSize: '0.875rem' }}>
               {showSettings ? 'Hide Settings' : 'API & Integrations Settings'}
             </button>
           </div>
@@ -740,19 +740,19 @@ function Dashboard() {
               <div style={{ marginTop: '1rem', background: 'rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '8px', display: 'flex', gap: '1rem', justifyContent: 'center', textAlign: 'left', flexWrap: 'wrap' }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.5rem', color: '#ccc' }}>Hunter.io API Key (Email Discovery):</label>
-                  <input type="password" value={hunterKey} onChange={e => saveHunterKey(e.target.value)} placeholder="Enter Hunter.io API key..." style={{ width: '280px', padding: '0.5rem', background: '#000', border: '1px solid #333', color: '#fff', borderRadius: '4px' }} />
+                  <input type="password" value={hunterKey} onChange={e => saveHunterKey(e.target.value)} placeholder="Enter Hunter.io API key..." style={{ width: '280px', padding: '0.5rem', background: 'var(--surface)', border: '1px solid var(--input-border)', color: 'var(--text-primary)', borderRadius: '4px' }} />
                 </div>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.5rem', color: '#ccc' }}>RapidAPI Key (JSearch India Leads):</label>
-                  <input type="password" value={rapidApiKey} onChange={e => saveRapidApiKey(e.target.value)} placeholder="Enter RapidAPI key..." style={{ width: '280px', padding: '0.5rem', background: '#000', border: '1px solid #333', color: '#fff', borderRadius: '4px' }} />
+                  <input type="password" value={rapidApiKey} onChange={e => saveRapidApiKey(e.target.value)} placeholder="Enter RapidAPI key..." style={{ width: '280px', padding: '0.5rem', background: 'var(--surface)', border: '1px solid var(--input-border)', color: 'var(--text-primary)', borderRadius: '4px' }} />
                 </div>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.5rem', color: '#ccc' }}>Slack Webhook URL (Alerts):</label>
-                  <input type="password" value={slackWebhook} onChange={e => saveSlackWebhook(e.target.value)} placeholder="https://hooks.slack.com/..." style={{ width: '280px', padding: '0.5rem', background: '#000', border: '1px solid #333', color: '#fff', borderRadius: '4px' }} />
+                  <input type="password" value={slackWebhook} onChange={e => saveSlackWebhook(e.target.value)} placeholder="https://hooks.slack.com/..." style={{ width: '280px', padding: '0.5rem', background: 'var(--surface)', border: '1px solid var(--input-border)', color: 'var(--text-primary)', borderRadius: '4px' }} />
                 </div>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.5rem', color: '#ccc' }}>Tavily API Key (Deep Dive):</label>
-                  <input type="password" value={tavilyKey} onChange={e => { setTavilyKey(e.target.value); if(user) localStorage.setItem(`leadsora_tavily_${user.email}`, e.target.value); }} placeholder="tvly-..." style={{ width: '280px', padding: '0.5rem', background: '#000', border: '1px solid #333', color: '#fff', borderRadius: '4px' }} />
+                  <input type="password" value={tavilyKey} onChange={e => { setTavilyKey(e.target.value); if(user) localStorage.setItem(`leadsora_tavily_${user.email}`, e.target.value); }} placeholder="tvly-..." style={{ width: '280px', padding: '0.5rem', background: 'var(--surface)', border: '1px solid var(--input-border)', color: 'var(--text-primary)', borderRadius: '4px' }} />
                 </div>
               </div>
             )}
@@ -771,13 +771,13 @@ function Dashboard() {
               <div className="dashboard-header" style={{ justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   <div className="dot dot-red"></div><div className="dot dot-yellow"></div><div className="dot dot-green"></div>
-                  <span style={{ marginLeft: '1rem', color: '#666', fontSize: '0.875rem' }}>intent-results.sh</span>
+                  <span style={{ marginLeft: '1rem', color: 'var(--text-muted)', fontSize: '0.875rem' }}>intent-results.sh</span>
                 </div>
                 <div className="dashboard-controls-mobile" style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
                   <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
                     <input type="checkbox" checked={highIntentOnly} onChange={e => setHighIntentOnly(e.target.checked)} style={{ accentColor: '#ffbd2e' }} /> High Intent Only (85+)
                   </label>
-                  <div style={{ display: 'flex', background: '#000', border: '1px solid #333', borderRadius: '6px', overflow: 'hidden' }}>
+                  <div style={{ display: 'flex', background: 'var(--surface)', border: '1px solid var(--input-border)', borderRadius: '6px', overflow: 'hidden' }}>
                     <button onClick={() => setViewMode('list')} style={{ background: viewMode === 'list' ? '#333' : 'transparent', color: viewMode === 'list' ? '#fff' : '#888', border: 'none', padding: '0.25rem 0.75rem', fontSize: '0.8rem', cursor: 'pointer' }}>List View</button>
                     <button onClick={() => setViewMode('pipeline')} style={{ background: viewMode === 'pipeline' ? '#333' : 'transparent', color: viewMode === 'pipeline' ? '#fff' : '#888', border: 'none', padding: '0.25rem 0.75rem', fontSize: '0.8rem', cursor: 'pointer' }}>Pipeline CRM</button>
                   </div>
@@ -785,18 +785,18 @@ function Dashboard() {
                     {emailLength === 'detailed' ? <AlignLeft size={14} /> : <AlignJustify size={14} />} {emailLength === 'detailed' ? 'Detailed Pitch' : 'Short & Punchy'}
                   </button>
                   <button onClick={exportToCSV} className="btn-secondary" style={{ padding: '0.25rem 0.75rem', fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Download size={14} /> Export CSV</button>
-                  <button onClick={() => { if (window.confirm('Clear leads?')) setLeads([]); }} className="btn-secondary" style={{ padding: '0.25rem 0.75rem', fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'transparent', border: '1px solid #333', color: '#888' }}><Trash2 size={14} /> Clear</button>
+                  <button onClick={() => { if (window.confirm('Clear leads?')) setLeads([]); }} className="btn-secondary" style={{ padding: '0.25rem 0.75rem', fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'transparent', border: '1px solid var(--input-border)', color: 'var(--text-muted)' }}><Trash2 size={14} /> Clear</button>
                 </div>
               </div>
 
-              <div className="dashboard-body" style={{ background: '#111' }}>
+              <div className="dashboard-body" style={{ background: 'var(--surface)' }}>
 
                 {/* ── Filter & Sort Bar ── */}
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1rem', padding: '0.75rem 1rem', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid #222', alignItems: 'center' }}>
-                  <span style={{ fontSize: '0.75rem', color: '#666', marginRight: '0.25rem' }}>🎛️ Filter:</span>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginRight: '0.25rem' }}>🎛️ Filter:</span>
 
                   {/* Score filter */}
-                  <select value={filterScore} onChange={e => setFilterScore(Number(e.target.value))} style={{ background: '#000', border: '1px solid #333', color: filterScore > 0 ? '#a78bfa' : '#888', borderRadius: '4px', padding: '3px 8px', fontSize: '0.75rem', cursor: 'pointer' }}>
+                  <select value={filterScore} onChange={e => setFilterScore(Number(e.target.value))} style={{ background: 'var(--surface)', border: '1px solid var(--input-border)', color: filterScore > 0 ? '#a78bfa' : '#888', borderRadius: '4px', padding: '3px 8px', fontSize: '0.75rem', cursor: 'pointer' }}>
                     <option value={0}>All Scores</option>
                     <option value={90}>90+ 🔥 Ultra Hot</option>
                     <option value={85}>85+ ⚡ High Intent</option>
@@ -804,7 +804,7 @@ function Dashboard() {
                   </select>
 
                   {/* Source filter */}
-                  <select value={filterSource} onChange={e => setFilterSource(e.target.value)} style={{ background: '#000', border: '1px solid #333', color: filterSource !== 'all' ? '#a78bfa' : '#888', borderRadius: '4px', padding: '3px 8px', fontSize: '0.75rem', cursor: 'pointer' }}>
+                  <select value={filterSource} onChange={e => setFilterSource(e.target.value)} style={{ background: 'var(--surface)', border: '1px solid var(--input-border)', color: filterSource !== 'all' ? '#a78bfa' : '#888', borderRadius: '4px', padding: '3px 8px', fontSize: '0.75rem', cursor: 'pointer' }}>
                     <option value="all">All Sources</option>
                     <option value="LinkedIn">LinkedIn</option>
                     <option value="Indeed">Indeed</option>
@@ -815,30 +815,30 @@ function Dashboard() {
                   </select>
 
                   {/* Sort */}
-                  <select value={sortBy} onChange={e => setSortBy(e.target.value as any)} style={{ background: '#000', border: '1px solid #333', color: '#888', borderRadius: '4px', padding: '3px 8px', fontSize: '0.75rem', cursor: 'pointer' }}>
+                  <select value={sortBy} onChange={e => setSortBy(e.target.value as any)} style={{ background: 'var(--surface)', border: '1px solid var(--input-border)', color: 'var(--text-muted)', borderRadius: '4px', padding: '3px 8px', fontSize: '0.75rem', cursor: 'pointer' }}>
                     <option value="score">Sort: Highest Score</option>
                     <option value="newest">Sort: Newest First</option>
                     <option value="company">Sort: Company A–Z</option>
                   </select>
 
-                  <span style={{ marginLeft: 'auto', fontSize: '0.72rem', color: '#555' }}>
+                  <span style={{ marginLeft: 'auto', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
                     {getDisplayLeads(leads).length} of {leads.length} leads
                   </span>
 
                   {/* Reset filters */}
                   {(filterScore > 0 || filterSource !== 'all' || sortBy !== 'score') && (
-                    <button onClick={() => { setFilterScore(0); setFilterSource('all'); setSortBy('score'); }} style={{ background: 'none', border: '1px solid #333', color: '#888', borderRadius: '4px', padding: '3px 8px', fontSize: '0.72rem', cursor: 'pointer' }}>✕ Reset</button>
+                    <button onClick={() => { setFilterScore(0); setFilterSource('all'); setSortBy('score'); }} style={{ background: 'none', border: '1px solid var(--input-border)', color: 'var(--text-muted)', borderRadius: '4px', padding: '3px 8px', fontSize: '0.72rem', cursor: 'pointer' }}>✕ Reset</button>
                   )}
                 </div>
 
                 {/* ── Saved Search Presets ── */}
                 {savedSearches.length > 0 && (
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1rem', alignItems: 'center' }}>
-                    <span style={{ fontSize: '0.72rem', color: '#555' }}>⭐ Saved:</span>
+                    <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>⭐ Saved:</span>
                     {savedSearches.map((s, idx) => (
                       <div key={idx} style={{ display: 'flex', alignItems: 'center', background: 'rgba(124,58,237,0.08)', border: '1px solid rgba(124,58,237,0.2)', borderRadius: '999px', overflow: 'hidden' }}>
                         <button onClick={() => loadSearch(s)} style={{ background: 'none', border: 'none', color: '#a78bfa', padding: '3px 10px', fontSize: '0.72rem', cursor: 'pointer', whiteSpace: 'nowrap' }}>{s.label}</button>
-                        <button onClick={() => deleteSearch(s.label)} style={{ background: 'none', border: 'none', color: '#555', padding: '3px 6px 3px 0', fontSize: '0.7rem', cursor: 'pointer' }}>✕</button>
+                        <button onClick={() => deleteSearch(s.label)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', padding: '3px 6px 3px 0', fontSize: '0.7rem', cursor: 'pointer' }}>✕</button>
                       </div>
                     ))}
                   </div>
@@ -849,19 +849,19 @@ function Dashboard() {
                     {getDisplayLeads(leads).map(lead => (
                     <div key={lead.id} className="glass-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
                       <div style={{ flex: 1, minWidth: '300px' }}>
-                        <h4 style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>{lead.company} <span style={{ fontSize: '0.875rem', color: '#888' }}>• {lead.country}</span></h4>
+                        <h4 style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>{lead.company} <span style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>• {lead.country}</span></h4>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem' }}>
                           <p style={{ color: 'var(--text-secondary)' }}>Signal: {lead.problem}</p>
-                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.75rem', padding: '0.125rem 0.5rem', background: 'rgba(255,255,255,0.1)', borderRadius: '999px', color: '#ccc' }}><Clock size={12} /> {lead.postedAt}</span>
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.75rem', padding: '0.125rem 0.5rem', background: 'var(--input-bg)', borderRadius: '999px', color: '#ccc' }}><Clock size={12} /> {lead.postedAt}</span>
                         </div>
 
                         {/* Outreach Box */}
                         <div className="ai-box-mobile" style={{ background: 'rgba(0,0,0,0.3)', padding: '1rem', borderRadius: '8px', border: `1px solid ${aiOutreach[lead.id] ? '#7c3aed55' : '#333'}`, position: 'relative', marginTop: '1rem', display: 'flex', flexDirection: 'column' }}>
-                          {aiOutreach[lead.id] && <span style={{ position: 'absolute', top: '-10px', left: '12px', background: 'linear-gradient(135deg,#7c3aed,#4facfe)', color: '#fff', fontSize: '0.65rem', padding: '2px 8px', borderRadius: '999px', fontWeight: 700 }}>✨ AI Generated</span>}
+                          {aiOutreach[lead.id] && <span style={{ position: 'absolute', top: '-10px', left: '12px', background: 'linear-gradient(135deg,#7c3aed,#4facfe)', color: 'var(--text-primary)', fontSize: '0.65rem', padding: '2px 8px', borderRadius: '999px', fontWeight: 700 }}>✨ AI Generated</span>}
                           
                           {/* Omnichannel Blitz / AI Actions */}
                           <div className="ai-actions-mobile" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', alignSelf: 'flex-end', marginBottom: '0.75rem', flexWrap: 'wrap' }}>
-                            <button onClick={() => { setBlitzLead(lead); if(!aiOutreach[lead.id]) generateAIOutreach(lead); if(!foundEmails[lead.id] && hunterKey) fetchEmailsWithHunter(lead); }} disabled={!!generatingId} style={{ background: 'linear-gradient(135deg, #7c3aed, #4facfe)', color: '#fff', border: 'none', cursor: generatingId ? 'not-allowed' : 'pointer', padding: '4px 12px', borderRadius: '4px', fontWeight: 'bold', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '6px' }} title="Omnichannel Blitz">
+                            <button onClick={() => { setBlitzLead(lead); if(!aiOutreach[lead.id]) generateAIOutreach(lead); if(!foundEmails[lead.id] && hunterKey) fetchEmailsWithHunter(lead); }} disabled={!!generatingId} style={{ background: 'linear-gradient(135deg, #7c3aed, #4facfe)', color: 'var(--text-primary)', border: 'none', cursor: generatingId ? 'not-allowed' : 'pointer', padding: '4px 12px', borderRadius: '4px', fontWeight: 'bold', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '6px' }} title="Omnichannel Blitz">
                               {generatingId === lead.id ? <Loader2 size={12} className="animate-spin" /> : <><Sparkles size={12} /> Blitz</>}
                             </button>
                             <a href={`https://mail.google.com/mail/?view=cm&fs=1&to=${foundEmails[lead.id]?.map((e: any) => e.value).join(',') || lead.contactEmail || ''}&su=${encodeURIComponent(getSubjectLine(lead))}&body=${encodeURIComponent(getEmailBody(lead))}`} target="_blank" rel="noreferrer" onClick={(e) => { 
@@ -892,7 +892,7 @@ function Dashboard() {
                           <button 
                             onClick={() => fetchEmailsWithHunter(lead)} 
                             disabled={fetchingEmailsFor === lead.id}
-                            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.78rem', color: '#fff', background: '#ffbd2e', border: 'none', padding: '4px 12px', borderRadius: '999px', cursor: fetchingEmailsFor === lead.id ? 'not-allowed' : 'pointer', fontWeight: 600 }}
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.78rem', color: 'var(--text-primary)', background: '#ffbd2e', border: 'none', padding: '4px 12px', borderRadius: '999px', cursor: fetchingEmailsFor === lead.id ? 'not-allowed' : 'pointer', fontWeight: 600 }}
                           >
                             {fetchingEmailsFor === lead.id ? <Loader2 size={12} className="animate-spin" /> : '🎯'} Find Emails
                           </button>
@@ -900,7 +900,7 @@ function Dashboard() {
                           <button 
                             onClick={() => findHiringManager(lead)} 
                             disabled={findingManagerFor === lead.id}
-                            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.78rem', color: '#fff', background: '#4facfe', border: 'none', padding: '4px 12px', borderRadius: '999px', cursor: findingManagerFor === lead.id ? 'not-allowed' : 'pointer', fontWeight: 600 }}
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.78rem', color: 'var(--text-primary)', background: '#4facfe', border: 'none', padding: '4px 12px', borderRadius: '999px', cursor: findingManagerFor === lead.id ? 'not-allowed' : 'pointer', fontWeight: 600 }}
                           >
                             {findingManagerFor === lead.id ? <Loader2 size={12} className="animate-spin" /> : <UserCheck size={12} />} Hiring Manager
                           </button>
@@ -908,20 +908,20 @@ function Dashboard() {
                           <button 
                             onClick={() => analyzeCompany(lead)} 
                             disabled={analyzingCompanyFor === lead.id}
-                            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.78rem', color: '#fff', background: '#7c3aed', border: 'none', padding: '4px 12px', borderRadius: '999px', cursor: analyzingCompanyFor === lead.id ? 'not-allowed' : 'pointer', fontWeight: 600 }}
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.78rem', color: 'var(--text-primary)', background: '#7c3aed', border: 'none', padding: '4px 12px', borderRadius: '999px', cursor: analyzingCompanyFor === lead.id ? 'not-allowed' : 'pointer', fontWeight: 600 }}
                           >
                             {analyzingCompanyFor === lead.id ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />} Deep Dive
                           </button>
 
                           <button 
                             onClick={() => setShowNote(prev => ({ ...prev, [lead.id]: !prev[lead.id] }))} 
-                            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.78rem', color: '#ccc', background: 'rgba(255,255,255,0.05)', border: '1px solid #333', padding: '4px 12px', borderRadius: '999px', cursor: 'pointer', fontWeight: 600 }}
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.78rem', color: '#ccc', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--input-border)', padding: '4px 12px', borderRadius: '999px', cursor: 'pointer', fontWeight: 600 }}
                           >
                             <FileText size={12} /> Notes
                           </button>
                           
                           {lead.contactLinkedIn
-                            ? <a href={lead.contactLinkedIn} target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', fontSize: '0.78rem', color: '#fff', background: '#0a66c2', padding: '4px 12px', borderRadius: '999px', textDecoration: 'none' }}>in LinkedIn</a>
+                            ? <a href={lead.contactLinkedIn} target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', fontSize: '0.78rem', color: 'var(--text-primary)', background: '#0a66c2', padding: '4px 12px', borderRadius: '999px', textDecoration: 'none' }}>in LinkedIn</a>
                             : <a href={`https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(lead.company + ' hiring')}`} target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', fontSize: '0.78rem', color: '#94a3b8', background: 'rgba(255,255,255,0.05)', padding: '4px 12px', borderRadius: '999px', textDecoration: 'none' }}>🔍 LinkedIn</a>
                           }
                           {lead.sourceUrl && <a href={lead.sourceUrl} target="_blank" rel="noreferrer" style={{ fontSize: '0.78rem', color: '#ffbd2e', textDecoration: 'underline', marginLeft: 'auto' }}>View on {lead.source || 'Source'} ↗</a>}
@@ -929,14 +929,14 @@ function Dashboard() {
 
                         {/* Display Found Emails */}
                         {foundEmails[lead.id] && (
-                          <div style={{ marginTop: '0.75rem', padding: '0.75rem', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', border: '1px solid #27272a' }}>
-                            <h5 style={{ fontSize: '0.75rem', color: '#888', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Decision Makers Found</h5>
+                          <div style={{ marginTop: '0.75rem', padding: '0.75rem', background: 'var(--input-bg)', borderRadius: '8px', border: '1px solid #27272a' }}>
+                            <h5 style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Decision Makers Found</h5>
                             {foundEmails[lead.id].length > 0 ? (
                               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                                 {foundEmails[lead.id].map((em: any, idx: number) => (
                                   <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.85rem' }}>
                                     <div style={{ color: '#ccc' }}>
-                                      <strong style={{ color: '#fff' }}>{em.first_name} {em.last_name}</strong> {em.position && <span style={{ color: '#888' }}>- {em.position}</span>}
+                                      <strong style={{ color: 'var(--text-primary)' }}>{em.first_name} {em.last_name}</strong> {em.position && <span style={{ color: 'var(--text-muted)' }}>- {em.position}</span>}
                                     </div>
                                     <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                                       <a href={`https://mail.google.com/mail/?view=cm&fs=1&to=${em.value}&su=${encodeURIComponent(`Exploring synergies: ${lead.problem?.replace('Hiring: ', '') || 'Open Role'} at ${lead.company}`)}&body=${encodeURIComponent(getEmailBody(lead))}`} target="_blank" rel="noreferrer" style={{ color: '#4facfe', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px' }} title="Send Pitch in Gmail">
@@ -945,7 +945,7 @@ function Dashboard() {
                                         {emailVerification[`${lead.id}_${em.value}`] === 'valid' && <span title="Verified Safe" style={{ color: '#27c93f', fontSize: '10px' }}>✅</span>}
                                         {emailVerification[`${lead.id}_${em.value}`] === 'risky' && <span title="Accept-All / Risky" style={{ color: '#ffbd2e', fontSize: '10px' }}>⚠️</span>}
                                         {emailVerification[`${lead.id}_${em.value}`] === 'invalid' && <span title="Invalid Email" style={{ color: '#ff5f56', fontSize: '10px' }}>❌</span>}
-                                        {emailVerification[`${lead.id}_${em.value}`] === 'checking' && <Loader2 size={10} className="animate-spin" style={{ color: '#888' }} />}
+                                        {emailVerification[`${lead.id}_${em.value}`] === 'checking' && <Loader2 size={10} className="animate-spin" style={{ color: 'var(--text-muted)' }} />}
                                       </a>
                                       <button onClick={() => handleCopy(`em-${idx}-${em.value}`, em.value)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: copiedId === `em-${idx}-${em.value}` ? '#27c93f' : '#666', padding: '0 4px' }} title="Copy Email">
                                         {copiedId === `em-${idx}-${em.value}` ? <Check size={14} /> : <Copy size={14} />}
@@ -954,14 +954,14 @@ function Dashboard() {
                                         <a href={em.sources[0].uri} target="_blank" rel="noreferrer" style={{ color: '#0a66c2', marginLeft: '4px' }} title="LinkedIn Profile">in</a>
                                       )}
                                       {!emailVerification[`${lead.id}_${em.value}`] && (
-                                        <button onClick={() => verifyEmail(em.value, lead.id)} style={{ fontSize: '0.65rem', background: 'rgba(255,255,255,0.05)', border: '1px solid #333', color: '#888', borderRadius: '4px', padding: '2px 6px', cursor: 'pointer' }}>Verify</button>
+                                        <button onClick={() => verifyEmail(em.value, lead.id)} style={{ fontSize: '0.65rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--input-border)', color: 'var(--text-muted)', borderRadius: '4px', padding: '2px 6px', cursor: 'pointer' }}>Verify</button>
                                       )}
                                     </div>
                                   </div>
                                 ))}
                               </div>
                             ) : (
-                              <p style={{ fontSize: '0.85rem', color: '#888', margin: 0 }}>No direct emails found for {lead.company}. Try manual LinkedIn search.</p>
+                              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0 }}>No direct emails found for {lead.company}. Try manual LinkedIn search.</p>
                             )}
                           </div>
                         )}
@@ -970,14 +970,14 @@ function Dashboard() {
                         {showNote[lead.id] && (
                           <div style={{ marginTop: '1rem', padding: '0.75rem', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid #27272a' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                              <h5 style={{ fontSize: '0.75rem', color: '#888', margin: 0, textTransform: 'uppercase', letterSpacing: '1px' }}>Internal Notes</h5>
-                              <button onClick={() => setShowNote(prev => ({ ...prev, [lead.id]: false }))} style={{ background: 'none', border: 'none', color: '#555', cursor: 'pointer', padding: 0 }}><X size={14} /></button>
+                              <h5 style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: 0, textTransform: 'uppercase', letterSpacing: '1px' }}>Internal Notes</h5>
+                              <button onClick={() => setShowNote(prev => ({ ...prev, [lead.id]: false }))} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 0 }}><X size={14} /></button>
                             </div>
                             <textarea
                               value={notes[lead.id] || ''}
                               onChange={(e) => saveNote(lead.id, e.target.value)}
                               placeholder="Add a note about this lead... (Saved automatically)"
-                              style={{ width: '100%', minHeight: '80px', background: '#000', border: '1px solid #333', borderRadius: '4px', color: '#fff', padding: '0.5rem', fontSize: '0.85rem', resize: 'vertical', fontFamily: "'Inter', sans-serif" }}
+                              style={{ width: '100%', minHeight: '80px', background: 'var(--surface)', border: '1px solid var(--input-border)', borderRadius: '4px', color: 'var(--text-primary)', padding: '0.5rem', fontSize: '0.85rem', resize: 'vertical', fontFamily: "'Inter', sans-serif" }}
                             />
                           </div>
                         )}
@@ -1007,20 +1007,20 @@ function Dashboard() {
                              setLeads(prev => prev.map(l => l.status === 'Contacted' ? { ...l, lastContactedAt: Date.now() - (5 * 24 * 60 * 60 * 1000), followUpGenerated: false } : l));
                            }
                          }}
-                         style={{ textTransform: 'uppercase', fontSize: '0.8rem', color: '#888', marginBottom: col === 'Contacted' ? '0.4rem' : '1rem', letterSpacing: '1px', display: 'flex', justifyContent: 'space-between', cursor: col === 'Contacted' ? 'pointer' : 'default' }}>
-                        {col} <span style={{ background: '#000', padding: '2px 8px', borderRadius: '12px' }}>{(highIntentOnly ? leads.filter(l => l.intentScore >= 85) : leads).filter(l => (l.status || 'New') === col).length}</span>
+                         style={{ textTransform: 'uppercase', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: col === 'Contacted' ? '0.4rem' : '1rem', letterSpacing: '1px', display: 'flex', justifyContent: 'space-between', cursor: col === 'Contacted' ? 'pointer' : 'default' }}>
+                        {col} <span style={{ background: 'var(--surface)', padding: '2px 8px', borderRadius: '12px' }}>{(highIntentOnly ? leads.filter(l => l.intentScore >= 85) : leads).filter(l => (l.status || 'New') === col).length}</span>
                       </h3>
                       {col === 'Contacted' && (
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '1rem', background: 'rgba(39,201,63,0.08)', border: '1px solid rgba(39,201,63,0.2)', borderRadius: '6px', padding: '4px 8px' }}>
                           <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#27c93f', display: 'inline-block', boxShadow: '0 0 6px #27c93f', animation: 'pulse 2s infinite' }}></span>
                           <span style={{ fontSize: '0.65rem', color: '#27c93f', fontWeight: 600 }}>INBOX SYNC ACTIVE</span>
-                          <span style={{ fontSize: '0.6rem', color: '#555', marginLeft: 'auto' }}>↓↓ double-click to time-travel</span>
+                          <span style={{ fontSize: '0.6rem', color: 'var(--text-muted)', marginLeft: 'auto' }}>↓↓ double-click to time-travel</span>
                         </div>
                       )}
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                         {(highIntentOnly ? leads.filter(l => l.intentScore >= 85) : leads).filter(l => (l.status || 'New') === col).map(lead => (
                           <div key={lead.id} draggable onDragStart={e => e.dataTransfer.setData('text/plain', lead.id)} className="glass-card" style={{ cursor: 'grab', padding: '1rem', border: '1px solid #222', background: 'rgba(0,0,0,0.4)' }}>
-                            <h4 style={{ fontSize: '1rem', marginBottom: '0.25rem', color: '#fff' }}>{lead.company}</h4>
+                            <h4 style={{ fontSize: '1rem', marginBottom: '0.25rem', color: 'var(--text-primary)' }}>{lead.company}</h4>
                             <p style={{ fontSize: '0.8rem', color: '#a1a1aa', marginBottom: '0.75rem', lineHeight: 1.3 }}>{lead.problem}</p>
                             
                             {aiOutreach[lead.id] && (
@@ -1032,21 +1032,21 @@ function Dashboard() {
                             
                             <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap' }}>
                               <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                                <button onClick={() => fetchEmailsWithHunter(lead)} disabled={fetchingEmailsFor === lead.id} style={{ fontSize: '0.7rem', color: '#fff', background: '#ffbd2e', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}>
+                                <button onClick={() => fetchEmailsWithHunter(lead)} disabled={fetchingEmailsFor === lead.id} style={{ fontSize: '0.7rem', color: 'var(--text-primary)', background: '#ffbd2e', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}>
                                   {fetchingEmailsFor === lead.id ? '...' : 'Find Email'}
                                 </button>
-                                <button onClick={() => findHiringManager(lead)} disabled={findingManagerFor === lead.id} style={{ fontSize: '0.7rem', color: '#fff', background: '#4facfe', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}>
+                                <button onClick={() => findHiringManager(lead)} disabled={findingManagerFor === lead.id} style={{ fontSize: '0.7rem', color: 'var(--text-primary)', background: '#4facfe', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}>
                                   {findingManagerFor === lead.id ? '...' : 'Hiring Manager'}
                                 </button>
-                                <button onClick={() => analyzeCompany(lead)} disabled={analyzingCompanyFor === lead.id} style={{ fontSize: '0.7rem', color: '#fff', background: '#7c3aed', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}>
+                                <button onClick={() => analyzeCompany(lead)} disabled={analyzingCompanyFor === lead.id} style={{ fontSize: '0.7rem', color: 'var(--text-primary)', background: '#7c3aed', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}>
                                   {analyzingCompanyFor === lead.id ? '...' : 'Deep Dive'}
                                 </button>
-                                <button onClick={() => setShowNote(prev => ({ ...prev, [lead.id]: !prev[lead.id] }))} style={{ fontSize: '0.7rem', color: '#ccc', background: 'rgba(255,255,255,0.05)', border: '1px solid #333', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}>
+                                <button onClick={() => setShowNote(prev => ({ ...prev, [lead.id]: !prev[lead.id] }))} style={{ fontSize: '0.7rem', color: '#ccc', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--input-border)', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}>
                                   Notes
                                 </button>
                               </div>
                               <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                <button onClick={() => { setBlitzLead(lead); if(!aiOutreach[lead.id]) generateAIOutreach(lead); if(!foundEmails[lead.id] && hunterKey) fetchEmailsWithHunter(lead); }} disabled={!!generatingId} style={{ background: 'linear-gradient(135deg, #7c3aed, #4facfe)', color: '#fff', border: 'none', cursor: 'pointer', padding: '4px 8px', borderRadius: '4px', fontSize: '0.7rem', display: 'flex', alignItems: 'center', gap: '4px' }} title="Omnichannel Blitz">
+                                <button onClick={() => { setBlitzLead(lead); if(!aiOutreach[lead.id]) generateAIOutreach(lead); if(!foundEmails[lead.id] && hunterKey) fetchEmailsWithHunter(lead); }} disabled={!!generatingId} style={{ background: 'linear-gradient(135deg, #7c3aed, #4facfe)', color: 'var(--text-primary)', border: 'none', cursor: 'pointer', padding: '4px 8px', borderRadius: '4px', fontSize: '0.7rem', display: 'flex', alignItems: 'center', gap: '4px' }} title="Omnichannel Blitz">
                                   {generatingId === lead.id ? <Loader2 size={12} className="animate-spin" /> : <><Sparkles size={12} /> Blitz</>}
                                 </button>
                                 {foundEmails[lead.id]?.[0]?.value && (
@@ -1068,7 +1068,7 @@ function Dashboard() {
                                   value={notes[lead.id] || ''}
                                   onChange={(e) => saveNote(lead.id, e.target.value)}
                                   placeholder="Add a note..."
-                                  style={{ width: '100%', minHeight: '60px', background: 'rgba(0,0,0,0.5)', border: '1px solid #333', borderRadius: '4px', color: '#fff', padding: '0.5rem', fontSize: '0.75rem', resize: 'vertical' }}
+                                  style={{ width: '100%', minHeight: '60px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '4px', color: 'var(--text-primary)', padding: '0.5rem', fontSize: '0.75rem', resize: 'vertical' }}
                                 />
                               </div>
                             )}
@@ -1095,22 +1095,22 @@ function Dashboard() {
               <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'rgba(39,201,63,0.15)', border: '2px solid #27c93f', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', animation: 'pulse 1.5s infinite' }}>🤖</div>
               <div>
                 <div style={{ fontSize: '0.65rem', color: '#27c93f', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '2px' }}>⚡ Autonomous Engine Triggered</div>
-                <h2 style={{ margin: 0, fontSize: '1.3rem', color: '#fff' }}>Follow-Up #1 Drafted for <span style={{ color: '#27c93f' }}>{followUpModal.company}</span></h2>
+                <h2 style={{ margin: 0, fontSize: '1.3rem', color: 'var(--text-primary)' }}>Follow-Up #1 Drafted for <span style={{ color: '#27c93f' }}>{followUpModal.company}</span></h2>
               </div>
             </div>
             
             {/* Detection Summary */}
             <div style={{ background: 'rgba(39,201,63,0.05)', border: '1px solid rgba(39,201,63,0.15)', borderRadius: '10px', padding: '1rem', marginBottom: '1.5rem' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', fontSize: '0.8rem' }}>
-                <div><span style={{ color: '#555' }}>📅 Last Contacted:</span><br /><span style={{ color: '#fff', fontWeight: 600 }}>4+ days ago</span></div>
-                <div><span style={{ color: '#555' }}>📭 Reply Status:</span><br /><span style={{ color: '#ff5f56', fontWeight: 600 }}>No Reply Detected</span></div>
-                <div><span style={{ color: '#555' }}>🧠 Action:</span><br /><span style={{ color: '#27c93f', fontWeight: 600 }}>AI Follow-Up Generated</span></div>
-                <div><span style={{ color: '#555' }}>🎯 Lead Score:</span><br /><span style={{ color: '#ffbd2e', fontWeight: 600 }}>{followUpModal.intentScore || 90}🔥</span></div>
+                <div><span style={{ color: 'var(--text-muted)' }}>📅 Last Contacted:</span><br /><span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>4+ days ago</span></div>
+                <div><span style={{ color: 'var(--text-muted)' }}>📭 Reply Status:</span><br /><span style={{ color: '#ff5f56', fontWeight: 600 }}>No Reply Detected</span></div>
+                <div><span style={{ color: 'var(--text-muted)' }}>🧠 Action:</span><br /><span style={{ color: '#27c93f', fontWeight: 600 }}>AI Follow-Up Generated</span></div>
+                <div><span style={{ color: 'var(--text-muted)' }}>🎯 Lead Score:</span><br /><span style={{ color: '#ffbd2e', fontWeight: 600 }}>{followUpModal.intentScore || 90}🔥</span></div>
               </div>
             </div>
 
             {/* AI Draft Preview */}
-            <div style={{ background: '#000', border: '1px solid #1a1a1a', borderRadius: '8px', padding: '1rem', marginBottom: '1.5rem', fontSize: '0.82rem', color: '#a1a1aa', whiteSpace: 'pre-wrap', fontFamily: 'monospace', maxHeight: '180px', overflowY: 'auto' }}>
+            <div style={{ background: 'var(--surface)', border: '1px solid #1a1a1a', borderRadius: '8px', padding: '1rem', marginBottom: '1.5rem', fontSize: '0.82rem', color: '#a1a1aa', whiteSpace: 'pre-wrap', fontFamily: 'monospace', maxHeight: '180px', overflowY: 'auto' }}>
               {aiOutreach[followUpModal.id] || 'Generating follow-up email via AI... ✨'}
             </div>
 
@@ -1119,10 +1119,10 @@ function Dashboard() {
               <a href={`https://mail.google.com/mail/?view=cm&fs=1&su=${encodeURIComponent(`Following up – ${followUpModal.company}`)}&body=${encodeURIComponent(aiOutreach[followUpModal.id] || 'Following up on my previous message...')}`} target="_blank" rel="noreferrer" onClick={() => setFollowUpModal(null)} style={{ flex: 1, background: 'linear-gradient(135deg, #27c93f, #0a8a21)', color: '#000', padding: '12px 20px', borderRadius: '10px', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', minWidth: '160px' }}>
                 📧 Send in Gmail
               </a>
-              <button onClick={() => { setBlitzLead(followUpModal); setFollowUpModal(null); }} style={{ flex: 1, background: 'linear-gradient(135deg, #7c3aed, #4facfe)', color: '#fff', border: 'none', padding: '12px 20px', borderRadius: '10px', fontSize: '0.9rem', fontWeight: 700, cursor: 'pointer', minWidth: '160px' }}>
+              <button onClick={() => { setBlitzLead(followUpModal); setFollowUpModal(null); }} style={{ flex: 1, background: 'linear-gradient(135deg, #7c3aed, #4facfe)', color: 'var(--text-primary)', border: 'none', padding: '12px 20px', borderRadius: '10px', fontSize: '0.9rem', fontWeight: 700, cursor: 'pointer', minWidth: '160px' }}>
                 ⚡ Full Blitz Mode
               </button>
-              <button onClick={() => setFollowUpModal(null)} style={{ background: 'rgba(255,255,255,0.05)', color: '#888', border: '1px solid #333', padding: '12px 16px', borderRadius: '10px', fontSize: '0.85rem', cursor: 'pointer' }}>
+              <button onClick={() => setFollowUpModal(null)} style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-muted)', border: '1px solid var(--input-border)', padding: '12px 16px', borderRadius: '10px', fontSize: '0.85rem', cursor: 'pointer' }}>
                 Dismiss
               </button>
             </div>
@@ -1133,8 +1133,8 @@ function Dashboard() {
       {/* Omnichannel Blitz Modal */}
       {blitzLead && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, padding: '1rem' }}>
-          <div style={{ background: '#111', border: '1px solid #333', borderRadius: '16px', padding: '2.5rem', width: '100%', maxWidth: '800px', maxHeight: '90vh', overflowY: 'auto', position: 'relative', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
-            <button onClick={() => setBlitzLead(null)} style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', padding: '8px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.2s' }} onMouseOver={e => e.currentTarget.style.background = 'rgba(255,0,0,0.5)'} onMouseOut={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'} title="Close">
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--input-border)', borderRadius: '16px', padding: '2.5rem', width: '100%', maxWidth: '800px', maxHeight: '90vh', overflowY: 'auto', position: 'relative', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
+            <button onClick={() => setBlitzLead(null)} style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)', padding: '8px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.2s' }} onMouseOver={e => e.currentTarget.style.background = 'rgba(255,0,0,0.5)'} onMouseOut={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'} title="Close">
               <X size={20} />
             </button>
             <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: 0, marginBottom: '1.5rem', background: 'linear-gradient(135deg, #7c3aed, #4facfe)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}><Sparkles /> Omnichannel Blitz: {blitzLead.company}</h2>
@@ -1143,13 +1143,13 @@ function Dashboard() {
               {/* Email */}
               <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid #222', borderRadius: '8px', padding: '1rem' }}>
                 <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0 0 1rem 0', color: '#e2e8f0', fontSize: '1rem' }}>📧 Step 1: The Cold Email</h3>
-                <div style={{ background: '#000', padding: '1rem', borderRadius: '6px', fontSize: '0.85rem', color: '#a1a1aa', whiteSpace: 'pre-wrap', fontFamily: 'monospace' }}>
+                <div style={{ background: 'var(--surface)', padding: '1rem', borderRadius: '6px', fontSize: '0.85rem', color: '#a1a1aa', whiteSpace: 'pre-wrap', fontFamily: 'monospace' }}>
                   {generatingId === blitzLead.id && !aiOutreach[blitzLead.id] ? "Generating AI Pitch..." : getEmailBody(blitzLead)}
                 </div>
                 <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem' }}>
                   <a href={`https://mail.google.com/mail/?view=cm&fs=1&to=${foundEmails[blitzLead.id]?.map((e: any) => e.value).join(',') || blitzLead.contactEmail || ''}&su=${encodeURIComponent(`Exploring synergies at ${blitzLead.company}`)}&body=${encodeURIComponent(getEmailBody(blitzLead))}`} target="_blank" rel="noreferrer" style={{ background: '#4facfe', color: '#000', padding: '8px 16px', borderRadius: '6px', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px' }}><Mail size={16}/> Open in Gmail</a>
                   {!foundEmails[blitzLead.id] && hunterKey && (
-                    <span style={{ fontSize: '0.75rem', color: '#888', display: 'flex', alignItems: 'center' }}>Searching for email... <Loader2 size={12} className="animate-spin" style={{ marginLeft: '4px' }} /></span>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center' }}>Searching for email... <Loader2 size={12} className="animate-spin" style={{ marginLeft: '4px' }} /></span>
                   )}
                 </div>
               </div>
@@ -1157,7 +1157,7 @@ function Dashboard() {
               {/* LinkedIn */}
               <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid #222', borderRadius: '8px', padding: '1rem' }}>
                 <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0 0 1rem 0', color: '#e2e8f0', fontSize: '1rem' }}>💼 Step 2: LinkedIn Connect</h3>
-                <div style={{ background: '#000', padding: '1rem', borderRadius: '6px', fontSize: '0.85rem', color: '#a1a1aa', whiteSpace: 'pre-wrap', fontFamily: 'monospace' }}>
+                <div style={{ background: 'var(--surface)', padding: '1rem', borderRadius: '6px', fontSize: '0.85rem', color: '#a1a1aa', whiteSpace: 'pre-wrap', fontFamily: 'monospace' }}>
                   {`Hi! Saw the news about ${blitzLead.company} and wanted to connect. My ${userPersona} helps companies exactly like yours hit their targets faster via fractional execution. Sent you an email with a custom ROI roadmap!`}
                 </div>
                 <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem' }}>
@@ -1166,7 +1166,7 @@ function Dashboard() {
                     const personLinkedIn = foundEmails[blitzLead.id]?.[0]?.linkedin;
                     const targetLinkedIn = personLinkedIn || `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(blitzLead.company)}`;
                     window.open(targetLinkedIn, '_blank'); 
-                  }} style={{ background: '#0a66c2', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600 }}>
+                  }} style={{ background: '#0a66c2', color: 'var(--text-primary)', border: 'none', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600 }}>
                     {foundEmails[blitzLead.id]?.[0]?.linkedin ? 'Copy & Open Profile' : 'Copy & Search LinkedIn'}
                   </button>
                 </div>
@@ -1175,7 +1175,7 @@ function Dashboard() {
               {/* Twitter */}
               <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid #222', borderRadius: '8px', padding: '1rem' }}>
                 <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0 0 1rem 0', color: '#e2e8f0', fontSize: '1rem' }}>🐦 Step 3: Twitter DM</h3>
-                <div style={{ background: '#000', padding: '1rem', borderRadius: '6px', fontSize: '0.85rem', color: '#a1a1aa', whiteSpace: 'pre-wrap', fontFamily: 'monospace' }}>
+                <div style={{ background: 'var(--surface)', padding: '1rem', borderRadius: '6px', fontSize: '0.85rem', color: '#a1a1aa', whiteSpace: 'pre-wrap', fontFamily: 'monospace' }}>
                   {`Huge fan of what you're building at ${blitzLead.company}. Just sent over an email outlining exactly how we can step in and help you hit your scaling targets. Check your inbox!`}
                 </div>
                 <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem' }}>
@@ -1185,7 +1185,7 @@ function Dashboard() {
                      const companyTwitter = hunterData[blitzLead.id]?.twitter;
                      const targetTwitter = personTwitter ? `https://twitter.com/${personTwitter}` : companyTwitter ? `https://twitter.com/${companyTwitter}` : `https://twitter.com/search?q=${encodeURIComponent(blitzLead.company)}&src=typed_query&f=user`;
                      window.open(targetTwitter, '_blank'); 
-                   }} style={{ background: '#1da1f2', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600 }}>
+                   }} style={{ background: '#1da1f2', color: 'var(--text-primary)', border: 'none', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600 }}>
                      {foundEmails[blitzLead.id]?.[0]?.twitter || hunterData[blitzLead.id]?.twitter ? 'Copy & Open Profile' : 'Copy & Search Twitter'}
                    </button>
                 </div>
@@ -1198,13 +1198,13 @@ function Dashboard() {
       {/* Business Profile Onboarding Modal */}
       {showProfileModal && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, padding: '1rem' }}>
-          <div style={{ background: '#111', border: '1px solid #333', borderRadius: '16px', padding: '2.5rem', width: '100%', maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto', position: 'relative', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
-            <button onClick={() => setShowProfileModal(false)} style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', padding: '8px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onMouseOver={e => e.currentTarget.style.background = 'rgba(255,0,0,0.5)'} onMouseOut={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}><X size={20} /></button>
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--input-border)', borderRadius: '16px', padding: '2.5rem', width: '100%', maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto', position: 'relative', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
+            <button onClick={() => setShowProfileModal(false)} style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)', padding: '8px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onMouseOver={e => e.currentTarget.style.background = 'rgba(255,0,0,0.5)'} onMouseOut={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}><X size={20} /></button>
 
             <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
               <div style={{ width: '56px', height: '56px', borderRadius: '16px', background: 'linear-gradient(135deg, #7c3aed, #4facfe)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}><User size={28} color="#fff" /></div>
               <h2 style={{ margin: '0 0 0.5rem 0', fontSize: '1.5rem', background: 'linear-gradient(135deg, #7c3aed, #4facfe)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Your Business Profile</h2>
-              <p style={{ color: '#888', fontSize: '0.9rem', margin: 0 }}>Set up your identity for professional email signatures. All fields are optional.</p>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>Set up your identity for professional email signatures. All fields are optional.</p>
             </div>
 
             {!businessProfile.fullName && !profileDismissed && (
@@ -1224,14 +1224,14 @@ function Dashboard() {
                 { key: 'address', label: 'Mailing Address', placeholder: 'e.g. New York, USA', icon: '📍' },
               ].map(field => (
                 <div key={field.key}>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#888', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{field.icon} {field.label}</label>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{field.icon} {field.label}</label>
                   <div style={{ display: 'flex', gap: '0.5rem' }}>
                     <input
                       type="text"
                       value={(businessProfile as any)[field.key]}
                       onChange={e => setBusinessProfile(prev => ({ ...prev, [field.key]: e.target.value }))}
                       placeholder={field.placeholder}
-                      style={{ flex: 1, padding: '10px 14px', background: 'rgba(255,255,255,0.03)', border: '1px solid #333', borderRadius: '8px', color: '#fff', fontSize: '0.95rem', outline: 'none', boxSizing: 'border-box' }}
+                      style={{ flex: 1, padding: '10px 14px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.95rem', outline: 'none', boxSizing: 'border-box' }}
                       onFocus={e => e.currentTarget.style.borderColor = '#7c3aed'}
                       onBlur={e => e.currentTarget.style.borderColor = '#333'}
                     />
@@ -1250,7 +1250,7 @@ function Dashboard() {
                   value={businessProfile.companyContext || ''}
                   onChange={e => setBusinessProfile(prev => ({ ...prev, companyContext: e.target.value }))}
                   placeholder="Enter your website URL above and click Auto-Extract, or write a short description of your core services and unique value proposition here..."
-                  style={{ width: '100%', minHeight: '80px', padding: '10px 14px', background: 'rgba(124, 58, 237, 0.05)', border: '1px solid #7c3aed55', borderRadius: '8px', color: '#fff', fontSize: '0.85rem', outline: 'none', boxSizing: 'border-box', resize: 'vertical' }}
+                  style={{ width: '100%', minHeight: '80px', padding: '10px 14px', background: 'rgba(124, 58, 237, 0.05)', border: '1px solid #7c3aed55', borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.85rem', outline: 'none', boxSizing: 'border-box', resize: 'vertical' }}
                 />
               </div>
             </div>
@@ -1258,7 +1258,7 @@ function Dashboard() {
             {/* Signature Preview */}
             {(businessProfile.fullName || businessProfile.companyName) && (
               <div style={{ marginTop: '1.5rem', background: 'rgba(255,255,255,0.02)', border: '1px solid #222', borderRadius: '8px', padding: '1rem' }}>
-                <p style={{ fontSize: '0.75rem', color: '#888', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.5rem' }}>Signature Preview</p>
+                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.5rem' }}>Signature Preview</p>
                 <div style={{ fontSize: '0.85rem', color: '#a1a1aa', whiteSpace: 'pre-wrap', fontFamily: 'monospace', lineHeight: 1.6 }}>
                   ──────────────{'\n'}
                   {businessProfile.fullName}{businessProfile.jobTitle ? ` | ${businessProfile.jobTitle}` : ''}{'\n'}
@@ -1271,10 +1271,10 @@ function Dashboard() {
             )}
 
             <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
-              <button onClick={() => { saveBusinessProfile(businessProfile); setShowProfileModal(false); }} style={{ flex: 1, padding: '12px', background: 'linear-gradient(135deg, #7c3aed, #4facfe)', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '1rem', fontWeight: 600, cursor: 'pointer' }}>
+              <button onClick={() => { saveBusinessProfile(businessProfile); setShowProfileModal(false); }} style={{ flex: 1, padding: '12px', background: 'linear-gradient(135deg, #7c3aed, #4facfe)', color: 'var(--text-primary)', border: 'none', borderRadius: '8px', fontSize: '1rem', fontWeight: 600, cursor: 'pointer' }}>
                 Save Profile
               </button>
-              <button onClick={() => { setProfileDismissed(true); setShowProfileModal(false); }} style={{ padding: '12px 20px', background: 'transparent', color: '#888', border: '1px solid #333', borderRadius: '8px', fontSize: '0.9rem', cursor: 'pointer' }}>
+              <button onClick={() => { setProfileDismissed(true); setShowProfileModal(false); }} style={{ padding: '12px 20px', background: 'transparent', color: 'var(--text-muted)', border: '1px solid var(--input-border)', borderRadius: '8px', fontSize: '0.9rem', cursor: 'pointer' }}>
                 Skip for now
               </button>
             </div>
@@ -1285,32 +1285,32 @@ function Dashboard() {
       {/* Ghost Mode Scheduler Modal */}
       {showGhostConfig && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, padding: '1rem' }}>
-          <div style={{ background: '#111', border: '1px solid #333', borderRadius: '16px', padding: '2.5rem', width: '100%', maxWidth: '550px', position: 'relative', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
-            <button onClick={() => setShowGhostConfig(false)} style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', padding: '8px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onMouseOver={e => e.currentTarget.style.background = 'rgba(255,0,0,0.5)'} onMouseOut={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}><X size={20} /></button>
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--input-border)', borderRadius: '16px', padding: '2.5rem', width: '100%', maxWidth: '550px', position: 'relative', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
+            <button onClick={() => setShowGhostConfig(false)} style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)', padding: '8px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onMouseOver={e => e.currentTarget.style.background = 'rgba(255,0,0,0.5)'} onMouseOut={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}><X size={20} /></button>
 
             <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
               <h2 style={{ margin: '0 0 0.5rem 0', fontSize: '1.5rem', color: '#27c93f' }}>👻 Ghost Mode Configuration</h2>
-              <p style={{ color: '#888', fontSize: '0.9rem', margin: 0 }}>Configure when and how the autonomous engine hunts for leads.</p>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>Configure when and how the autonomous engine hunts for leads.</p>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
               {/* Scan Time */}
               <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: '#888', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>⏰ Daily Scan Time</label>
-                <input type="time" value={ghostConfig.scanTime} onChange={e => setGhostConfig(prev => ({ ...prev, scanTime: e.target.value }))} style={{ width: '100%', padding: '10px 14px', background: 'rgba(255,255,255,0.03)', border: '1px solid #333', borderRadius: '8px', color: '#fff', fontSize: '0.95rem', outline: 'none', boxSizing: 'border-box' }} />
+                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>⏰ Daily Scan Time</label>
+                <input type="time" value={ghostConfig.scanTime} onChange={e => setGhostConfig(prev => ({ ...prev, scanTime: e.target.value }))} style={{ width: '100%', padding: '10px 14px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.95rem', outline: 'none', boxSizing: 'border-box' }} />
               </div>
 
               {/* Leads Per Day */}
               <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: '#888', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>📊 Leads Per Day: <strong style={{ color: '#27c93f' }}>{ghostConfig.leadsPerDay}</strong></label>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>📊 Leads Per Day: <strong style={{ color: '#27c93f' }}>{ghostConfig.leadsPerDay}</strong></label>
                 <input type="range" min="5" max="50" step="5" value={ghostConfig.leadsPerDay} onChange={e => setGhostConfig(prev => ({ ...prev, leadsPerDay: parseInt(e.target.value) }))} style={{ width: '100%', accentColor: '#27c93f' }} />
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: '#555' }}><span>5</span><span>25</span><span>50</span></div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: 'var(--text-muted)' }}><span>5</span><span>25</span><span>50</span></div>
               </div>
 
               {/* Scan Mode */}
               <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: '#888', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>🎯 Scan Mode</label>
-                <select value={ghostConfig.scanMode} onChange={e => setGhostConfig(prev => ({ ...prev, scanMode: e.target.value }))} style={{ width: '100%', padding: '10px 14px', background: '#0a0a0a', border: '1px solid #333', borderRadius: '8px', color: '#fff', fontSize: '0.95rem', outline: 'none' }}>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>🎯 Scan Mode</label>
+                <select value={ghostConfig.scanMode} onChange={e => setGhostConfig(prev => ({ ...prev, scanMode: e.target.value }))} style={{ width: '100%', padding: '10px 14px', background: '#0a0a0a', border: '1px solid var(--input-border)', borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.95rem', outline: 'none' }}>
                   <option value="hiring">🔥 Hiring Intent</option>
                   <option value="layoff">🎯 Layoff Sniper</option>
                   <option value="vc_whale">🐋 VC Whales</option>
@@ -1320,20 +1320,20 @@ function Dashboard() {
 
               {/* Keywords */}
               <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: '#888', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>🔍 Target Keywords</label>
-                <input type="text" value={ghostConfig.keywords} onChange={e => setGhostConfig(prev => ({ ...prev, keywords: e.target.value }))} placeholder="e.g. React Developer, Marketing Manager" style={{ width: '100%', padding: '10px 14px', background: 'rgba(255,255,255,0.03)', border: '1px solid #333', borderRadius: '8px', color: '#fff', fontSize: '0.95rem', outline: 'none', boxSizing: 'border-box' }} />
+                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>🔍 Target Keywords</label>
+                <input type="text" value={ghostConfig.keywords} onChange={e => setGhostConfig(prev => ({ ...prev, keywords: e.target.value }))} placeholder="e.g. React Developer, Marketing Manager" style={{ width: '100%', padding: '10px 14px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.95rem', outline: 'none', boxSizing: 'border-box' }} />
               </div>
 
               {/* Slack Webhook */}
               <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: '#888', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>💬 Slack Webhook URL</label>
-                <input type="url" value={ghostConfig.slackWebhook || ''} onChange={e => setGhostConfig(prev => ({ ...prev, slackWebhook: e.target.value }))} placeholder="https://hooks.slack.com/services/..." style={{ width: '100%', padding: '10px 14px', background: 'rgba(255,255,255,0.03)', border: '1px solid #333', borderRadius: '8px', color: '#fff', fontSize: '0.95rem', outline: 'none', boxSizing: 'border-box' }} />
+                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>💬 Slack Webhook URL</label>
+                <input type="url" value={ghostConfig.slackWebhook || ''} onChange={e => setGhostConfig(prev => ({ ...prev, slackWebhook: e.target.value }))} placeholder="https://hooks.slack.com/services/..." style={{ width: '100%', padding: '10px 14px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.95rem', outline: 'none', boxSizing: 'border-box' }} />
               </div>
 
               {/* Enable Toggle */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '10px' }}>
                 <input type="checkbox" id="ghost-enabled" checked={ghostConfig.enabled} onChange={e => setGhostConfig(prev => ({ ...prev, enabled: e.target.checked }))} style={{ width: '18px', height: '18px', accentColor: '#27c93f' }} />
-                <label htmlFor="ghost-enabled" style={{ color: '#fff', fontSize: '0.95rem', cursor: 'pointer' }}>Enable Background Scanning</label>
+                <label htmlFor="ghost-enabled" style={{ color: 'var(--text-primary)', fontSize: '0.95rem', cursor: 'pointer' }}>Enable Background Scanning</label>
               </div>
             </div>
 
@@ -1347,23 +1347,23 @@ function Dashboard() {
       {/* Deep Dive Intelligence Modal */}
       {reportModal && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, padding: '1rem' }}>
-          <div style={{ background: '#111', border: '1px solid rgba(124,58,237,0.3)', borderRadius: '16px', padding: '2.5rem', width: '100%', maxWidth: '700px', maxHeight: '90vh', overflowY: 'auto', position: 'relative', boxShadow: '0 25px 50px -12px rgba(124,58,237,0.15)' }}>
-            <button onClick={() => setReportModal(null)} style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', padding: '8px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onMouseOver={e => e.currentTarget.style.background = 'rgba(255,0,0,0.5)'} onMouseOut={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}><X size={20} /></button>
+          <div style={{ background: 'var(--surface)', border: '1px solid rgba(124,58,237,0.3)', borderRadius: '16px', padding: '2.5rem', width: '100%', maxWidth: '700px', maxHeight: '90vh', overflowY: 'auto', position: 'relative', boxShadow: '0 25px 50px -12px rgba(124,58,237,0.15)' }}>
+            <button onClick={() => setReportModal(null)} style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)', padding: '8px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onMouseOver={e => e.currentTarget.style.background = 'rgba(255,0,0,0.5)'} onMouseOut={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}><X size={20} /></button>
 
             <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
               <div style={{ width: '56px', height: '56px', borderRadius: '16px', background: 'linear-gradient(135deg, #7c3aed, #4facfe)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}><Sparkles size={28} color="#fff" /></div>
               <h2 style={{ margin: '0 0 0.5rem 0', fontSize: '1.5rem', background: 'linear-gradient(135deg, #7c3aed, #4facfe)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Company Intelligence</h2>
-              <p style={{ color: '#888', fontSize: '1rem', margin: 0, fontWeight: 500 }}>{reportModal.lead.company}</p>
+              <p style={{ color: 'var(--text-muted)', fontSize: '1rem', margin: 0, fontWeight: 500 }}>{reportModal.lead.company}</p>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               <div>
                 <h4 style={{ color: '#a78bfa', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '1px', margin: '0 0 0.5rem 0' }}>Overview & Market Positioning</h4>
-                <div style={{ color: '#fff', fontSize: '0.95rem', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{reportModal.report.summary}</div>
+                <div style={{ color: 'var(--text-primary)', fontSize: '0.95rem', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{reportModal.report.summary}</div>
               </div>
 
               {reportModal.report.recent_news && (
-                <div style={{ padding: '1rem', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', border: '1px solid #333' }}>
+                <div style={{ padding: '1rem', background: 'var(--input-bg)', borderRadius: '8px', border: '1px solid var(--input-border)' }}>
                   <h4 style={{ color: '#a78bfa', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '1px', margin: '0 0 0.5rem 0' }}>Recent Milestones</h4>
                   <div style={{ color: '#ccc', fontSize: '0.9rem', lineHeight: '1.5', whiteSpace: 'pre-wrap' }}>{reportModal.report.recent_news}</div>
                 </div>
@@ -1391,7 +1391,7 @@ function Dashboard() {
       {linkedinDMModal && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.88)', backdropFilter: 'blur(10px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, padding: '1rem' }}>
           <div style={{ background: '#0a0a14', border: '1px solid rgba(10,102,194,0.4)', borderRadius: '20px', padding: '2.5rem', width: '100%', maxWidth: '520px', position: 'relative', boxShadow: '0 0 60px rgba(10,102,194,0.15)' }}>
-            <button onClick={() => setLinkedinDMModal(null)} style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', padding: '7px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <button onClick={() => setLinkedinDMModal(null)} style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.15)', color: 'var(--text-primary)', padding: '7px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <X size={18} />
             </button>
 
@@ -1399,14 +1399,14 @@ function Dashboard() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '1.75rem' }}>
               <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'linear-gradient(135deg, #0a66c2, #0077b5)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', flexShrink: 0 }}>💼</div>
               <div>
-                <h2 style={{ margin: 0, fontSize: '1.25rem', color: '#fff', fontWeight: 700 }}>LinkedIn DM Ready</h2>
+                <h2 style={{ margin: 0, fontSize: '1.25rem', color: 'var(--text-primary)', fontWeight: 700 }}>LinkedIn DM Ready</h2>
                 <p style={{ margin: '2px 0 0', color: '#0a66c2', fontSize: '0.85rem', fontWeight: 600 }}>{linkedinDMModal.lead.company}</p>
               </div>
             </div>
 
             {/* DM Content */}
             <div style={{ background: 'rgba(10, 102, 194, 0.06)', border: '1px solid rgba(10,102,194,0.2)', borderRadius: '12px', padding: '1.25rem', marginBottom: '1.5rem', position: 'relative' }}>
-              <div style={{ position: 'absolute', top: '-10px', left: '16px', background: '#0a66c2', color: '#fff', fontSize: '0.65rem', padding: '2px 10px', borderRadius: '999px', fontWeight: 700, letterSpacing: '0.5px' }}>✨ AI GENERATED DM</div>
+              <div style={{ position: 'absolute', top: '-10px', left: '16px', background: '#0a66c2', color: 'var(--text-primary)', fontSize: '0.65rem', padding: '2px 10px', borderRadius: '999px', fontWeight: 700, letterSpacing: '0.5px' }}>✨ AI GENERATED DM</div>
               <p style={{ margin: 0, color: '#e2e8f0', fontSize: '0.95rem', lineHeight: '1.7', whiteSpace: 'pre-wrap', fontFamily: 'inherit' }}>{linkedinDMModal.dm}</p>
             </div>
 
@@ -1415,7 +1415,7 @@ function Dashboard() {
               <span style={{ fontSize: '0.75rem', color: linkedinDMModal.dm.length > 300 ? '#ff5f56' : '#27c93f' }}>
                 {linkedinDMModal.dm.length} / 300 characters {linkedinDMModal.dm.length <= 300 ? '✓ LinkedIn safe' : '⚠ Too long'}
               </span>
-              <span style={{ fontSize: '0.75rem', color: '#666' }}>Ready to paste into LinkedIn</span>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Ready to paste into LinkedIn</span>
             </div>
 
             {/* Action Buttons */}
@@ -1426,7 +1426,7 @@ function Dashboard() {
                   setCopiedDmId(linkedinDMModal.lead.id);
                   setTimeout(() => setCopiedDmId(null), 2000);
                 }}
-                style={{ width: '100%', padding: '14px', background: copiedDmId === linkedinDMModal.lead.id ? 'linear-gradient(135deg, #27c93f, #10b981)' : 'linear-gradient(135deg, #0a66c2, #0077b5)', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '1rem', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', transition: 'all 0.2s' }}
+                style={{ width: '100%', padding: '14px', background: copiedDmId === linkedinDMModal.lead.id ? 'linear-gradient(135deg, #27c93f, #10b981)' : 'linear-gradient(135deg, #0a66c2, #0077b5)', color: 'var(--text-primary)', border: 'none', borderRadius: '10px', fontSize: '1rem', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', transition: 'all 0.2s' }}
               >
                 {copiedDmId === linkedinDMModal.lead.id ? <><Check size={18} /> Copied to Clipboard!</> : <><Copy size={18} /> Copy DM</>}
               </button>
@@ -1440,7 +1440,7 @@ function Dashboard() {
               </a>
               <button
                 onClick={() => { generateLinkedInDM({ ...linkedinDMModal.lead, id: linkedinDMModal.lead.id + '_regen' }); setLinkedinDMModal(null); setTimeout(() => { setGeneratingDmId(null); }, 100); }}
-                style={{ background: 'none', border: 'none', color: '#555', fontSize: '0.8rem', cursor: 'pointer', textAlign: 'center' }}
+                style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '0.8rem', cursor: 'pointer', textAlign: 'center' }}
               >
                 ↻ Regenerate DM
               </button>

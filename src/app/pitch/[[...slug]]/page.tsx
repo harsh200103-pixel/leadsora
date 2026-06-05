@@ -31,7 +31,7 @@ export default function PitchDeck({ params, searchParams }: { params: Promise<{ 
   if (!mounted) return null;
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#000', color: '#fff', fontFamily: "'Inter', sans-serif", overflowX: 'hidden' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg)', color: 'var(--text-primary)', fontFamily: "'Inter', sans-serif", overflowX: 'hidden' }}>
       
       {/* Background Effects */}
       <div style={{ position: 'fixed', top: '-20%', left: '-10%', width: '50vw', height: '50vw', background: 'radial-gradient(circle, rgba(124, 58, 237, 0.15) 0%, transparent 70%)', filter: 'blur(80px)', zIndex: 0 }} />
@@ -67,7 +67,7 @@ export default function PitchDeck({ params, searchParams }: { params: Promise<{ 
             <div style={{ background: 'rgba(255, 95, 86, 0.05)', border: '1px solid rgba(255, 95, 86, 0.2)', borderRadius: '16px', padding: '2rem', position: 'relative', overflow: 'hidden' }}>
               <div style={{ position: 'absolute', top: 0, left: 0, width: '4px', height: '100%', background: '#ff5f56' }} />
               <p style={{ color: '#ff5f56', fontSize: '0.9rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.5rem' }}>Traditional In-House</p>
-              <div style={{ fontSize: '2rem', fontWeight: 700, color: '#fff', marginBottom: '1rem', lineHeight: 1.2 }}>3 to 6<br/><span style={{ fontSize: '1.25rem', color: '#888', fontWeight: 400 }}>Months to Value</span></div>
+              <div style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '1rem', lineHeight: 1.2 }}>3 to 6<br/><span style={{ fontSize: '1.25rem', color: 'var(--text-muted)', fontWeight: 400 }}>Months to Value</span></div>
               <ul style={{ listStyle: 'none', padding: 0, margin: 0, color: '#a1a1aa', fontSize: '0.9rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 <li style={{ display: 'flex', gap: '8px' }}><TrendingDown size={16} color="#ff5f56" /> 45-90 Day Recruiting Cycle</li>
                 <li style={{ display: 'flex', gap: '8px' }}><Clock size={16} color="#ff5f56" /> 30+ Day Onboarding Ramp</li>
@@ -79,7 +79,7 @@ export default function PitchDeck({ params, searchParams }: { params: Promise<{ 
             <div style={{ background: 'linear-gradient(180deg, rgba(39, 201, 63, 0.1) 0%, rgba(39, 201, 63, 0.02) 100%)', border: '1px solid rgba(39, 201, 63, 0.3)', borderRadius: '16px', padding: '2rem', position: 'relative', overflow: 'hidden' }}>
               <div style={{ position: 'absolute', top: 0, left: 0, width: '4px', height: '100%', background: '#27c93f' }} />
               <p style={{ color: '#27c93f', fontSize: '0.9rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.5rem' }}>Fractional Partnership</p>
-              <div style={{ fontSize: '2rem', fontWeight: 700, color: '#fff', marginBottom: '1rem', lineHeight: 1.2 }}>48<br/><span style={{ fontSize: '1.25rem', color: '#888', fontWeight: 400 }}>Hours to Value</span></div>
+              <div style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '1rem', lineHeight: 1.2 }}>48<br/><span style={{ fontSize: '1.25rem', color: 'var(--text-muted)', fontWeight: 400 }}>Hours to Value</span></div>
               <ul style={{ listStyle: 'none', padding: 0, margin: 0, color: '#a1a1aa', fontSize: '0.9rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 <li style={{ display: 'flex', gap: '8px' }}><Zap size={16} color="#27c93f" /> Start Tomorrow</li>
                 <li style={{ display: 'flex', gap: '8px' }}><CheckCircle2 size={16} color="#27c93f" /> Immediate System Integration</li>
@@ -89,9 +89,9 @@ export default function PitchDeck({ params, searchParams }: { params: Promise<{ 
             
           </div>
           
-          <div style={{ textAlign: 'center', marginTop: '2.5rem', padding: '1.5rem', background: 'rgba(255,255,255,0.03)', borderRadius: '12px' }}>
-            <h4 style={{ fontSize: '1.25rem', color: '#fff', margin: '0 0 0.5rem 0' }}>The Outcome: <span style={{ color: '#27c93f', fontSize: '1.5rem' }}>Zero Execution Risk</span></h4>
-            <p style={{ fontSize: '0.9rem', color: '#888', margin: 0 }}>Skip the hiring pipeline and start shipping immediately.</p>
+          <div style={{ textAlign: 'center', marginTop: '2.5rem', padding: '1.5rem', background: 'var(--input-bg)', borderRadius: '12px' }}>
+            <h4 style={{ fontSize: '1.25rem', color: 'var(--text-primary)', margin: '0 0 0.5rem 0' }}>The Outcome: <span style={{ color: '#27c93f', fontSize: '1.5rem' }}>Zero Execution Risk</span></h4>
+            <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', margin: 0 }}>Skip the hiring pipeline and start shipping immediately.</p>
           </div>
         </div>
 
@@ -111,7 +111,7 @@ export default function PitchDeck({ params, searchParams }: { params: Promise<{ 
                   {i + 1}
                 </div>
                 <div>
-                  <h4 style={{ fontSize: '1.1rem', color: '#fff', margin: '0 0 0.5rem 0' }}>{step.title}</h4>
+                  <h4 style={{ fontSize: '1.1rem', color: 'var(--text-primary)', margin: '0 0 0.5rem 0' }}>{step.title}</h4>
                   <p style={{ color: '#a1a1aa', fontSize: '0.95rem', margin: 0, lineHeight: 1.5 }}>{step.desc}</p>
                 </div>
               </div>
@@ -123,15 +123,15 @@ export default function PitchDeck({ params, searchParams }: { params: Promise<{ 
         <div 
           style={{ textAlign: 'center', background: 'linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(79, 172, 254, 0.1))', padding: '4rem 2rem', borderRadius: '24px', border: '1px solid rgba(124, 58, 237, 0.2)', animation: 'fadeInUp 0.6s ease-out 0.6s forwards', opacity: 0 }}
         >
-          <h2 style={{ fontSize: '2rem', fontWeight: 700, color: '#fff', marginBottom: '1rem' }}>Ready to scale {companyName}?</h2>
+          <h2 style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '1rem' }}>Ready to scale {companyName}?</h2>
           <p style={{ color: '#a1a1aa', marginBottom: '2.5rem', fontSize: '1.1rem' }}>Let&apos;s hop on a 15-minute discovery call to map out exactly how we can step in.</p>
           
           {showContact ? (
             <div style={{ background: 'rgba(255,255,255,0.05)', padding: '1.5rem', borderRadius: '16px', display: 'inline-flex', flexDirection: 'column', gap: '0.5rem', border: '1px solid rgba(255,255,255,0.1)', animation: 'fadeInUp 0.3s ease-out forwards' }}>
-              <p style={{ margin: '0 0 0.5rem 0', fontSize: '0.85rem', color: '#888', textTransform: 'uppercase', letterSpacing: '1px' }}>Direct Contact Info</p>
-              {senderEmail && <a href={`mailto:${senderEmail}`} style={{ color: '#fff', textDecoration: 'none', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center' }}>📧 {senderEmail}</a>}
-              {senderPhone && <a href={`tel:${senderPhone}`} style={{ color: '#fff', textDecoration: 'none', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center' }}>📞 {senderPhone}</a>}
-              {!senderEmail && !senderPhone && <p style={{ color: '#fff', fontSize: '1.1rem', margin: 0 }}>Please reply directly to the email you received to schedule a call!</p>}
+              <p style={{ margin: '0 0 0.5rem 0', fontSize: '0.85rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>Direct Contact Info</p>
+              {senderEmail && <a href={`mailto:${senderEmail}`} style={{ color: 'var(--text-primary)', textDecoration: 'none', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center' }}>📧 {senderEmail}</a>}
+              {senderPhone && <a href={`tel:${senderPhone}`} style={{ color: 'var(--text-primary)', textDecoration: 'none', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center' }}>📞 {senderPhone}</a>}
+              {!senderEmail && !senderPhone && <p style={{ color: 'var(--text-primary)', fontSize: '1.1rem', margin: 0 }}>Please reply directly to the email you received to schedule a call!</p>}
             </div>
           ) : (
             <button onClick={() => setShowContact(true)} style={{ background: '#fff', color: '#000', border: 'none', cursor: 'pointer', padding: '1rem 2.5rem', borderRadius: '999px', fontSize: '1.1rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '8px', transition: 'transform 0.2s' }} onMouseOver={e => e.currentTarget.style.transform = 'scale(1.05)'} onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}>

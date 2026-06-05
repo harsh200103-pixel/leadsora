@@ -90,10 +90,10 @@ export default function AnalyticsPage() {
 
   if (authLoading || !user || !stats) {
     return (
-      <div style={{ minHeight: '100vh', background: '#0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ textAlign: 'center' }}>
           <Activity size={32} color="#7c3aed" style={{ animation: 'pulse 1.5s infinite', marginBottom: '1rem' }} />
-          <p style={{ color: '#666' }}>Loading analytics...</p>
+          <p style={{ color: 'var(--text-muted)' }}>Loading analytics...</p>
         </div>
       </div>
     );
@@ -118,11 +118,11 @@ export default function AnalyticsPage() {
   const maxSource = stats.topSources[0]?.[1] || 1;
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0a0a0a', color: '#fff', fontFamily: "'Inter', sans-serif" }}>
+    <div style={{ minHeight: '100vh', background: 'var(--bg)', color: 'var(--text-primary)', fontFamily: "'Inter', sans-serif" }}>
       {/* Navbar */}
       <nav style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 1.5rem', borderBottom: '1px solid #1a1a1a', background: 'rgba(10,10,10,0.95)', backdropFilter: 'blur(10px)', position: 'sticky', top: 0, zIndex: 100 }}>
         <Logo style={{ height: '44px', width: 'auto' }} />
-        <Link href="/dashboard" style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#888', fontSize: '0.85rem', textDecoration: 'none', border: '1px solid #333', padding: '6px 12px', borderRadius: '8px', transition: 'all 0.2s' }}
+        <Link href="/dashboard" style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-muted)', fontSize: '0.85rem', textDecoration: 'none', border: '1px solid var(--input-border)', padding: '6px 12px', borderRadius: '8px', transition: 'all 0.2s' }}
           onMouseOver={(e: any) => e.currentTarget.style.color = '#fff'}
           onMouseOut={(e: any) => e.currentTarget.style.color = '#888'}>
           <ArrowLeft size={14} /> Back to Dashboard
@@ -134,11 +134,11 @@ export default function AnalyticsPage() {
         <div style={{ marginBottom: '2.5rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
             <BarChart2 size={28} color="#7c3aed" />
-            <h1 style={{ fontSize: '1.8rem', margin: 0, background: 'linear-gradient(135deg, #fff 0%, #a78bfa 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+            <h1 style={{ fontSize: '1.8rem', margin: 0, background: 'linear-gradient(135deg, var(--text-primary) 0%, #a78bfa 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
               Sales Intelligence Dashboard
             </h1>
           </div>
-          <p style={{ color: '#555', fontSize: '0.9rem' }}>Live analytics calculated from your CRM pipeline and scan history.</p>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Live analytics calculated from your CRM pipeline and scan history.</p>
         </div>
 
         {/* KPI Cards */}
@@ -150,11 +150,11 @@ export default function AnalyticsPage() {
             { label: 'Emails Found', value: stats.totalEmails, icon: <Mail size={18} />, color: '#27c93f' },
             { label: 'Avg Intent Score', value: stats.avgScore, icon: <Activity size={18} />, color: '#ffbd2e' },
           ].map((kpi, i) => (
-            <div key={i} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid #1e1e1e', borderRadius: '12px', padding: '1.25rem', position: 'relative', overflow: 'hidden' }}>
+            <div key={i} style={{ background: 'var(--input-bg)', border: '1px solid #1e1e1e', borderRadius: '12px', padding: '1.25rem', position: 'relative', overflow: 'hidden' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: kpi.color, marginBottom: '0.75rem', fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                 {kpi.icon} {kpi.label}
               </div>
-              <div style={{ fontSize: '2.2rem', fontWeight: 800, color: '#fff', fontFamily: "'Space Grotesk', sans-serif" }}>
+              <div style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--text-primary)', fontFamily: "'Space Grotesk', sans-serif" }}>
                 {kpi.value}
               </div>
               <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '2px', background: kpi.color, opacity: 0.4 }} />
@@ -166,7 +166,7 @@ export default function AnalyticsPage() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '2rem' }}>
           {/* Pipeline Funnel */}
           <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid #1e1e1e', borderRadius: '16px', padding: '1.5rem' }}>
-            <h2 style={{ fontSize: '1rem', color: '#fff', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <h2 style={{ fontSize: '1rem', color: 'var(--text-primary)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Users size={16} color="#4facfe" /> Pipeline Funnel
             </h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
@@ -176,9 +176,9 @@ export default function AnalyticsPage() {
                   <div key={i}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px', fontSize: '0.82rem' }}>
                       <span style={{ color: '#ccc' }}>{stage.emoji} {stage.label}</span>
-                      <span style={{ color: stage.color, fontWeight: 700 }}>{stage.count} <span style={{ color: '#555', fontWeight: 400 }}>({pct}%)</span></span>
+                      <span style={{ color: stage.color, fontWeight: 700 }}>{stage.count} <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>({pct}%)</span></span>
                     </div>
-                    <div style={{ background: '#111', borderRadius: '4px', height: '8px', overflow: 'hidden' }}>
+                    <div style={{ background: 'var(--surface)', borderRadius: '4px', height: '8px', overflow: 'hidden' }}>
                       <div style={{ width: `${Math.max(pct, 2)}%`, height: '100%', background: stage.color, borderRadius: '4px', transition: 'width 0.8s ease' }} />
                     </div>
                   </div>
@@ -194,7 +194,7 @@ export default function AnalyticsPage() {
 
           {/* Intent Score Distribution */}
           <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid #1e1e1e', borderRadius: '16px', padding: '1.5rem' }}>
-            <h2 style={{ fontSize: '1rem', color: '#fff', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <h2 style={{ fontSize: '1rem', color: 'var(--text-primary)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Zap size={16} color="#ffbd2e" /> Intent Score Distribution
             </h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
@@ -207,7 +207,7 @@ export default function AnalyticsPage() {
                       <span style={{ color: '#ccc' }}>{bucket}</span>
                       <span style={{ color: colors[i], fontWeight: 700 }}>{count} leads</span>
                     </div>
-                    <div style={{ background: '#111', borderRadius: '4px', height: '8px', overflow: 'hidden' }}>
+                    <div style={{ background: 'var(--surface)', borderRadius: '4px', height: '8px', overflow: 'hidden' }}>
                       <div style={{ width: `${Math.max(pct, 2)}%`, height: '100%', background: colors[i], borderRadius: '4px' }} />
                     </div>
                   </div>
@@ -219,11 +219,11 @@ export default function AnalyticsPage() {
 
         {/* Top Sources */}
         <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid #1e1e1e', borderRadius: '16px', padding: '1.5rem', marginBottom: '2rem' }}>
-          <h2 style={{ fontSize: '1rem', color: '#fff', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <h2 style={{ fontSize: '1rem', color: 'var(--text-primary)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <BarChart2 size={16} color="#27c93f" /> Top Lead Sources
           </h2>
           {stats.topSources.length === 0 ? (
-            <p style={{ color: '#555', fontSize: '0.85rem' }}>No leads scanned yet. Run your first scan to see source analytics.</p>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>No leads scanned yet. Run your first scan to see source analytics.</p>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               {stats.topSources.map(([source, count]: any, i: number) => {
@@ -231,10 +231,10 @@ export default function AnalyticsPage() {
                 return (
                   <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                     <span style={{ width: '160px', fontSize: '0.8rem', color: '#aaa', flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{source}</span>
-                    <div style={{ flex: 1, background: '#111', borderRadius: '4px', height: '10px', overflow: 'hidden' }}>
+                    <div style={{ flex: 1, background: 'var(--surface)', borderRadius: '4px', height: '10px', overflow: 'hidden' }}>
                       <div style={{ width: `${pct}%`, height: '100%', background: `hsl(${140 + i * 30}, 70%, 50%)`, borderRadius: '4px', transition: 'width 0.8s ease' }} />
                     </div>
-                    <span style={{ width: '36px', textAlign: 'right', fontSize: '0.82rem', color: '#fff', fontWeight: 600 }}>{count}</span>
+                    <span style={{ width: '36px', textAlign: 'right', fontSize: '0.82rem', color: 'var(--text-primary)', fontWeight: 600 }}>{count}</span>
                   </div>
                 );
               })}
@@ -245,19 +245,19 @@ export default function AnalyticsPage() {
         {/* Scan Mode Performance */}
         {stats.modeStats.length > 0 && (
           <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid #1e1e1e', borderRadius: '16px', padding: '1.5rem' }}>
-            <h2 style={{ fontSize: '1rem', color: '#fff', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <h2 style={{ fontSize: '1rem', color: 'var(--text-primary)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <TrendingUp size={16} color="#7c3aed" /> Scan Mode Performance
             </h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem' }}>
               {stats.modeStats.map((mode: any, i: number) => (
                 <div key={i} style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid #1a1a1a', borderRadius: '10px', padding: '1rem', textAlign: 'center' }}>
-                  <div style={{ fontSize: '0.75rem', color: '#666', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                     {modeLabels[mode.mode] || mode.mode}
                   </div>
                   <div style={{ fontSize: '1.8rem', fontWeight: 800, color: mode.avgScore >= 85 ? '#ff5f56' : mode.avgScore >= 75 ? '#ffbd2e' : '#4facfe' }}>
                     {mode.avgScore}
                   </div>
-                  <div style={{ fontSize: '0.72rem', color: '#555' }}>avg score · {mode.count} leads</div>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>avg score · {mode.count} leads</div>
                 </div>
               ))}
             </div>
@@ -266,11 +266,11 @@ export default function AnalyticsPage() {
 
         {/* Empty state */}
         {stats.totalLeads === 0 && (
-          <div style={{ textAlign: 'center', padding: '4rem 2rem', color: '#555' }}>
+          <div style={{ textAlign: 'center', padding: '4rem 2rem', color: 'var(--text-muted)' }}>
             <BarChart2 size={48} style={{ marginBottom: '1rem', opacity: 0.3 }} />
-            <h3 style={{ color: '#333', marginBottom: '0.5rem' }}>No data yet</h3>
+            <h3 style={{ color: 'var(--text-muted)', marginBottom: '0.5rem' }}>No data yet</h3>
             <p>Run your first scan on the dashboard to start seeing analytics here.</p>
-            <Link href="/dashboard" style={{ display: 'inline-block', marginTop: '1rem', padding: '10px 24px', background: '#7c3aed', borderRadius: '8px', color: '#fff', textDecoration: 'none', fontSize: '0.9rem' }}>
+            <Link href="/dashboard" style={{ display: 'inline-block', marginTop: '1rem', padding: '10px 24px', background: '#7c3aed', borderRadius: '8px', color: 'var(--text-primary)', textDecoration: 'none', fontSize: '0.9rem' }}>
               Go to Dashboard →
             </Link>
           </div>

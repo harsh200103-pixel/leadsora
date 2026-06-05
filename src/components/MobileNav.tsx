@@ -23,7 +23,7 @@ export default function MobileNav() {
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }} className="desktop-nav-links">
         <button
           onClick={() => go('/login')}
-          style={{ padding: '0.5rem 1.25rem', background: 'transparent', border: '1px solid #333', borderRadius: '8px', color: '#aaa', fontSize: '0.9rem', cursor: 'pointer', fontFamily: "'Inter', sans-serif", transition: 'all 0.2s' }}
+          style={{ padding: '0.5rem 1.25rem', background: 'transparent', border: '1px solid var(--input-border)', borderRadius: '8px', color: '#aaa', fontSize: '0.9rem', cursor: 'pointer', fontFamily: "'Inter', sans-serif", transition: 'all 0.2s' }}
           onMouseOver={e => { (e.currentTarget as HTMLElement).style.borderColor = '#fff'; (e.currentTarget as HTMLElement).style.color = '#fff'; }}
           onMouseOut={e => { (e.currentTarget as HTMLElement).style.borderColor = '#333'; (e.currentTarget as HTMLElement).style.color = '#aaa'; }}
         >Sign In</button>
@@ -36,7 +36,7 @@ export default function MobileNav() {
       <button
         onClick={() => setOpen(!open)}
         className="mobile-menu-btn"
-        style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', padding: '0.5rem' }}
+        style={{ background: 'none', border: 'none', color: 'var(--text-primary)', cursor: 'pointer', padding: '0.5rem' }}
         aria-label="Toggle menu"
       >
         {open ? <X size={24} /> : <Menu size={24} />}
@@ -50,7 +50,7 @@ export default function MobileNav() {
           borderBottom: '1px solid #27272a', padding: '1.5rem',
           display: 'flex', flexDirection: 'column', gap: '1rem', zIndex: 200,
         }}>
-          <button onClick={() => go('/login')} style={{ width: '100%', padding: '0.875rem', background: 'transparent', border: '1px solid #333', borderRadius: '10px', color: '#fff', fontSize: '1rem', cursor: 'pointer', fontFamily: "'Inter', sans-serif" }}>
+          <button onClick={() => go('/login')} style={{ width: '100%', padding: '0.875rem', background: 'transparent', border: '1px solid var(--input-border)', borderRadius: '10px', color: 'var(--text-primary)', fontSize: '1rem', cursor: 'pointer', fontFamily: "'Inter', sans-serif" }}>
             Sign In
           </button>
           <button onClick={() => go('/signup')} className="btn-primary" style={{ width: '100%', padding: '0.875rem', fontSize: '1rem' }}>

@@ -89,8 +89,8 @@ export default function LandingPage() {
           </span>
         </h1>
 
-        <p style={{ fontSize: 'clamp(1rem, 2.5vw, 1.25rem)', color: 'rgba(255,255,255,0.6)', maxWidth: 560, margin: '0 auto 2.5rem', lineHeight: 1.7 }}>
-          LEADSORA scans job boards, funding databases, and company signals to find businesses with <strong style={{ color: '#fff' }}>confirmed budget</strong> and <strong style={{ color: '#fff' }}>immediate technical pain</strong> — then writes the perfect outreach for you.
+        <p style={{ fontSize: 'clamp(1rem, 2.5vw, 1.25rem)', color: 'var(--text-secondary)', maxWidth: 560, margin: '0 auto 2.5rem', lineHeight: 1.7 }}>
+          LEADSORA scans job boards, funding databases, and company signals to find businesses with <strong style={{ color: 'var(--text-primary)' }}>confirmed budget</strong> and <strong style={{ color: 'var(--text-primary)' }}>immediate technical pain</strong> — then writes the perfect outreach for you.
         </p>
 
         {/* Waitlist Form */}
@@ -102,7 +102,7 @@ export default function LandingPage() {
               onChange={e => setEmail(e.target.value)}
               placeholder="Enter your email for early access"
               required
-              style={{ padding: '0.8rem 1.25rem', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '10px', color: '#fff', fontSize: '0.95rem', outline: 'none', width: 'min(100%, 320px)' }}
+              style={{ padding: '0.8rem 1.25rem', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '10px', color: 'var(--text-primary)', fontSize: '0.95rem', outline: 'none', width: 'min(100%, 320px)' }}
             />
             <button type="submit" className="btn-primary" disabled={submitting} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.8rem 1.5rem' }}>
               {submitting ? 'Joining...' : <><Sparkles size={16} /> Join Waitlist</>}
@@ -115,13 +115,13 @@ export default function LandingPage() {
         )}
 
         {/* Live waitlist counter */}
-        <p style={{ fontSize: '0.82rem', color: '#555', transition: 'opacity 0.5s', opacity: countVisible ? 1 : 0 }}>
+        <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', transition: 'opacity 0.5s', opacity: countVisible ? 1 : 0 }}>
           🔥 <strong style={{ color: '#a78bfa' }}>{waitlistCount.toLocaleString()}</strong> founders & agencies already waiting
         </p>
 
         {/* Already have account */}
         <div style={{ marginTop: '1.5rem' }}>
-          <button onClick={() => router.push('/login')} style={{ background: 'none', border: 'none', color: '#555', fontSize: '0.85rem', cursor: 'pointer', textDecoration: 'underline' }}>
+          <button onClick={() => router.push('/login')} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '0.85rem', cursor: 'pointer', textDecoration: 'underline' }}>
             Already have an account? Sign in →
           </button>
         </div>
@@ -133,7 +133,7 @@ export default function LandingPage() {
           {stats.map((s, i) => (
             <div key={i} className="glass-card text-center" style={{ padding: '1.5rem 1rem' }}>
               <div style={{ fontSize: '2rem', fontWeight: 800, background: 'linear-gradient(135deg, #a78bfa, #4facfe)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>{s.value}</div>
-              <div style={{ fontSize: '0.8rem', color: '#666', marginTop: '0.25rem' }}>{s.label}</div>
+              <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>{s.label}</div>
             </div>
           ))}
         </div>
@@ -141,7 +141,7 @@ export default function LandingPage() {
 
       {/* ── SCAN MODES ───────────────────────────────────────── */}
       <section className="container" style={{ padding: '2rem 0 5rem' }}>
-        <p style={{ textAlign: 'center', fontSize: '0.75rem', color: '#555', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '1rem' }}>5 Intelligence Modes</p>
+        <p style={{ textAlign: 'center', fontSize: '0.75rem', color: 'var(--text-muted)', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '1rem' }}>5 Intelligence Modes</p>
         <h2 className="section-title text-center" style={{ marginBottom: '2.5rem' }}>Every Buying Signal. Every Source.</h2>
         <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', justifyContent: 'center' }}>
           {scanModes.map((m, i) => (
@@ -149,7 +149,7 @@ export default function LandingPage() {
               <span style={{ fontSize: '1.5rem' }}>{m.icon}</span>
               <div>
                 <div style={{ fontWeight: 700, fontSize: '0.9rem', color: m.color }}>{m.name}</div>
-                <div style={{ fontSize: '0.72rem', color: '#555' }}>{m.desc}</div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{m.desc}</div>
               </div>
             </div>
           ))}
@@ -208,7 +208,7 @@ export default function LandingPage() {
         <div className="dashboard-card">
           <div className="dashboard-header">
             <div className="dot dot-red" /><div className="dot dot-yellow" /><div className="dot dot-green" />
-            <span style={{ marginLeft: '1rem', color: '#666', fontSize: '0.875rem' }}>leadsora — intent-engine.live</span>
+            <span style={{ marginLeft: '1rem', color: 'var(--text-muted)', fontSize: '0.875rem' }}>leadsora — intent-engine.live</span>
             <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.72rem', color: '#27c93f' }}>
               <span style={{ width: 6, height: 6, background: '#27c93f', borderRadius: '50%', animation: 'pulse 1.5s infinite' }} /> SCANNING
             </span>
@@ -224,18 +224,18 @@ export default function LandingPage() {
                 <div style={{ flex: 1, minWidth: 200 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.35rem', flexWrap: 'wrap' }}>
                     <h4 style={{ fontSize: '1.1rem' }}>{lead.company}</h4>
-                    <span style={{ fontSize: '0.75rem', color: '#888' }}>• {lead.country}</span>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>• {lead.country}</span>
                     <span style={{ fontSize: '0.7rem', background: 'rgba(124,58,237,0.15)', border: '1px solid rgba(124,58,237,0.25)', padding: '1px 8px', borderRadius: '999px', color: '#a78bfa' }}>{lead.tag}</span>
                   </div>
                   <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{lead.signal}</p>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.35rem' }}>
                   <span style={{ fontSize: '1.25rem', fontWeight: 800, color: lead.score >= 95 ? '#ff5f56' : lead.score >= 90 ? '#ffbd2e' : '#27c93f' }}>{lead.score} 🔥</span>
-                  <span style={{ fontSize: '0.7rem', color: '#444' }}>via {lead.source}</span>
+                  <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>via {lead.source}</span>
                 </div>
               </div>
             ))}
-            <div style={{ textAlign: 'center', padding: '1rem', color: '#555', fontSize: '0.8rem' }}>
+            <div style={{ textAlign: 'center', padding: '1rem', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
               ↑ Live data. Updated in real time every scan.
             </div>
           </div>
@@ -273,10 +273,10 @@ export default function LandingPage() {
               <div style={{ display: 'flex', gap: '0.25rem', marginBottom: '0.75rem' }}>
                 {[...Array(5)].map((_, j) => <Star key={j} size={14} color="#ffbd2e" fill="#ffbd2e" />)}
               </div>
-              <p style={{ color: '#ccc', fontStyle: 'italic', fontSize: '0.9rem', lineHeight: 1.7, marginBottom: '1rem' }}>&ldquo;{t.quote}&rdquo;</p>
+              <p style={{ color: 'var(--text-secondary)', fontStyle: 'italic', fontSize: '0.9rem', lineHeight: 1.7, marginBottom: '1rem' }}>&ldquo;{t.quote}&rdquo;</p>
               <div>
                 <div style={{ fontWeight: 700, fontSize: '0.85rem' }}>{t.name}</div>
-                <div style={{ fontSize: '0.75rem', color: '#666' }}>{t.role}</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{t.role}</div>
               </div>
             </div>
           ))}
@@ -291,7 +291,7 @@ export default function LandingPage() {
           <div className="glass-card pricing-card">
             <h3>Starter</h3>
             <div className="pricing-price" style={{ display: 'flex', alignItems: 'baseline', gap: '0.25rem' }}>
-              <span style={{ fontSize: '1rem', color: '#666', textDecoration: 'line-through' }}>$49</span>
+              <span style={{ fontSize: '1rem', color: 'var(--text-muted)', textDecoration: 'line-through' }}>$49</span>
               <span>$29</span><span style={{ fontSize: '1rem', color: 'var(--text-secondary)' }}>/mo</span>
             </div>
             <ul className="pricing-features">
@@ -306,7 +306,7 @@ export default function LandingPage() {
             <div style={{ position: 'absolute', top: '-14px', left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(135deg, #7c3aed, #4facfe)', color: '#fff', padding: '0.3rem 1.25rem', borderRadius: '999px', fontSize: '0.78rem', fontWeight: 700, whiteSpace: 'nowrap' }}>⭐ Most Popular</div>
             <h3>Growth</h3>
             <div className="pricing-price" style={{ display: 'flex', alignItems: 'baseline', gap: '0.25rem' }}>
-              <span style={{ fontSize: '1rem', color: '#666', textDecoration: 'line-through' }}>$149</span>
+              <span style={{ fontSize: '1rem', color: 'var(--text-muted)', textDecoration: 'line-through' }}>$149</span>
               <span>$79</span><span style={{ fontSize: '1rem', color: 'var(--text-secondary)' }}>/mo</span>
             </div>
             <ul className="pricing-features">
@@ -322,7 +322,7 @@ export default function LandingPage() {
           <div className="glass-card pricing-card">
             <h3>Agency</h3>
             <div className="pricing-price" style={{ display: 'flex', alignItems: 'baseline', gap: '0.25rem' }}>
-              <span style={{ fontSize: '1rem', color: '#666', textDecoration: 'line-through' }}>$399</span>
+              <span style={{ fontSize: '1rem', color: 'var(--text-muted)', textDecoration: 'line-through' }}>$399</span>
               <span>$199</span><span style={{ fontSize: '1rem', color: 'var(--text-secondary)' }}>/mo</span>
             </div>
             <ul className="pricing-features">
@@ -355,7 +355,7 @@ export default function LandingPage() {
                 onChange={e => setEmail(e.target.value)}
                 placeholder="Your work email"
                 required
-                style={{ padding: '0.8rem 1.25rem', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '10px', color: '#fff', fontSize: '0.95rem', outline: 'none', width: 'min(100%, 300px)' }}
+                style={{ padding: '0.8rem 1.25rem', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '10px', color: 'var(--text-primary)', fontSize: '0.95rem', outline: 'none', width: 'min(100%, 300px)' }}
               />
               <button type="submit" className="btn-primary" disabled={submitting} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 {submitting ? 'Joining...' : <>Claim Early Access <ArrowRight size={16} /></>}
@@ -367,7 +367,7 @@ export default function LandingPage() {
             </div>
           )}
           <div style={{ marginTop: '2rem' }}>
-            <button onClick={() => router.push('/login')} style={{ background: 'none', border: 'none', color: '#555', fontSize: '0.85rem', cursor: 'pointer' }}>
+            <button onClick={() => router.push('/login')} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '0.85rem', cursor: 'pointer' }}>
               Already have an account? Sign in →
             </button>
           </div>
@@ -382,13 +382,13 @@ export default function LandingPage() {
             <div style={{ display: 'flex', gap: '2rem' }}>
               {['Features', 'Pricing', 'Contact'].map(link => (
                 <a key={link} href="#" style={{ color: 'var(--text-secondary)', transition: 'color 0.2s' }}
-                  onMouseOver={e => (e.currentTarget.style.color = '#fff')}
+                  onMouseOver={e => (e.currentTarget.style.color = 'var(--text-primary)')}
                   onMouseOut={e => (e.currentTarget.style.color = 'var(--text-secondary)')}>
                   {link}
                 </a>
               ))}
             </div>
-            <div style={{ fontSize: '0.85rem', color: '#555' }}>© 2026 LEADSORA. All rights reserved.</div>
+            <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>© 2026 LEADSORA. All rights reserved.</div>
           </div>
         </div>
       </footer>
