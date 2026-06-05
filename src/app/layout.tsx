@@ -24,7 +24,7 @@ export default function RootLayout({
             __html: `
               (function() {
                 try {
-                  var saved = localStorage.getItem('leadsora_theme');
+                  var saved = localStorage.getItem('leadsora_theme_v2');
                   var theme = saved === 'dark' ? 'dark' : 'light';
                   document.documentElement.setAttribute('data-theme', theme);
                 } catch(e) {
