@@ -1,9 +1,11 @@
 "use client";
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext } from 'react';
+import { useSession, signIn, signOut } from 'next-auth/react';
 
 interface User {
   name: string;
   email: string;
+  image?: string;
 }
 
 interface AuthContextType {
@@ -18,54 +20,49 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: session, status } = useSession();
+  const isLoading = status === 'loading';
 
-  useEffect(() => {
-    const savedUser = localStorage.getItem('dealfinder_user');
-    if (savedUser) {
-      try { setUser(JSON.parse(savedUser)); } catch (e) {}
-    }
-    setIsLoading(false);
-  }, []);
+  const user: User | null = session?.user
+    ? {
+        name: session.user.name || 'User',
+        email: session.user.email || '',
+        image: session.user.image || undefined,
+      }
+    : null;
 
-  const signup = async (name: string, email: string, password: string): Promise<boolean> => {
-    // Store user credentials locally (demo mode)
-    const users = JSON.parse(localStorage.getItem('dealfinder_users') || '[]');
-    const exists = users.find((u: any) => u.email === email);
-    if (exists) return false;
-
-    users.push({ name, email, password });
-    localStorage.setItem('dealfinder_users', JSON.stringify(users));
-
-    const newUser = { name, email };
-    localStorage.setItem('dealfinder_user', JSON.stringify(newUser));
-    setUser(newUser);
-    return true;
-  };
-
+  // Email/password login — stores users in localStorage for now
   const login = async (email: string, password: string): Promise<boolean> => {
     const users = JSON.parse(localStorage.getItem('dealfinder_users') || '[]');
     const found = users.find((u: any) => u.email === email && u.password === password);
     if (!found) return false;
+    // Sign in with credentials via NextAuth
+    const result = await signIn('credentials', {
+      redirect: false,
+      email,
+      password,
+    });
+    return !result?.error;
+  };
 
-    const loggedInUser = { name: found.name, email: found.email };
-    localStorage.setItem('dealfinder_user', JSON.stringify(loggedInUser));
-    setUser(loggedInUser);
+  const signup = async (name: string, email: string, password: string): Promise<boolean> => {
+    const users = JSON.parse(localStorage.getItem('dealfinder_users') || '[]');
+    const exists = users.find((u: any) => u.email === email);
+    if (exists) return false;
+    users.push({ name, email, password });
+    localStorage.setItem('dealfinder_users', JSON.stringify(users));
+    // Auto login after signup
+    await signIn('credentials', { redirect: false, email, password });
     return true;
   };
 
   const logout = () => {
-    localStorage.removeItem('dealfinder_user');
-    setUser(null);
+    signOut({ callbackUrl: '/login' });
   };
 
+  // Real Google OAuth
   const loginWithGoogle = async (): Promise<boolean> => {
-    // Simulate Google Login delay
-    await new Promise(resolve => setTimeout(resolve, 800));
-    const googleUser = { name: 'Google User', email: 'user@gmail.com' };
-    localStorage.setItem('dealfinder_user', JSON.stringify(googleUser));
-    setUser(googleUser);
+    await signIn('google', { callbackUrl: '/dashboard' });
     return true;
   };
 

@@ -1,11 +1,12 @@
 "use client";
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Mail, Lock, User, ArrowRight, Loader2, Eye, EyeOff } from 'lucide-react';
+import { signIn } from 'next-auth/react';
+import { Mail, Lock, ArrowRight, Loader2, Eye, EyeOff } from 'lucide-react';
 import Logo from '../../components/Logo';
 
 export default function LoginPage() {
-  const { login, loginWithGoogle } = useAuth();
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -16,7 +17,6 @@ export default function LoginPage() {
     e.preventDefault();
     setError('');
     setIsLoading(true);
-
     const success = await login(email, password);
     if (success) {
       window.location.href = '/dashboard';
@@ -26,13 +26,9 @@ export default function LoginPage() {
     setIsLoading(false);
   };
 
-  const handleGoogleLogin = async () => {
+  const handleGoogleLogin = () => {
     setIsLoading(true);
-    const success = await loginWithGoogle();
-    if (success) {
-      window.location.href = '/dashboard';
-    }
-    setIsLoading(false);
+    signIn('google', { callbackUrl: '/dashboard' });
   };
 
   return (
