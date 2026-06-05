@@ -56,6 +56,10 @@ function Dashboard() {
   const [hunterData, setHunterData] = useState<{[key: string]: any}>({});
   const [fetchingEmailsFor, setFetchingEmailsFor] = useState<string | null>(null);
   const [generatingId, setGeneratingId] = useState<string | null>(null);
+  const [linkedinDMs, setLinkedinDMs] = useState<{[key: string]: string}>({});
+  const [generatingDmId, setGeneratingDmId] = useState<string | null>(null);
+  const [linkedinDMModal, setLinkedinDMModal] = useState<{ lead: any; dm: string } | null>(null);
+  const [copiedDmId, setCopiedDmId] = useState<string | null>(null);
   const [leads, setLeads] = useState<any[]>([]);
   const [mounted, setMounted] = useState(false);
 
@@ -459,6 +463,44 @@ function Dashboard() {
     }
   };
 
+  const generateLinkedInDM = async (lead: any) => {
+    if (generatingDmId) return;
+    // If we already have a DM, just open the modal
+    if (linkedinDMs[lead.id]) {
+      setLinkedinDMModal({ lead, dm: linkedinDMs[lead.id] });
+      return;
+    }
+    setGeneratingDmId(lead.id);
+    try {
+      const res = await fetch('/api/generate-linkedin-dm', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          company: lead.company,
+          title: lead.problem?.replace('Hiring: ', '') || lead.title || 'Open Role',
+          contactName: lead.contactName,
+          persona: userPersona,
+          scanMode,
+          senderName: businessProfile.fullName,
+          companyContext: businessProfile.companyContext,
+          deepDiveContext: companyReports[lead.id] || null,
+        }),
+      });
+      const data = await res.json();
+      if (data.dm) {
+        setLinkedinDMs(prev => ({ ...prev, [lead.id]: data.dm }));
+        setLinkedinDMModal({ lead, dm: data.dm });
+      } else {
+        alert('LinkedIn DM Error: ' + (data.error || 'Failed to generate DM.'));
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Network error generating LinkedIn DM.');
+    } finally {
+      setGeneratingDmId(null);
+    }
+  };
+
   const fetchEmailsWithHunter = async (lead: any) => {
     if (!hunterKey) return alert("Please add your Hunter.io API key in the settings first!");
     setFetchingEmailsFor(lead.id);
@@ -825,6 +867,9 @@ function Dashboard() {
                             </a>
                             <button onClick={() => { if(!aiOutreach[lead.id]) generateAIOutreach(lead); else handleCopy(lead.id, getEmailBody(lead)); }} style={{ background: copiedId === lead.id ? 'rgba(39, 201, 63, 0.1)' : 'rgba(255,255,255,0.05)', border: `1px solid ${copiedId === lead.id ? '#27c93f' : '#333'}`, cursor: 'pointer', color: copiedId === lead.id ? '#27c93f' : '#ccc', display: 'inline-flex', alignItems: 'center', padding: '4px 10px', borderRadius: '4px', fontSize: '0.75rem', gap: '6px', transition: 'all 0.2s' }} title={!aiOutreach[lead.id] ? "Generate pitch to copy" : "Copy to Clipboard"}>
                               {copiedId === lead.id ? <><Check size={12} /> Copied</> : <><Copy size={12} /> Copy</>}
+                            </button>
+                            <button onClick={() => generateLinkedInDM(lead)} disabled={!!generatingDmId} style={{ background: linkedinDMs[lead.id] ? 'rgba(10, 102, 194, 0.2)' : 'rgba(10,102,194,0.08)', border: '1px solid rgba(10,102,194,0.4)', color: '#0a66c2', display: 'inline-flex', alignItems: 'center', padding: '4px 10px', borderRadius: '4px', fontSize: '0.75rem', gap: '6px', cursor: generatingDmId ? 'not-allowed' : 'pointer', transition: 'all 0.2s', fontWeight: 600 }} title="Generate LinkedIn DM">
+                              {generatingDmId === lead.id ? <Loader2 size={12} className="animate-spin" /> : '💼'} {linkedinDMs[lead.id] ? 'View DM' : 'LinkedIn DM'}
                             </button>
                           </div>
                           
@@ -1330,6 +1375,68 @@ function Dashboard() {
                   <div style={{ color: '#ccc', fontSize: '0.9rem', lineHeight: '1.5', whiteSpace: 'pre-wrap' }}>{reportModal.report.tech_stack}</div>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* LinkedIn DM Modal */}
+      {linkedinDMModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.88)', backdropFilter: 'blur(10px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, padding: '1rem' }}>
+          <div style={{ background: '#0a0a14', border: '1px solid rgba(10,102,194,0.4)', borderRadius: '20px', padding: '2.5rem', width: '100%', maxWidth: '520px', position: 'relative', boxShadow: '0 0 60px rgba(10,102,194,0.15)' }}>
+            <button onClick={() => setLinkedinDMModal(null)} style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', padding: '7px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <X size={18} />
+            </button>
+
+            {/* Header */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '1.75rem' }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'linear-gradient(135deg, #0a66c2, #0077b5)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', flexShrink: 0 }}>💼</div>
+              <div>
+                <h2 style={{ margin: 0, fontSize: '1.25rem', color: '#fff', fontWeight: 700 }}>LinkedIn DM Ready</h2>
+                <p style={{ margin: '2px 0 0', color: '#0a66c2', fontSize: '0.85rem', fontWeight: 600 }}>{linkedinDMModal.lead.company}</p>
+              </div>
+            </div>
+
+            {/* DM Content */}
+            <div style={{ background: 'rgba(10, 102, 194, 0.06)', border: '1px solid rgba(10,102,194,0.2)', borderRadius: '12px', padding: '1.25rem', marginBottom: '1.5rem', position: 'relative' }}>
+              <div style={{ position: 'absolute', top: '-10px', left: '16px', background: '#0a66c2', color: '#fff', fontSize: '0.65rem', padding: '2px 10px', borderRadius: '999px', fontWeight: 700, letterSpacing: '0.5px' }}>✨ AI GENERATED DM</div>
+              <p style={{ margin: 0, color: '#e2e8f0', fontSize: '0.95rem', lineHeight: '1.7', whiteSpace: 'pre-wrap', fontFamily: 'inherit' }}>{linkedinDMModal.dm}</p>
+            </div>
+
+            {/* Character count */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+              <span style={{ fontSize: '0.75rem', color: linkedinDMModal.dm.length > 300 ? '#ff5f56' : '#27c93f' }}>
+                {linkedinDMModal.dm.length} / 300 characters {linkedinDMModal.dm.length <= 300 ? '✓ LinkedIn safe' : '⚠ Too long'}
+              </span>
+              <span style={{ fontSize: '0.75rem', color: '#666' }}>Ready to paste into LinkedIn</span>
+            </div>
+
+            {/* Action Buttons */}
+            <div style={{ display: 'flex', gap: '0.75rem', flexDirection: 'column' }}>
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(linkedinDMModal.dm);
+                  setCopiedDmId(linkedinDMModal.lead.id);
+                  setTimeout(() => setCopiedDmId(null), 2000);
+                }}
+                style={{ width: '100%', padding: '14px', background: copiedDmId === linkedinDMModal.lead.id ? 'linear-gradient(135deg, #27c93f, #10b981)' : 'linear-gradient(135deg, #0a66c2, #0077b5)', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '1rem', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', transition: 'all 0.2s' }}
+              >
+                {copiedDmId === linkedinDMModal.lead.id ? <><Check size={18} /> Copied to Clipboard!</> : <><Copy size={18} /> Copy DM</>}
+              </button>
+              <a
+                href={`https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(linkedinDMModal.lead.company)}`}
+                target="_blank"
+                rel="noreferrer"
+                style={{ width: '100%', padding: '12px', background: 'transparent', color: '#0a66c2', border: '1px solid rgba(10,102,194,0.4)', borderRadius: '10px', fontSize: '0.9rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', textDecoration: 'none', transition: 'all 0.2s', boxSizing: 'border-box' }}
+              >
+                🔍 Find Contact on LinkedIn →
+              </a>
+              <button
+                onClick={() => { generateLinkedInDM({ ...linkedinDMModal.lead, id: linkedinDMModal.lead.id + '_regen' }); setLinkedinDMModal(null); setTimeout(() => { setGeneratingDmId(null); }, 100); }}
+                style={{ background: 'none', border: 'none', color: '#555', fontSize: '0.8rem', cursor: 'pointer', textAlign: 'center' }}
+              >
+                ↻ Regenerate DM
+              </button>
             </div>
           </div>
         </div>
