@@ -1,6 +1,5 @@
 import { Redis } from '@upstash/redis';
 import { NextRequest, NextResponse } from 'next/server';
-import { scanAllSources } from '../../../utils/leadSources';
 
 const redisUrl = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL || '';
 const redisToken = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN || '';
@@ -13,11 +12,10 @@ if (redisUrl && redisToken) {
 export async function GET(request: NextRequest) {
   try {
     if (!redis) {
-      console.error('Redis is not configured. Ghost Mode aborted.');
       return NextResponse.json({ error: 'Redis is not configured' }, { status: 500 });
     }
 
-    // Verify Vercel Cron Secret for security
+    // Security check
     const authHeader = request.headers.get('authorization');
     if (process.env.CRON_SECRET && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -30,72 +28,55 @@ export async function GET(request: NextRequest) {
     for (const email of activeUsers) {
       const configStr = await redis.get(`ghostConfig_${email}`);
       if (!configStr) continue;
-      
+
       const config = typeof configStr === 'string' ? JSON.parse(configStr) : configStr;
-      
-      // Check if it's time to run (assuming UTC for now, or just running every hour for testing)
-      const targetHour = parseInt(config.scanTime.split(':')[0] || '8');
-      
-      // For MVP, we will run if it matches the hour. (If you want to run every hour for testing, comment this out)
-      if (currentUTCHour !== targetHour) {
-        console.log(`Skipping ${email} - target hour ${targetHour} != current UTC hour ${currentUTCHour}`);
-        continue;
-      }
+
+      // Check if it's the right hour to scan
+      const targetHour = parseInt((config.scanTime || '08:00').split(':')[0]);
+      if (currentUTCHour !== targetHour) continue;
 
       console.log(`Running Ghost Scan for ${email}`);
       runCount++;
 
-      // 1. Run the Scanner
-      // scanAllSources expects (searchQuery, location, userPersona, scanMode, callback)
-      const results = await scanAllSources(
-        config.keywords || 'Software Engineer',
-        'Global',
-        'B2B Agency',
-        config.scanMode || 'hiring',
-        () => {} // No-op callback since we are in background
-      );
+      // Call existing /api/leads endpoint (server-compatible, no browser deps)
+      const baseUrl = request.nextUrl.origin;
+      const scanRes = await fetch(`${baseUrl}/api/leads?search=${encodeURIComponent(config.keywords || 'Software Engineer')}`);
+      if (!scanRes.ok) continue;
 
-      if (!results || results.length === 0) continue;
+      const results = await scanRes.json();
+      const leads: any[] = Array.isArray(results) ? results : [];
 
-      // 2. Filter for whales & apply leadsPerDay limit
-      const whales = results.filter((l: any) => l.intentScore >= 90).slice(0, config.leadsPerDay || 10);
-      
+      // Filter whales with high intent score
+      const whales = leads.filter((l: any) => (l.intentScore || 0) >= 90).slice(0, config.leadsPerDay || 10);
       if (whales.length === 0) continue;
 
-      // 3. Save leads back to DB
-      const existingLeadsStr = await redis.get(`savedLeads_${email}`);
-      const existingLeads = existingLeadsStr ? (typeof existingLeadsStr === 'string' ? JSON.parse(existingLeadsStr) : existingLeadsStr) : [];
-      
-      // Avoid duplicates
-      const existingIds = new Set(existingLeads.map((l: any) => l.id));
+      // Deduplicate
+      const existingStr = await redis.get(`savedLeads_${email}`);
+      const existing: any[] = existingStr
+        ? typeof existingStr === 'string' ? JSON.parse(existingStr) : existingStr
+        : [];
+      const existingIds = new Set(existing.map((l: any) => l.id));
       const newWhales = whales.filter((w: any) => !existingIds.has(w.id));
 
       if (newWhales.length > 0) {
-        const updatedLeads = [...newWhales, ...existingLeads];
-        await redis.set(`savedLeads_${email}`, JSON.stringify(updatedLeads));
+        await redis.set(`savedLeads_${email}`, JSON.stringify([...newWhales, ...existing]));
 
-        // 4. Fire Slack Notification for the top whale
+        // Fire Slack notification for top whale
         if (config.slackWebhook) {
-          const topWhale = newWhales[0];
           try {
-            await fetch(request.nextUrl.origin + '/api/slack-notify', {
+            await fetch(`${baseUrl}/api/slack-notify`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                webhookUrl: config.slackWebhook,
-                type: 'new_lead',
-                lead: topWhale
-              })
+              body: JSON.stringify({ webhookUrl: config.slackWebhook, type: 'new_lead', lead: newWhales[0] }),
             });
           } catch (e) {
-            console.error('Failed to send Slack webhook', e);
+            console.error('Slack notify failed', e);
           }
         }
       }
     }
 
     return NextResponse.json({ success: true, processedUsers: runCount });
-
   } catch (error: any) {
     console.error('Ghost Mode Cron Error:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
