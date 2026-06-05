@@ -1,8 +1,9 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
-import { Activity, Loader2, Download, Check, Copy, Clock, Mail, Trash2, LogOut, Sparkles, X, User, Settings, AlignLeft, AlignJustify, FileText, BarChart2, UserCheck } from 'lucide-react';
+import { Activity, Loader2, Download, Check, Copy, Clock, Mail, Trash2, LogOut, Sparkles, X, User, Settings, AlignLeft, AlignJustify, FileText, BarChart2, UserCheck, Sun, Moon } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import Logo from '../../components/Logo';
 import { scanAllSources } from '../../utils/leadSources';
 
@@ -24,6 +25,7 @@ const Typewriter = ({ text, delay = 10 }: { text: string, delay?: number }) => {
 
 function Dashboard() {
   const { user, logout, isLoading: authLoading } = useAuth();
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     if (!authLoading && !user) window.location.href = '/login';
@@ -592,43 +594,48 @@ function Dashboard() {
   return (
     <>
       {/* Navbar */}
-      <nav style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 1rem', borderBottom: '1px solid #27272a', background: 'rgba(10,10,10,0.95)', backdropFilter: 'blur(10px)', position: 'sticky', top: 0, zIndex: 100, flexWrap: 'nowrap', gap: '0.5rem' }}>
+      <nav style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 1.25rem', borderBottom: '1px solid var(--nav-border)', background: 'var(--nav-bg)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', position: 'sticky', top: 0, zIndex: 100, flexWrap: 'nowrap', gap: '0.5rem' }}>
         <Logo style={{ height: '48px', width: 'auto', flexShrink: 0 }} />
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'nowrap', overflow: 'hidden' }}>
           
-          {/* Ghost Mode Toggle — label hidden on mobile */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: ghostModeEnabled ? 'rgba(39, 201, 63, 0.1)' : 'rgba(255,255,255,0.05)', padding: '5px 8px', borderRadius: '8px', border: `1px solid ${ghostModeEnabled ? '#27c93f' : '#333'}`, flexShrink: 0 }}>
-            <span style={{ fontSize: '0.8rem', color: ghostModeEnabled ? '#27c93f' : '#888', fontWeight: 600, whiteSpace: 'nowrap' }}>
+          {/* Ghost Mode Toggle */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: ghostModeEnabled ? 'var(--green-light)' : 'var(--surface)', padding: '5px 8px', borderRadius: '8px', border: `1px solid ${ghostModeEnabled ? 'var(--green)' : 'var(--border)'}`, flexShrink: 0 }}>
+            <span style={{ fontSize: '0.8rem', color: ghostModeEnabled ? 'var(--green)' : 'var(--text-muted)', fontWeight: 600, whiteSpace: 'nowrap' }}>
               <span className="hide-on-mobile">👻 Ghost Mode</span>
               <span className="show-on-mobile" style={{ display: 'none' }}>👻</span>
             </span>
             <label style={{ position: 'relative', display: 'inline-block', width: '30px', height: '18px', flexShrink: 0 }}>
               <input type="checkbox" checked={ghostModeEnabled} onChange={(e) => { setGhostModeEnabled(e.target.checked); if (e.target.checked) setShowGhostConfig(true); }} style={{ opacity: 0, width: 0, height: 0 }} />
-              <span style={{ position: 'absolute', cursor: 'pointer', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: ghostModeEnabled ? '#27c93f' : '#555', transition: '.4s', borderRadius: '34px' }}>
-                <span style={{ position: 'absolute', height: '12px', width: '12px', left: '3px', bottom: '3px', backgroundColor: 'white', transition: '.4s', borderRadius: '50%', transform: ghostModeEnabled ? 'translateX(12px)' : 'translateX(0)' }}></span>
+              <span style={{ position: 'absolute', cursor: 'pointer', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: ghostModeEnabled ? 'var(--green)' : 'var(--text-muted)', transition: '.35s', borderRadius: '34px' }}>
+                <span style={{ position: 'absolute', height: '12px', width: '12px', left: '3px', bottom: '3px', backgroundColor: 'white', transition: '.35s', borderRadius: '50%', transform: ghostModeEnabled ? 'translateX(12px)' : 'translateX(0)' }}></span>
               </span>
             </label>
-            {ghostModeEnabled && <button onClick={() => setShowGhostConfig(true)} style={{ background: 'none', border: 'none', color: '#27c93f', cursor: 'pointer', padding: 0, flexShrink: 0 }}><Settings size={13} /></button>}
+            {ghostModeEnabled && <button onClick={() => setShowGhostConfig(true)} style={{ background: 'none', border: 'none', color: 'var(--green)', cursor: 'pointer', padding: 0, flexShrink: 0 }}><Settings size={13} /></button>}
           </div>
 
+          {/* Theme Toggle */}
+          <button onClick={toggleTheme} className="theme-toggle" title={theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}>
+            {theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}
+          </button>
+
           {/* Profile Button */}
-          <button onClick={() => setShowProfileModal(true)} style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '5px 8px', background: businessProfile.fullName ? 'rgba(124, 58, 237, 0.1)' : 'rgba(255,189,46,0.1)', border: `1px solid ${businessProfile.fullName ? 'rgba(124, 58, 237, 0.3)' : 'rgba(255,189,46,0.3)'}`, borderRadius: '8px', color: businessProfile.fullName ? '#a78bfa' : '#ffbd2e', fontSize: '0.78rem', cursor: 'pointer', fontWeight: 600, flexShrink: 0, maxWidth: '110px', overflow: 'hidden' }}>
+          <button onClick={() => setShowProfileModal(true)} style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '5px 8px', background: businessProfile.fullName ? 'var(--purple-light)' : 'var(--yellow-light)', border: `1px solid ${businessProfile.fullName ? 'var(--purple)' : 'var(--yellow)'}`, borderRadius: '8px', color: businessProfile.fullName ? 'var(--purple)' : 'var(--yellow)', fontSize: '0.78rem', cursor: 'pointer', fontWeight: 600, flexShrink: 0, maxWidth: '110px', overflow: 'hidden' }}>
             <User size={13} style={{ flexShrink: 0 }} />
             <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{businessProfile.fullName?.split(' ')[0] || 'Profile'}</span>
           </button>
 
           <button
             onClick={() => { logout(); window.location.href = '/login'; }}
-            style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '5px 8px', background: 'transparent', border: '1px solid #333', borderRadius: '8px', color: '#888', fontSize: '0.78rem', cursor: 'pointer', fontFamily: "'Inter', sans-serif", flexShrink: 0, whiteSpace: 'nowrap' }}
-            onMouseOver={e => { (e.currentTarget as HTMLElement).style.borderColor = '#ff5f56'; (e.currentTarget as HTMLElement).style.color = '#ff5f56'; }}
-            onMouseOut={e => { (e.currentTarget as HTMLElement).style.borderColor = '#333'; (e.currentTarget as HTMLElement).style.color = '#888'; }}
+            style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '5px 8px', background: 'transparent', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--text-secondary)', fontSize: '0.78rem', cursor: 'pointer', fontFamily: "'Inter', sans-serif", flexShrink: 0, whiteSpace: 'nowrap', transition: 'all 0.2s' }}
+            onMouseOver={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--red)'; (e.currentTarget as HTMLElement).style.color = 'var(--red)'; }}
+            onMouseOut={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)'; (e.currentTarget as HTMLElement).style.color = 'var(--text-secondary)'; }}
           ><LogOut size={13} /> <span className="hide-on-mobile">Sign Out</span></button>
         </div>
       </nav>
 
       {/* Scanner Hero */}
       <section className="hero container text-center" style={{ paddingTop: '3rem', paddingBottom: '2rem' }}>
-        <h1 style={{ fontSize: 'clamp(1.8rem, 4vw, 3rem)' }}>Live Intent Scanner</h1>
+        <h1 style={{ fontSize: 'clamp(1.8rem, 4vw, 3rem)', color: 'var(--text-primary)' }}>Live Intent Scanner</h1>
         <p style={{ color: 'var(--text-secondary)' }}>Enter your niche and find companies actively looking for what you offer.</p>
       </section>
 
