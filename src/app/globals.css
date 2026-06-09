@@ -658,6 +658,23 @@ select option { background: var(--surface-raised); color: var(--text-primary); }
 
 /* ── Mobile Responsive ── */
 @media (max-width: 768px) {
+  /* Mobile Layout Overhauls */
+  .dashboard-header { flex-direction: column !important; align-items: flex-start !important; gap: 1rem !important; }
+  .dashboard-controls-mobile { width: 100% !important; justify-content: flex-start !important; }
+  .dashboard-controls-mobile button { width: 100% !important; justify-content: center !important; }
+  .dashboard-controls-mobile div { width: 100% !important; justify-content: center !important; }
+  
+  .filter-bar-mobile { flex-direction: column !important; align-items: stretch !important; }
+  .filter-bar-mobile select { width: 100% !important; }
+
+  .profile-input-row { flex-direction: column !important; align-items: stretch !important; gap: 0.5rem !important; }
+  .profile-input-row button { width: 100% !important; justify-content: center !important; }
+
+  .save-profile-btn-row { flex-direction: column !important; gap: 0.5rem !important; }
+  .save-profile-btn-row button { width: 100% !important; margin: 0 !important; }
+  
+  .ghost-modal-content { max-height: 80vh !important; overflow-y: auto !important; padding: 1rem !important; }
+
   .mobile-menu-btn { display: block !important; }
   .desktop-nav-links { display: none !important; }
   .hide-on-mobile { display: none !important; }

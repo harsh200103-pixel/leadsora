@@ -727,7 +727,7 @@ function Dashboard() {
 
           {/* Settings */}
           {/* Settings & Nav */}
-          <div className="text-center mt-4" style={{ display: 'flex', justifyContent: 'center', gap: '1rem', alignItems: 'center' }}>
+          <div className="text-center mt-4" style={{ display: 'flex', justifyContent: 'center', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
             <Link href="/analytics" style={{ color: '#7c3aed', textDecoration: 'none', fontSize: '0.875rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
               <BarChart2 size={16} /> View Analytics Dashboard
             </Link>
@@ -792,7 +792,7 @@ function Dashboard() {
               <div className="dashboard-body" style={{ background: 'var(--surface)' }}>
 
                 {/* ── Filter & Sort Bar ── */}
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1rem', padding: '0.75rem 1rem', background: 'rgba(255,255,255,0.02)', borderRadius: '24px', border: '1px solid #222', alignItems: 'center' }}>
+                <div className="filter-bar-mobile" style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1rem', padding: '0.75rem 1rem', background: 'rgba(255,255,255,0.02)', borderRadius: '24px', border: '1px solid #222', alignItems: 'center' }}>
                   <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginRight: '0.25rem' }}>🎛️ Filter:</span>
 
                   {/* Score filter */}
@@ -1225,7 +1225,7 @@ function Dashboard() {
               ].map(field => (
                 <div key={field.key}>
                   <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.5px' }}>{field.icon} {field.label}</label>
-                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <div className="profile-input-row" style={{ display: 'flex', gap: '0.5rem' }}>
                     <input
                       type="text"
                       value={(businessProfile as any)[field.key]}
@@ -1270,7 +1270,7 @@ function Dashboard() {
               </div>
             )}
 
-            <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
+            <div className="save-profile-btn-row" style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
               <button onClick={() => { saveBusinessProfile(businessProfile); setShowProfileModal(false); }} style={{ flex: 1, padding: '12px', background: 'linear-gradient(135deg, #7c3aed, #4facfe)', color: 'var(--text-primary)', border: 'none', borderRadius: '24px', fontSize: '1rem', fontWeight: 600, cursor: 'pointer' }}>
                 Save Profile
               </button>
@@ -1288,7 +1288,7 @@ function Dashboard() {
           <div style={{ background: 'var(--surface)', border: '1px solid var(--input-border)', borderRadius: '24px', padding: '2.5rem', width: '100%', maxWidth: '550px', position: 'relative', boxShadow: 'var(--shadow-xl)' }}>
             <button onClick={() => setShowGhostConfig(false)} style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)', padding: '8px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onMouseOver={e => e.currentTarget.style.background = 'rgba(255,0,0,0.5)'} onMouseOut={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}><X size={20} /></button>
 
-            <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+            <div className="ghost-modal-content" style={{ textAlign: 'center', marginBottom: '2rem' }}>
               <h2 style={{ margin: '0 0 0.5rem 0', fontSize: '1.5rem', color: '#27c93f' }}>👻 Ghost Mode Configuration</h2>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>Configure when and how the autonomous engine hunts for leads.</p>
             </div>
