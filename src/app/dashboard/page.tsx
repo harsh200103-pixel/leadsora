@@ -856,7 +856,7 @@ function Dashboard() {
                         </div>
 
                         {/* Outreach Box */}
-                        <div className="ai-box-mobile" style={{ background: 'rgba(0,0,0,0.3)', padding: '1rem', borderRadius: '8px', border: `1px solid ${aiOutreach[lead.id] ? '#7c3aed55' : '#333'}`, position: 'relative', marginTop: '1rem', display: 'flex', flexDirection: 'column' }}>
+                        <div className="ai-box-mobile glass-card" style={{ padding: '1rem', borderRadius: '12px', border: `1px solid ${aiOutreach[lead.id] ? 'var(--accent)' : 'var(--border)'}`, position: 'relative', marginTop: '1rem', display: 'flex', flexDirection: 'column' }}>
                           {aiOutreach[lead.id] && <span style={{ position: 'absolute', top: '-10px', left: '12px', background: 'linear-gradient(135deg,#7c3aed,#4facfe)', color: 'var(--text-primary)', fontSize: '0.65rem', padding: '2px 8px', borderRadius: '999px', fontWeight: 700 }}>✨ AI Generated</span>}
                           
                           {/* Omnichannel Blitz / AI Actions */}
@@ -872,7 +872,7 @@ function Dashboard() {
                             }} style={{ background: 'rgba(79, 172, 254, 0.1)', border: '1px solid rgba(79, 172, 254, 0.3)', color: '#4facfe', display: 'inline-flex', alignItems: 'center', padding: '4px 10px', borderRadius: '4px', fontSize: '0.75rem', textDecoration: 'none', gap: '6px' }} title={!aiOutreach[lead.id] || (!foundEmails[lead.id] && hunterKey) ? "Generate Pitch & Find Email" : "Send in Gmail"}>
                               <Mail size={12} /> Gmail
                             </a>
-                            <button onClick={() => { if(!aiOutreach[lead.id]) generateAIOutreach(lead); else handleCopy(lead.id, getEmailBody(lead)); }} style={{ background: copiedId === lead.id ? 'rgba(39, 201, 63, 0.1)' : 'rgba(255,255,255,0.05)', border: `1px solid ${copiedId === lead.id ? '#27c93f' : '#333'}`, cursor: 'pointer', color: copiedId === lead.id ? '#27c93f' : '#ccc', display: 'inline-flex', alignItems: 'center', padding: '4px 10px', borderRadius: '4px', fontSize: '0.75rem', gap: '6px', transition: 'all 0.2s' }} title={!aiOutreach[lead.id] ? "Generate pitch to copy" : "Copy to Clipboard"}>
+                            <button onClick={() => { if(!aiOutreach[lead.id]) generateAIOutreach(lead); else handleCopy(lead.id, getEmailBody(lead)); }} style={{ background: copiedId === lead.id ? 'var(--green-light)' : 'var(--input-bg)', border: `1px solid ${copiedId === lead.id ? 'var(--green)' : 'var(--border)'}`, cursor: 'pointer', color: copiedId === lead.id ? 'var(--green)' : 'var(--text-secondary)', display: 'inline-flex', alignItems: 'center', padding: '4px 10px', borderRadius: '4px', fontSize: '0.75rem', gap: '6px', transition: 'all 0.2s' }} title={!aiOutreach[lead.id] ? "Generate pitch to copy" : "Copy to Clipboard"}>
                               {copiedId === lead.id ? <><Check size={12} /> Copied</> : <><Copy size={12} /> Copy</>}
                             </button>
                             <button onClick={() => generateLinkedInDM(lead)} disabled={!!generatingDmId} style={{ background: linkedinDMs[lead.id] ? 'rgba(10, 102, 194, 0.2)' : 'rgba(10,102,194,0.08)', border: '1px solid rgba(10,102,194,0.4)', color: '#0a66c2', display: 'inline-flex', alignItems: 'center', padding: '4px 10px', borderRadius: '4px', fontSize: '0.75rem', gap: '6px', cursor: generatingDmId ? 'not-allowed' : 'pointer', transition: 'all 0.2s', fontWeight: 600 }} title="Generate LinkedIn DM">
@@ -880,7 +880,7 @@ function Dashboard() {
                             </button>
                           </div>
                           
-                          <p className="ai-text-mobile" style={{ fontSize: '0.875rem', color: aiOutreach[lead.id] ? '#e2e8f0' : '#888', margin: 0 }}>
+                          <p className="ai-text-mobile" style={{ fontSize: '0.875rem', color: aiOutreach[lead.id] ? 'var(--text-primary)' : 'var(--text-muted)', margin: 0 }}>
                             <em>{aiOutreach[lead.id] ? <Typewriter text={aiOutreach[lead.id]} /> : "Click Blitz or Gmail to generate a personalized AI pitch for this lead."}</em>
                           </p>
                         </div>
@@ -1132,8 +1132,8 @@ function Dashboard() {
 
       {/* Omnichannel Blitz Modal */}
       {blitzLead && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, padding: '1rem' }}>
-          <div style={{ background: 'var(--surface)', border: '1px solid var(--input-border)', borderRadius: '16px', padding: '2.5rem', width: '100%', maxWidth: '800px', maxHeight: '90vh', overflowY: 'auto', position: 'relative', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0, 0, 0, 0.4)', backdropFilter: 'blur(20px) saturate(180%)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, padding: '1rem' }}>
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--input-border)', borderRadius: '16px', padding: '2.5rem', width: '100%', maxWidth: '800px', maxHeight: '90vh', overflowY: 'auto', position: 'relative', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2)' }}>
             <button onClick={() => setBlitzLead(null)} style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)', padding: '8px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.2s' }} onMouseOver={e => e.currentTarget.style.background = 'rgba(255,0,0,0.5)'} onMouseOut={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'} title="Close">
               <X size={20} />
             </button>
@@ -1197,8 +1197,8 @@ function Dashboard() {
       )}
       {/* Business Profile Onboarding Modal */}
       {showProfileModal && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, padding: '1rem' }}>
-          <div style={{ background: 'var(--surface)', border: '1px solid var(--input-border)', borderRadius: '16px', padding: '2.5rem', width: '100%', maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto', position: 'relative', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0, 0, 0, 0.4)', backdropFilter: 'blur(20px) saturate(180%)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, padding: '1rem' }}>
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--input-border)', borderRadius: '16px', padding: '2.5rem', width: '100%', maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto', position: 'relative', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2)' }}>
             <button onClick={() => setShowProfileModal(false)} style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)', padding: '8px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onMouseOver={e => e.currentTarget.style.background = 'rgba(255,0,0,0.5)'} onMouseOut={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}><X size={20} /></button>
 
             <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
@@ -1284,8 +1284,8 @@ function Dashboard() {
 
       {/* Ghost Mode Scheduler Modal */}
       {showGhostConfig && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, padding: '1rem' }}>
-          <div style={{ background: 'var(--surface)', border: '1px solid var(--input-border)', borderRadius: '16px', padding: '2.5rem', width: '100%', maxWidth: '550px', position: 'relative', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0, 0, 0, 0.4)', backdropFilter: 'blur(20px) saturate(180%)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, padding: '1rem' }}>
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--input-border)', borderRadius: '16px', padding: '2.5rem', width: '100%', maxWidth: '550px', position: 'relative', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2)' }}>
             <button onClick={() => setShowGhostConfig(false)} style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)', padding: '8px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onMouseOver={e => e.currentTarget.style.background = 'rgba(255,0,0,0.5)'} onMouseOut={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}><X size={20} /></button>
 
             <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
@@ -1310,7 +1310,7 @@ function Dashboard() {
               {/* Scan Mode */}
               <div>
                 <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>🎯 Scan Mode</label>
-                <select value={ghostConfig.scanMode} onChange={e => setGhostConfig(prev => ({ ...prev, scanMode: e.target.value }))} style={{ width: '100%', padding: '10px 14px', background: '#0a0a0a', border: '1px solid var(--input-border)', borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.95rem', outline: 'none' }}>
+                <select value={ghostConfig.scanMode} onChange={e => setGhostConfig(prev => ({ ...prev, scanMode: e.target.value }))} style={{ width: '100%', padding: '10px 14px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.95rem', outline: 'none' }}>
                   <option value="hiring">🔥 Hiring Intent</option>
                   <option value="layoff">🎯 Layoff Sniper</option>
                   <option value="vc_whale">🐋 VC Whales</option>
@@ -1346,7 +1346,7 @@ function Dashboard() {
 
       {/* Deep Dive Intelligence Modal */}
       {reportModal && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, padding: '1rem' }}>
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0, 0, 0, 0.4)', backdropFilter: 'blur(20px) saturate(180%)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, padding: '1rem' }}>
           <div style={{ background: 'var(--surface)', border: '1px solid rgba(124,58,237,0.3)', borderRadius: '16px', padding: '2.5rem', width: '100%', maxWidth: '700px', maxHeight: '90vh', overflowY: 'auto', position: 'relative', boxShadow: '0 25px 50px -12px rgba(124,58,237,0.15)' }}>
             <button onClick={() => setReportModal(null)} style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)', padding: '8px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onMouseOver={e => e.currentTarget.style.background = 'rgba(255,0,0,0.5)'} onMouseOut={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}><X size={20} /></button>
 
