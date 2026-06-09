@@ -26,9 +26,13 @@ export default function LoginPage() {
     setIsLoading(false);
   };
 
-  const handleGoogleLogin = () => {
+  const handleGoogleLogin = async () => {
     setIsLoading(true);
-    signIn('google', { callbackUrl: '/dashboard' });
+    const success = await loginWithGoogle();
+    if (success) {
+      window.location.href = '/dashboard';
+    }
+    setIsLoading(false);
   };
 
   return (
