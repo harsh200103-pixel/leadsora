@@ -1224,7 +1224,7 @@ function Dashboard() {
                 { key: 'address', label: 'Mailing Address', placeholder: 'e.g. New York, USA', icon: '📍' },
               ].map(field => (
                 <div key={field.key}>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{field.icon} {field.label}</label>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.5px' }}>{field.icon} {field.label}</label>
                   <div style={{ display: 'flex', gap: '0.5rem' }}>
                     <input
                       type="text"
@@ -1236,7 +1236,7 @@ function Dashboard() {
                       onBlur={e => e.currentTarget.style.borderColor = '#333'}
                     />
                     {field.key === 'website' && (
-                      <button onClick={scrapeWebsite} disabled={isScrapingWebsite} style={{ background: 'rgba(124, 58, 237, 0.1)', border: '1px solid #7c3aed', color: '#a78bfa', padding: '0 1rem', borderRadius: '8px', cursor: isScrapingWebsite ? 'not-allowed' : 'pointer', fontSize: '0.8rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                      <button onClick={scrapeWebsite} disabled={isScrapingWebsite} style={{ background: 'rgba(124, 58, 237, 0.1)', border: '1px solid #7c3aed', color: 'var(--accent)', padding: '0 1rem', borderRadius: '8px', cursor: isScrapingWebsite ? 'not-allowed' : 'pointer', fontSize: '0.8rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
                         {isScrapingWebsite ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />} Auto-Extract
                       </button>
                     )}
@@ -1245,7 +1245,7 @@ function Dashboard() {
               ))}
 
               <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: '#a78bfa', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>✨ Auto-Extracted Value Proposition (AI Context)</label>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--accent)', marginBottom: '4px', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.5px' }}>✨ Auto-Extracted Value Proposition (AI Context)</label>
                 <textarea
                   value={businessProfile.companyContext || ''}
                   onChange={e => setBusinessProfile(prev => ({ ...prev, companyContext: e.target.value }))}
@@ -1296,20 +1296,20 @@ function Dashboard() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
               {/* Scan Time */}
               <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>⏰ Daily Scan Time</label>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.5px' }}>⏰ Daily Scan Time</label>
                 <input type="time" value={ghostConfig.scanTime} onChange={e => setGhostConfig(prev => ({ ...prev, scanTime: e.target.value }))} style={{ width: '100%', padding: '10px 14px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.95rem', outline: 'none', boxSizing: 'border-box' }} />
               </div>
 
               {/* Leads Per Day */}
               <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>📊 Leads Per Day: <strong style={{ color: '#27c93f' }}>{ghostConfig.leadsPerDay}</strong></label>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.5px' }}>📊 Leads Per Day: <strong style={{ color: '#27c93f' }}>{ghostConfig.leadsPerDay}</strong></label>
                 <input type="range" min="5" max="50" step="5" value={ghostConfig.leadsPerDay} onChange={e => setGhostConfig(prev => ({ ...prev, leadsPerDay: parseInt(e.target.value) }))} style={{ width: '100%', accentColor: '#27c93f' }} />
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: 'var(--text-muted)' }}><span>5</span><span>25</span><span>50</span></div>
               </div>
 
               {/* Scan Mode */}
               <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>🎯 Scan Mode</label>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.5px' }}>🎯 Scan Mode</label>
                 <select value={ghostConfig.scanMode} onChange={e => setGhostConfig(prev => ({ ...prev, scanMode: e.target.value }))} style={{ width: '100%', padding: '10px 14px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.95rem', outline: 'none' }}>
                   <option value="hiring">🔥 Hiring Intent</option>
                   <option value="layoff">🎯 Layoff Sniper</option>
@@ -1320,13 +1320,13 @@ function Dashboard() {
 
               {/* Keywords */}
               <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>🔍 Target Keywords</label>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.5px' }}>🔍 Target Keywords</label>
                 <input type="text" value={ghostConfig.keywords} onChange={e => setGhostConfig(prev => ({ ...prev, keywords: e.target.value }))} placeholder="e.g. React Developer, Marketing Manager" style={{ width: '100%', padding: '10px 14px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.95rem', outline: 'none', boxSizing: 'border-box' }} />
               </div>
 
               {/* Slack Webhook */}
               <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>💬 Slack Webhook URL</label>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.5px' }}>💬 Slack Webhook URL</label>
                 <input type="url" value={ghostConfig.slackWebhook || ''} onChange={e => setGhostConfig(prev => ({ ...prev, slackWebhook: e.target.value }))} placeholder="https://hooks.slack.com/services/..." style={{ width: '100%', padding: '10px 14px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.95rem', outline: 'none', boxSizing: 'border-box' }} />
               </div>
 
@@ -1337,7 +1337,7 @@ function Dashboard() {
               </div>
             </div>
 
-            <button onClick={() => { saveGhostConfig(ghostConfig); setShowGhostConfig(false); }} style={{ width: '100%', padding: '14px', marginTop: '2rem', background: ghostConfig.enabled ? 'linear-gradient(135deg, #27c93f, #10b981)' : '#333', color: ghostConfig.enabled ? '#000' : '#888', border: 'none', borderRadius: '8px', fontSize: '1rem', fontWeight: 700, cursor: 'pointer' }}>
+            <button onClick={() => { saveGhostConfig(ghostConfig); setShowGhostConfig(false); }} style={{ width: '100%', padding: '14px', marginTop: '2rem', background: ghostConfig.enabled ? 'linear-gradient(135deg, #27c93f, #10b981)' : 'var(--bg-tertiary)', color: ghostConfig.enabled ? '#000' : 'var(--text-muted)', border: 'none', borderRadius: '8px', fontSize: '1rem', fontWeight: 700, cursor: 'pointer' }}>
               {ghostConfig.enabled ? '👻 Save & Activate Ghost Mode' : 'Save Config (Disabled)'}
             </button>
           </div>
