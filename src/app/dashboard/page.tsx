@@ -1024,7 +1024,7 @@ function Dashboard() {
                             {aiOutreach[lead.id] && (
                               <div style={{ background: 'rgba(124, 58, 237, 0.1)', padding: '0.5rem', borderRadius: '4px', marginBottom: '0.75rem', border: '1px solid rgba(124, 58, 237, 0.3)' }}>
                                 <span style={{ color: '#a78bfa', fontSize: '0.65rem', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '2px', display: 'block' }}>✨ AI Draft</span>
-                                <p style={{ fontSize: '0.75rem', color: '#e2e8f0', margin: 0 }}><em><Typewriter text={aiOutreach[lead.id]} /></em></p>
+                                <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: 0 }}><em><Typewriter text={aiOutreach[lead.id]} /></em></p>
                               </div>
                             )}
                             
@@ -1143,7 +1143,7 @@ function Dashboard() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               {/* Email */}
               <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid #222', borderRadius: '24px', padding: '1rem' }}>
-                <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0 0 1rem 0', color: '#e2e8f0', fontSize: '1rem' }}>📧 Step 1: The Cold Email</h3>
+                <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0 0 1rem 0', color: 'var(--text-secondary)', fontSize: '1rem' }}>📧 Step 1: The Cold Email</h3>
                 <div style={{ background: 'var(--surface)', padding: '1rem', borderRadius: '20px', fontSize: '0.85rem', color: '#a1a1aa', whiteSpace: 'pre-wrap', fontFamily: 'monospace' }}>
                   {generatingId === blitzLead.id && !aiOutreach[blitzLead.id] ? "Generating AI Pitch..." : getEmailBody(blitzLead)}
                 </div>
@@ -1157,7 +1157,7 @@ function Dashboard() {
 
               {/* LinkedIn */}
               <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid #222', borderRadius: '24px', padding: '1rem' }}>
-                <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0 0 1rem 0', color: '#e2e8f0', fontSize: '1rem' }}>💼 Step 2: LinkedIn Connect</h3>
+                <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0 0 1rem 0', color: 'var(--text-secondary)', fontSize: '1rem' }}>💼 Step 2: LinkedIn Connect</h3>
                 <div style={{ background: 'var(--surface)', padding: '1rem', borderRadius: '20px', fontSize: '0.85rem', color: '#a1a1aa', whiteSpace: 'pre-wrap', fontFamily: 'monospace' }}>
                   {`Hi! Saw the news about ${blitzLead.company} and wanted to connect. My ${userPersona} helps companies exactly like yours hit their targets faster via fractional execution. Sent you an email with a custom ROI roadmap!`}
                 </div>
@@ -1175,7 +1175,7 @@ function Dashboard() {
 
               {/* Twitter */}
               <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid #222', borderRadius: '24px', padding: '1rem' }}>
-                <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0 0 1rem 0', color: '#e2e8f0', fontSize: '1rem' }}>🐦 Step 3: Twitter DM</h3>
+                <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0 0 1rem 0', color: 'var(--text-secondary)', fontSize: '1rem' }}>🐦 Step 3: Twitter DM</h3>
                 <div style={{ background: 'var(--surface)', padding: '1rem', borderRadius: '20px', fontSize: '0.85rem', color: '#a1a1aa', whiteSpace: 'pre-wrap', fontFamily: 'monospace' }}>
                   {`Huge fan of what you're building at ${blitzLead.company}. Just sent over an email outlining exactly how we can step in and help you hit your scaling targets. Check your inbox!`}
                 </div>
@@ -1391,7 +1391,7 @@ function Dashboard() {
       {/* LinkedIn DM Modal */}
       {linkedinDMModal && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.88)', backdropFilter: 'blur(10px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, padding: '1rem' }}>
-          <div style={{ background: '#0a0a14', border: '1px solid rgba(10,102,194,0.4)', borderRadius: '20px', padding: '2.5rem', width: '100%', maxWidth: '520px', position: 'relative', boxShadow: '0 0 60px rgba(10,102,194,0.15)' }}>
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '20px', padding: '2.5rem', width: '100%', maxWidth: '520px', position: 'relative', boxShadow: 'var(--shadow)' }}>
             <button onClick={() => setLinkedinDMModal(null)} style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.15)', color: 'var(--text-primary)', padding: '7px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <X size={18} />
             </button>
@@ -1408,7 +1408,7 @@ function Dashboard() {
             {/* DM Content */}
             <div style={{ background: 'rgba(10, 102, 194, 0.06)', border: '1px solid rgba(10,102,194,0.2)', borderRadius: '20px', padding: '1.25rem', marginBottom: '1.5rem', position: 'relative' }}>
               <div style={{ position: 'absolute', top: '-10px', left: '16px', background: '#0a66c2', color: 'var(--text-primary)', fontSize: '0.65rem', padding: '2px 10px', borderRadius: '999px', fontWeight: 700, letterSpacing: '0.5px' }}>✨ AI GENERATED DM</div>
-              <p style={{ margin: 0, color: '#e2e8f0', fontSize: '0.95rem', lineHeight: '1.7', whiteSpace: 'pre-wrap', fontFamily: 'inherit' }}>{linkedinDMModal.dm}</p>
+              <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: '1.7', whiteSpace: 'pre-wrap', fontFamily: 'inherit' }}>{linkedinDMModal.dm}</p>
             </div>
 
             {/* Character count */}
@@ -1431,14 +1431,20 @@ function Dashboard() {
               >
                 {copiedDmId === linkedinDMModal.lead.id ? <><Check size={18} /> Copied to Clipboard!</> : <><Copy size={18} /> Copy DM</>}
               </button>
-              <a
-                href={`https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(linkedinDMModal.lead.company)}`}
-                target="_blank"
-                rel="noreferrer"
-                style={{ width: '100%', padding: '12px', background: 'transparent', color: '#0a66c2', border: '1px solid rgba(10,102,194,0.4)', borderRadius: '16px', fontSize: '0.9rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', textDecoration: 'none', transition: 'all 0.2s', boxSizing: 'border-box', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.04), 0 1px 0 rgba(255,255,255,0.8)' }}
-              >
-                🔍 Find Contact on LinkedIn →
-              </a>
+              {(() => {
+                const person = foundEmails[linkedinDMModal.lead.id]?.[0];
+                const targetLinkedIn = person?.linkedin || person?.sources?.find((s: any) => s.uri?.includes('linkedin'))?.uri || `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(linkedinDMModal.lead.company + (person ? ' ' + (person.first_name || '') + ' ' + (person.last_name || '') : ''))}`;
+                return (
+                  <a
+                    href={targetLinkedIn}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{ width: '100%', padding: '12px', background: 'transparent', color: '#0a66c2', border: '1px solid rgba(10,102,194,0.4)', borderRadius: '16px', fontSize: '0.9rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', textDecoration: 'none', transition: 'all 0.2s', boxSizing: 'border-box' }}
+                  >
+                    {person ? '🔍 Copy & Open Profile →' : '🔍 Find Contact on LinkedIn →'}
+                  </a>
+                );
+              })()}
               <button
                 onClick={() => { generateLinkedInDM({ ...linkedinDMModal.lead, id: linkedinDMModal.lead.id + '_regen' }); setLinkedinDMModal(null); setTimeout(() => { setGeneratingDmId(null); }, 100); }}
                 style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '0.8rem', cursor: 'pointer', textAlign: 'center' }}
