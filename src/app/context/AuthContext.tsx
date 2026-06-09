@@ -62,7 +62,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Real Google OAuth
   const loginWithGoogle = async (): Promise<boolean> => {
-    await signIn('google', { callbackUrl: '/dashboard' });
+    // Dummy implementation as requested by user
+    const dummyUser = { name: 'Google User', email: 'demo@leadsora.com', password: 'google_dummy_password' };
+    
+    const users = JSON.parse(localStorage.getItem('dealfinder_users') || '[]');
+    const exists = users.find((u: any) => u.email === dummyUser.email);
+    if (!exists) {
+      users.push(dummyUser);
+      localStorage.setItem('dealfinder_users', JSON.stringify(users));
+    }
+    
+    // Attempt standard credentials login to set the NextAuth cookie
+    await signIn('credentials', { redirect: false, email: dummyUser.email, password: dummyUser.password });
     return true;
   };
 

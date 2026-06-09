@@ -286,7 +286,7 @@ export default function LandingPage() {
       {/* ── PRICING ──────────────────────────────────────────── */}
       <section className="pricing container">
         <h2 className="section-title text-center">Early Access Pricing</h2>
-        <p style={{ textAlign: 'center', color: '#555', marginBottom: '3rem', fontSize: '0.9rem' }}>Lock in founding member pricing before public launch.</p>
+        <p style={{ textAlign: 'center', color: 'var(--text-muted)', marginBottom: '3rem', fontSize: '0.9rem' }}>Lock in founding member pricing before public launch.</p>
         <div className="pricing-grid">
           <div className="glass-card pricing-card">
             <h3>Starter</h3>
@@ -303,7 +303,7 @@ export default function LandingPage() {
             <button className="btn-secondary" style={{ width: '100%' }} onClick={() => router.push('/signup')}>Get Started</button>
           </div>
           <div className="glass-card pricing-card popular">
-            <div style={{ position: 'absolute', top: '-14px', left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(135deg, #7c3aed, #4facfe)', color: '#fff', padding: '0.3rem 1.25rem', borderRadius: '999px', fontSize: '0.78rem', fontWeight: 700, whiteSpace: 'nowrap' }}>⭐ Most Popular</div>
+            <div style={{ position: 'absolute', top: '-14px', left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(135deg, #7c3aed, #4facfe)', color: 'var(--text-primary)', padding: '0.3rem 1.25rem', borderRadius: '999px', fontSize: '0.78rem', fontWeight: 700, whiteSpace: 'nowrap' }}>⭐ Most Popular</div>
             <h3>Growth</h3>
             <div className="pricing-price" style={{ display: 'flex', alignItems: 'baseline', gap: '0.25rem' }}>
               <span style={{ fontSize: '1rem', color: 'var(--text-muted)', textDecoration: 'line-through' }}>$149</span>
