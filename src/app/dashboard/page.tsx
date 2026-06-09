@@ -950,9 +950,7 @@ function Dashboard() {
                                       <button onClick={() => handleCopy(`em-${idx}-${em.value}`, em.value)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: copiedId === `em-${idx}-${em.value}` ? '#27c93f' : '#666', padding: '0 4px' }} title="Copy Email">
                                         {copiedId === `em-${idx}-${em.value}` ? <Check size={14} /> : <Copy size={14} />}
                                       </button>
-                                      {em.sources?.[0]?.uri?.includes('linkedin') && (
-                                        <a href={em.sources[0].uri} target="_blank" rel="noreferrer" style={{ color: '#0a66c2', marginLeft: '4px' }} title="LinkedIn Profile">in</a>
-                                      )}
+                                      <a href={em.linkedin || em.sources?.find((s: any) => s.uri?.includes('linkedin'))?.uri || `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(lead.company + ' ' + (em.first_name || '') + ' ' + (em.last_name || ''))}`} target="_blank" rel="noreferrer" style={{ color: '#0a66c2', background: 'rgba(10,102,194,0.1)', padding: '2px 6px', borderRadius: '4px', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.65rem' }} title="Open LinkedIn Profile">💼 LinkedIn</a>
                                       {!emailVerification[`${lead.id}_${em.value}`] && (
                                         <button onClick={() => verifyEmail(em.value, lead.id)} style={{ fontSize: '0.65rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--input-border)', color: 'var(--text-muted)', borderRadius: '4px', padding: '2px 6px', cursor: 'pointer' }}>Verify</button>
                                       )}
@@ -1055,6 +1053,9 @@ function Dashboard() {
                                     {emailVerification[`${lead.id}_${foundEmails[lead.id][0].value}`] === 'valid' && <span style={{fontSize:'10px'}}>✅</span>}
                                     {emailVerification[`${lead.id}_${foundEmails[lead.id][0].value}`] === 'risky' && <span style={{fontSize:'10px'}}>⚠️</span>}
                                   </a>
+                                )}
+                                {foundEmails[lead.id]?.[0] && (
+                                  <a href={foundEmails[lead.id][0].linkedin || foundEmails[lead.id][0].sources?.find((s: any) => s.uri?.includes('linkedin'))?.uri || `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(lead.company + ' ' + (foundEmails[lead.id][0].first_name || '') + ' ' + (foundEmails[lead.id][0].last_name || ''))}`} target="_blank" rel="noreferrer" style={{ color: '#0a66c2', background: 'rgba(10,102,194,0.1)', padding: '4px 8px', borderRadius: '4px', display: 'flex', alignItems: 'center', gap: '4px', textDecoration: 'none', fontSize: '0.8rem' }} title="Open LinkedIn">💼 In</a>
                                 )}
                               </div>
                             </div>
