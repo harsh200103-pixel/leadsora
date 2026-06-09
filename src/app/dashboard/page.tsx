@@ -599,7 +599,7 @@ function Dashboard() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'nowrap', overflow: 'hidden' }}>
           
           {/* Ghost Mode Toggle */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: ghostModeEnabled ? 'var(--green-light)' : 'var(--surface)', padding: '5px 8px', borderRadius: '8px', border: `1px solid ${ghostModeEnabled ? 'var(--green)' : 'var(--border)'}`, flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: ghostModeEnabled ? 'var(--green-light)' : 'var(--surface)', padding: '5px 8px', borderRadius: '24px', border: `1px solid ${ghostModeEnabled ? 'var(--green)' : 'var(--border)'}`, flexShrink: 0 }}>
             <span style={{ fontSize: '0.8rem', color: ghostModeEnabled ? 'var(--green)' : 'var(--text-muted)', fontWeight: 600, whiteSpace: 'nowrap' }}>
               <span className="hide-on-mobile">👻 Ghost Mode</span>
               <span className="show-on-mobile" style={{ display: 'none' }}>👻</span>
@@ -619,14 +619,14 @@ function Dashboard() {
           </button>
 
           {/* Profile Button */}
-          <button onClick={() => setShowProfileModal(true)} style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '5px 8px', background: businessProfile.fullName ? 'var(--purple-light)' : 'var(--yellow-light)', border: `1px solid ${businessProfile.fullName ? 'var(--purple)' : 'var(--yellow)'}`, borderRadius: '8px', color: businessProfile.fullName ? 'var(--purple)' : 'var(--yellow)', fontSize: '0.78rem', cursor: 'pointer', fontWeight: 600, flexShrink: 0, maxWidth: '110px', overflow: 'hidden' }}>
+          <button onClick={() => setShowProfileModal(true)} style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '5px 8px', background: businessProfile.fullName ? 'var(--purple-light)' : 'var(--yellow-light)', border: `1px solid ${businessProfile.fullName ? 'var(--purple)' : 'var(--yellow)'}`, borderRadius: '24px', color: businessProfile.fullName ? 'var(--purple)' : 'var(--yellow)', fontSize: '0.78rem', cursor: 'pointer', fontWeight: 600, flexShrink: 0, maxWidth: '110px', overflow: 'hidden' }}>
             <User size={13} style={{ flexShrink: 0 }} />
             <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{businessProfile.fullName?.split(' ')[0] || 'Profile'}</span>
           </button>
 
           <button
             onClick={() => { logout(); window.location.href = '/login'; }}
-            style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '5px 8px', background: 'transparent', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--text-secondary)', fontSize: '0.78rem', cursor: 'pointer', fontFamily: "'Inter', sans-serif", flexShrink: 0, whiteSpace: 'nowrap', transition: 'all 0.2s' }}
+            style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '5px 8px', background: 'transparent', border: '1px solid var(--border)', borderRadius: '24px', color: 'var(--text-secondary)', fontSize: '0.78rem', cursor: 'pointer', fontFamily: "'Inter', sans-serif", flexShrink: 0, whiteSpace: 'nowrap', transition: 'all 0.2s' }}
             onMouseOver={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--red)'; (e.currentTarget as HTMLElement).style.color = 'var(--red)'; }}
             onMouseOut={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)'; (e.currentTarget as HTMLElement).style.color = 'var(--text-secondary)'; }}
           ><LogOut size={13} /> <span className="hide-on-mobile">Sign Out</span></button>
@@ -677,7 +677,7 @@ function Dashboard() {
             <button type="submit" className="btn-primary flex items-center justify-center gap-2" disabled={isScanning} style={{ background: scanMode === 'layoff' ? '#ff5f56' : scanMode === 'vc_whale' ? '#0a66c2' : scanMode === 'stale_job' ? '#ffbd2e' : '' }}>
               {isScanning ? <><Loader2 className="animate-spin" size={20} /> Scanning...</> : 'Scan Market'}
             </button>
-            <button type="button" onClick={saveSearch} title="Save this search as a preset" style={{ background: 'rgba(124,58,237,0.12)', border: '1px solid rgba(124,58,237,0.3)', color: '#a78bfa', borderRadius: '8px', padding: '0 0.75rem', fontSize: '0.8rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', whiteSpace: 'nowrap' }}>
+            <button type="button" onClick={saveSearch} title="Save this search as a preset" style={{ background: 'rgba(124,58,237,0.12)', border: '1px solid rgba(124,58,237,0.3)', color: '#a78bfa', borderRadius: '24px', padding: '0 0.75rem', fontSize: '0.8rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', whiteSpace: 'nowrap' }}>
               ⭐ Save Search
             </button>
           </form>
@@ -737,7 +737,7 @@ function Dashboard() {
             </button>
           </div>
           {showSettings && (
-              <div style={{ marginTop: '1rem', background: 'rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '8px', display: 'flex', gap: '1rem', justifyContent: 'center', textAlign: 'left', flexWrap: 'wrap' }}>
+              <div style={{ marginTop: '1rem', background: 'rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '24px', display: 'flex', gap: '1rem', justifyContent: 'center', textAlign: 'left', flexWrap: 'wrap' }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.5rem', color: '#ccc' }}>Hunter.io API Key (Email Discovery):</label>
                   <input type="password" value={hunterKey} onChange={e => saveHunterKey(e.target.value)} placeholder="Enter Hunter.io API key..." style={{ width: '280px', padding: '0.5rem', background: 'var(--surface)', border: '1px solid var(--input-border)', color: 'var(--text-primary)', borderRadius: '4px' }} />
@@ -777,7 +777,7 @@ function Dashboard() {
                   <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
                     <input type="checkbox" checked={highIntentOnly} onChange={e => setHighIntentOnly(e.target.checked)} style={{ accentColor: '#ffbd2e' }} /> High Intent Only (85+)
                   </label>
-                  <div style={{ display: 'flex', background: 'var(--surface)', border: '1px solid var(--input-border)', borderRadius: '6px', overflow: 'hidden' }}>
+                  <div style={{ display: 'flex', background: 'var(--surface)', border: '1px solid var(--input-border)', borderRadius: '20px', overflow: 'hidden' }}>
                     <button onClick={() => setViewMode('list')} style={{ background: viewMode === 'list' ? '#333' : 'transparent', color: viewMode === 'list' ? '#fff' : '#888', border: 'none', padding: '0.25rem 0.75rem', fontSize: '0.8rem', cursor: 'pointer' }}>List View</button>
                     <button onClick={() => setViewMode('pipeline')} style={{ background: viewMode === 'pipeline' ? '#333' : 'transparent', color: viewMode === 'pipeline' ? '#fff' : '#888', border: 'none', padding: '0.25rem 0.75rem', fontSize: '0.8rem', cursor: 'pointer' }}>Pipeline CRM</button>
                   </div>
@@ -792,7 +792,7 @@ function Dashboard() {
               <div className="dashboard-body" style={{ background: 'var(--surface)' }}>
 
                 {/* ── Filter & Sort Bar ── */}
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1rem', padding: '0.75rem 1rem', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid #222', alignItems: 'center' }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1rem', padding: '0.75rem 1rem', background: 'rgba(255,255,255,0.02)', borderRadius: '24px', border: '1px solid #222', alignItems: 'center' }}>
                   <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginRight: '0.25rem' }}>🎛️ Filter:</span>
 
                   {/* Score filter */}
@@ -856,7 +856,7 @@ function Dashboard() {
                         </div>
 
                         {/* Outreach Box */}
-                        <div className="ai-box-mobile glass-card" style={{ padding: '1rem', borderRadius: '12px', border: `1px solid ${aiOutreach[lead.id] ? 'var(--accent)' : 'var(--border)'}`, position: 'relative', marginTop: '1rem', display: 'flex', flexDirection: 'column' }}>
+                        <div className="ai-box-mobile glass-card" style={{ padding: '1rem', borderRadius: '20px', border: `1px solid ${aiOutreach[lead.id] ? 'var(--accent)' : 'var(--border)'}`, position: 'relative', marginTop: '1rem', display: 'flex', flexDirection: 'column' }}>
                           {aiOutreach[lead.id] && <span style={{ position: 'absolute', top: '-10px', left: '12px', background: 'linear-gradient(135deg,#7c3aed,#4facfe)', color: 'var(--text-primary)', fontSize: '0.65rem', padding: '2px 8px', borderRadius: '999px', fontWeight: 700 }}>✨ AI Generated</span>}
                           
                           {/* Omnichannel Blitz / AI Actions */}
@@ -929,7 +929,7 @@ function Dashboard() {
 
                         {/* Display Found Emails */}
                         {foundEmails[lead.id] && (
-                          <div style={{ marginTop: '0.75rem', padding: '0.75rem', background: 'var(--input-bg)', borderRadius: '8px', border: '1px solid #27272a' }}>
+                          <div style={{ marginTop: '0.75rem', padding: '0.75rem', background: 'var(--input-bg)', borderRadius: '24px', border: '1px solid #27272a' }}>
                             <h5 style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Decision Makers Found</h5>
                             {foundEmails[lead.id].length > 0 ? (
                               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
@@ -968,7 +968,7 @@ function Dashboard() {
 
                         {/* Notes Section */}
                         {showNote[lead.id] && (
-                          <div style={{ marginTop: '1rem', padding: '0.75rem', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid #27272a' }}>
+                          <div style={{ marginTop: '1rem', padding: '0.75rem', background: 'rgba(255,255,255,0.02)', borderRadius: '24px', border: '1px solid #27272a' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
                               <h5 style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: 0, textTransform: 'uppercase', letterSpacing: '1px' }}>Internal Notes</h5>
                               <button onClick={() => setShowNote(prev => ({ ...prev, [lead.id]: false }))} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 0 }}><X size={14} /></button>
@@ -1001,17 +1001,17 @@ function Dashboard() {
                            const leadId = e.dataTransfer.getData('text/plain');
                            setLeads(prev => prev.map(l => l.id === leadId ? { ...l, status: col, lastContactedAt: col === 'Contacted' ? Date.now() : l.lastContactedAt } : l));
                          }}
-                         style={{ flex: 1, minWidth: '320px', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', padding: '1rem', border: '1px dashed #333' }}>
+                         style={{ flex: 1, minWidth: '320px', background: 'rgba(255,255,255,0.02)', borderRadius: '24px', padding: '1rem', border: '1px dashed #333' }}>
                       <h3 onDoubleClick={() => {
                            if (col === 'Contacted') {
                              setLeads(prev => prev.map(l => l.status === 'Contacted' ? { ...l, lastContactedAt: Date.now() - (5 * 24 * 60 * 60 * 1000), followUpGenerated: false } : l));
                            }
                          }}
                          style={{ textTransform: 'uppercase', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: col === 'Contacted' ? '0.4rem' : '1rem', letterSpacing: '1px', display: 'flex', justifyContent: 'space-between', cursor: col === 'Contacted' ? 'pointer' : 'default' }}>
-                        {col} <span style={{ background: 'var(--surface)', padding: '2px 8px', borderRadius: '12px' }}>{(highIntentOnly ? leads.filter(l => l.intentScore >= 85) : leads).filter(l => (l.status || 'New') === col).length}</span>
+                        {col} <span style={{ background: 'var(--surface)', padding: '2px 8px', borderRadius: '20px' }}>{(highIntentOnly ? leads.filter(l => l.intentScore >= 85) : leads).filter(l => (l.status || 'New') === col).length}</span>
                       </h3>
                       {col === 'Contacted' && (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '1rem', background: 'rgba(39,201,63,0.08)', border: '1px solid rgba(39,201,63,0.2)', borderRadius: '6px', padding: '4px 8px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '1rem', background: 'rgba(39,201,63,0.08)', border: '1px solid rgba(39,201,63,0.2)', borderRadius: '20px', padding: '4px 8px' }}>
                           <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#27c93f', display: 'inline-block', boxShadow: '0 0 6px #27c93f', animation: 'pulse 2s infinite' }}></span>
                           <span style={{ fontSize: '0.65rem', color: '#27c93f', fontWeight: 600 }}>INBOX SYNC ACTIVE</span>
                           <span style={{ fontSize: '0.6rem', color: 'var(--text-muted)', marginLeft: 'auto' }}>↓↓ double-click to time-travel</span>
@@ -1100,7 +1100,7 @@ function Dashboard() {
             </div>
             
             {/* Detection Summary */}
-            <div style={{ background: 'rgba(39,201,63,0.05)', border: '1px solid rgba(39,201,63,0.15)', borderRadius: '10px', padding: '1rem', marginBottom: '1.5rem' }}>
+            <div style={{ background: 'rgba(39,201,63,0.05)', border: '1px solid rgba(39,201,63,0.15)', borderRadius: '16px', padding: '1rem', marginBottom: '1.5rem' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', fontSize: '0.8rem' }}>
                 <div><span style={{ color: 'var(--text-muted)' }}>📅 Last Contacted:</span><br /><span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>4+ days ago</span></div>
                 <div><span style={{ color: 'var(--text-muted)' }}>📭 Reply Status:</span><br /><span style={{ color: '#ff5f56', fontWeight: 600 }}>No Reply Detected</span></div>
@@ -1110,19 +1110,19 @@ function Dashboard() {
             </div>
 
             {/* AI Draft Preview */}
-            <div style={{ background: 'var(--surface)', border: '1px solid #1a1a1a', borderRadius: '8px', padding: '1rem', marginBottom: '1.5rem', fontSize: '0.82rem', color: '#a1a1aa', whiteSpace: 'pre-wrap', fontFamily: 'monospace', maxHeight: '180px', overflowY: 'auto' }}>
+            <div style={{ background: 'var(--surface)', border: '1px solid #1a1a1a', borderRadius: '24px', padding: '1rem', marginBottom: '1.5rem', fontSize: '0.82rem', color: '#a1a1aa', whiteSpace: 'pre-wrap', fontFamily: 'monospace', maxHeight: '180px', overflowY: 'auto' }}>
               {aiOutreach[followUpModal.id] || 'Generating follow-up email via AI... ✨'}
             </div>
 
             {/* Action Buttons */}
             <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-              <a href={`https://mail.google.com/mail/?view=cm&fs=1&su=${encodeURIComponent(`Following up – ${followUpModal.company}`)}&body=${encodeURIComponent(aiOutreach[followUpModal.id] || 'Following up on my previous message...')}`} target="_blank" rel="noreferrer" onClick={() => setFollowUpModal(null)} style={{ flex: 1, background: 'linear-gradient(135deg, #27c93f, #0a8a21)', color: '#000', padding: '12px 20px', borderRadius: '10px', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', minWidth: '160px' }}>
+              <a href={`https://mail.google.com/mail/?view=cm&fs=1&su=${encodeURIComponent(`Following up – ${followUpModal.company}`)}&body=${encodeURIComponent(aiOutreach[followUpModal.id] || 'Following up on my previous message...')}`} target="_blank" rel="noreferrer" onClick={() => setFollowUpModal(null)} style={{ flex: 1, background: 'linear-gradient(135deg, #27c93f, #0a8a21)', color: '#000', padding: '12px 20px', borderRadius: '16px', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', minWidth: '160px' }}>
                 📧 Send in Gmail
               </a>
-              <button onClick={() => { setBlitzLead(followUpModal); setFollowUpModal(null); }} style={{ flex: 1, background: 'linear-gradient(135deg, #7c3aed, #4facfe)', color: 'var(--text-primary)', border: 'none', padding: '12px 20px', borderRadius: '10px', fontSize: '0.9rem', fontWeight: 700, cursor: 'pointer', minWidth: '160px' }}>
+              <button onClick={() => { setBlitzLead(followUpModal); setFollowUpModal(null); }} style={{ flex: 1, background: 'linear-gradient(135deg, #7c3aed, #4facfe)', color: 'var(--text-primary)', border: 'none', padding: '12px 20px', borderRadius: '16px', fontSize: '0.9rem', fontWeight: 700, cursor: 'pointer', minWidth: '160px' }}>
                 ⚡ Full Blitz Mode
               </button>
-              <button onClick={() => setFollowUpModal(null)} style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-muted)', border: '1px solid var(--input-border)', padding: '12px 16px', borderRadius: '10px', fontSize: '0.85rem', cursor: 'pointer' }}>
+              <button onClick={() => setFollowUpModal(null)} style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-muted)', border: '1px solid var(--input-border)', padding: '12px 16px', borderRadius: '16px', fontSize: '0.85rem', cursor: 'pointer' }}>
                 Dismiss
               </button>
             </div>
@@ -1133,7 +1133,7 @@ function Dashboard() {
       {/* Omnichannel Blitz Modal */}
       {blitzLead && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0, 0, 0, 0.4)', backdropFilter: 'blur(20px) saturate(180%)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, padding: '1rem' }}>
-          <div style={{ background: 'var(--surface)', border: '1px solid var(--input-border)', borderRadius: '16px', padding: '2.5rem', width: '100%', maxWidth: '800px', maxHeight: '90vh', overflowY: 'auto', position: 'relative', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2)' }}>
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--input-border)', borderRadius: '24px', padding: '2.5rem', width: '100%', maxWidth: '800px', maxHeight: '90vh', overflowY: 'auto', position: 'relative', boxShadow: 'var(--shadow-xl)' }}>
             <button onClick={() => setBlitzLead(null)} style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)', padding: '8px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.2s' }} onMouseOver={e => e.currentTarget.style.background = 'rgba(255,0,0,0.5)'} onMouseOut={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'} title="Close">
               <X size={20} />
             </button>
@@ -1141,13 +1141,13 @@ function Dashboard() {
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               {/* Email */}
-              <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid #222', borderRadius: '8px', padding: '1rem' }}>
+              <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid #222', borderRadius: '24px', padding: '1rem' }}>
                 <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0 0 1rem 0', color: '#e2e8f0', fontSize: '1rem' }}>📧 Step 1: The Cold Email</h3>
-                <div style={{ background: 'var(--surface)', padding: '1rem', borderRadius: '6px', fontSize: '0.85rem', color: '#a1a1aa', whiteSpace: 'pre-wrap', fontFamily: 'monospace' }}>
+                <div style={{ background: 'var(--surface)', padding: '1rem', borderRadius: '20px', fontSize: '0.85rem', color: '#a1a1aa', whiteSpace: 'pre-wrap', fontFamily: 'monospace' }}>
                   {generatingId === blitzLead.id && !aiOutreach[blitzLead.id] ? "Generating AI Pitch..." : getEmailBody(blitzLead)}
                 </div>
                 <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem' }}>
-                  <a href={`https://mail.google.com/mail/?view=cm&fs=1&to=${foundEmails[blitzLead.id]?.map((e: any) => e.value).join(',') || blitzLead.contactEmail || ''}&su=${encodeURIComponent(`Exploring synergies at ${blitzLead.company}`)}&body=${encodeURIComponent(getEmailBody(blitzLead))}`} target="_blank" rel="noreferrer" style={{ background: '#4facfe', color: '#000', padding: '8px 16px', borderRadius: '6px', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px' }}><Mail size={16}/> Open in Gmail</a>
+                  <a href={`https://mail.google.com/mail/?view=cm&fs=1&to=${foundEmails[blitzLead.id]?.map((e: any) => e.value).join(',') || blitzLead.contactEmail || ''}&su=${encodeURIComponent(`Exploring synergies at ${blitzLead.company}`)}&body=${encodeURIComponent(getEmailBody(blitzLead))}`} target="_blank" rel="noreferrer" style={{ background: '#4facfe', color: '#000', padding: '8px 16px', borderRadius: '20px', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px' }}><Mail size={16}/> Open in Gmail</a>
                   {!foundEmails[blitzLead.id] && hunterKey && (
                     <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center' }}>Searching for email... <Loader2 size={12} className="animate-spin" style={{ marginLeft: '4px' }} /></span>
                   )}
@@ -1155,9 +1155,9 @@ function Dashboard() {
               </div>
 
               {/* LinkedIn */}
-              <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid #222', borderRadius: '8px', padding: '1rem' }}>
+              <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid #222', borderRadius: '24px', padding: '1rem' }}>
                 <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0 0 1rem 0', color: '#e2e8f0', fontSize: '1rem' }}>💼 Step 2: LinkedIn Connect</h3>
-                <div style={{ background: 'var(--surface)', padding: '1rem', borderRadius: '6px', fontSize: '0.85rem', color: '#a1a1aa', whiteSpace: 'pre-wrap', fontFamily: 'monospace' }}>
+                <div style={{ background: 'var(--surface)', padding: '1rem', borderRadius: '20px', fontSize: '0.85rem', color: '#a1a1aa', whiteSpace: 'pre-wrap', fontFamily: 'monospace' }}>
                   {`Hi! Saw the news about ${blitzLead.company} and wanted to connect. My ${userPersona} helps companies exactly like yours hit their targets faster via fractional execution. Sent you an email with a custom ROI roadmap!`}
                 </div>
                 <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem' }}>
@@ -1166,16 +1166,16 @@ function Dashboard() {
                     const personLinkedIn = foundEmails[blitzLead.id]?.[0]?.linkedin;
                     const targetLinkedIn = personLinkedIn || `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(blitzLead.company)}`;
                     window.open(targetLinkedIn, '_blank'); 
-                  }} style={{ background: '#0a66c2', color: 'var(--text-primary)', border: 'none', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600 }}>
+                  }} style={{ background: '#0a66c2', color: 'var(--text-primary)', border: 'none', padding: '8px 16px', borderRadius: '20px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600 }}>
                     {foundEmails[blitzLead.id]?.[0]?.linkedin ? 'Copy & Open Profile' : 'Copy & Search LinkedIn'}
                   </button>
                 </div>
               </div>
 
               {/* Twitter */}
-              <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid #222', borderRadius: '8px', padding: '1rem' }}>
+              <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid #222', borderRadius: '24px', padding: '1rem' }}>
                 <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0 0 1rem 0', color: '#e2e8f0', fontSize: '1rem' }}>🐦 Step 3: Twitter DM</h3>
-                <div style={{ background: 'var(--surface)', padding: '1rem', borderRadius: '6px', fontSize: '0.85rem', color: '#a1a1aa', whiteSpace: 'pre-wrap', fontFamily: 'monospace' }}>
+                <div style={{ background: 'var(--surface)', padding: '1rem', borderRadius: '20px', fontSize: '0.85rem', color: '#a1a1aa', whiteSpace: 'pre-wrap', fontFamily: 'monospace' }}>
                   {`Huge fan of what you're building at ${blitzLead.company}. Just sent over an email outlining exactly how we can step in and help you hit your scaling targets. Check your inbox!`}
                 </div>
                 <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem' }}>
@@ -1185,7 +1185,7 @@ function Dashboard() {
                      const companyTwitter = hunterData[blitzLead.id]?.twitter;
                      const targetTwitter = personTwitter ? `https://twitter.com/${personTwitter}` : companyTwitter ? `https://twitter.com/${companyTwitter}` : `https://twitter.com/search?q=${encodeURIComponent(blitzLead.company)}&src=typed_query&f=user`;
                      window.open(targetTwitter, '_blank'); 
-                   }} style={{ background: '#1da1f2', color: 'var(--text-primary)', border: 'none', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600 }}>
+                   }} style={{ background: '#1da1f2', color: 'var(--text-primary)', border: 'none', padding: '8px 16px', borderRadius: '20px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600 }}>
                      {foundEmails[blitzLead.id]?.[0]?.twitter || hunterData[blitzLead.id]?.twitter ? 'Copy & Open Profile' : 'Copy & Search Twitter'}
                    </button>
                 </div>
@@ -1198,17 +1198,17 @@ function Dashboard() {
       {/* Business Profile Onboarding Modal */}
       {showProfileModal && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0, 0, 0, 0.4)', backdropFilter: 'blur(20px) saturate(180%)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, padding: '1rem' }}>
-          <div style={{ background: 'var(--surface)', border: '1px solid var(--input-border)', borderRadius: '16px', padding: '2.5rem', width: '100%', maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto', position: 'relative', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2)' }}>
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--input-border)', borderRadius: '24px', padding: '2.5rem', width: '100%', maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto', position: 'relative', boxShadow: 'var(--shadow-xl)' }}>
             <button onClick={() => setShowProfileModal(false)} style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)', padding: '8px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onMouseOver={e => e.currentTarget.style.background = 'rgba(255,0,0,0.5)'} onMouseOut={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}><X size={20} /></button>
 
             <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-              <div style={{ width: '56px', height: '56px', borderRadius: '16px', background: 'linear-gradient(135deg, #7c3aed, #4facfe)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}><User size={28} color="#fff" /></div>
+              <div style={{ width: '56px', height: '56px', borderRadius: '24px', background: 'linear-gradient(135deg, #7c3aed, #4facfe)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}><User size={28} color="#fff" /></div>
               <h2 style={{ margin: '0 0 0.5rem 0', fontSize: '1.5rem', background: 'linear-gradient(135deg, #7c3aed, #4facfe)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Your Business Profile</h2>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>Set up your identity for professional email signatures. All fields are optional.</p>
             </div>
 
             {!businessProfile.fullName && !profileDismissed && (
-              <div style={{ background: 'rgba(255,189,46,0.1)', border: '1px solid rgba(255,189,46,0.3)', borderRadius: '8px', padding: '0.75rem 1rem', marginBottom: '1.5rem', fontSize: '0.85rem', color: '#ffbd2e' }}>
+              <div style={{ background: 'rgba(255,189,46,0.1)', border: '1px solid rgba(255,189,46,0.3)', borderRadius: '24px', padding: '0.75rem 1rem', marginBottom: '1.5rem', fontSize: '0.85rem', color: '#ffbd2e' }}>
                 ⚠️ Without a profile, your AI emails will sign off with generic placeholders like &quot;[Your Name]&quot;.
               </div>
             )}
@@ -1231,12 +1231,12 @@ function Dashboard() {
                       value={(businessProfile as any)[field.key]}
                       onChange={e => setBusinessProfile(prev => ({ ...prev, [field.key]: e.target.value }))}
                       placeholder={field.placeholder}
-                      style={{ flex: 1, padding: '10px 14px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.95rem', outline: 'none', boxSizing: 'border-box' }}
+                      style={{ flex: 1, padding: '10px 14px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '24px', color: 'var(--text-primary)', fontSize: '0.95rem', outline: 'none', boxSizing: 'border-box', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.04), 0 1px 0 rgba(255,255,255,0.8)' }}
                       onFocus={e => e.currentTarget.style.borderColor = '#7c3aed'}
                       onBlur={e => e.currentTarget.style.borderColor = '#333'}
                     />
                     {field.key === 'website' && (
-                      <button onClick={scrapeWebsite} disabled={isScrapingWebsite} style={{ background: 'rgba(124, 58, 237, 0.1)', border: '1px solid #7c3aed', color: 'var(--accent)', padding: '0 1rem', borderRadius: '8px', cursor: isScrapingWebsite ? 'not-allowed' : 'pointer', fontSize: '0.8rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                      <button onClick={scrapeWebsite} disabled={isScrapingWebsite} style={{ background: 'rgba(124, 58, 237, 0.1)', border: '1px solid #7c3aed', color: 'var(--accent)', padding: '0 1rem', borderRadius: '24px', cursor: isScrapingWebsite ? 'not-allowed' : 'pointer', fontSize: '0.8rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
                         {isScrapingWebsite ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />} Auto-Extract
                       </button>
                     )}
@@ -1250,14 +1250,14 @@ function Dashboard() {
                   value={businessProfile.companyContext || ''}
                   onChange={e => setBusinessProfile(prev => ({ ...prev, companyContext: e.target.value }))}
                   placeholder="Enter your website URL above and click Auto-Extract, or write a short description of your core services and unique value proposition here..."
-                  style={{ width: '100%', minHeight: '80px', padding: '10px 14px', background: 'rgba(124, 58, 237, 0.05)', border: '1px solid #7c3aed55', borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.85rem', outline: 'none', boxSizing: 'border-box', resize: 'vertical' }}
+                  style={{ width: '100%', minHeight: '80px', padding: '10px 14px', background: 'rgba(124, 58, 237, 0.05)', border: '1px solid #7c3aed55', borderRadius: '24px', color: 'var(--text-primary)', fontSize: '0.85rem', outline: 'none', boxSizing: 'border-box', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.04), 0 1px 0 rgba(255,255,255,0.8)', resize: 'vertical' }}
                 />
               </div>
             </div>
 
             {/* Signature Preview */}
             {(businessProfile.fullName || businessProfile.companyName) && (
-              <div style={{ marginTop: '1.5rem', background: 'rgba(255,255,255,0.02)', border: '1px solid #222', borderRadius: '8px', padding: '1rem' }}>
+              <div style={{ marginTop: '1.5rem', background: 'rgba(255,255,255,0.02)', border: '1px solid #222', borderRadius: '24px', padding: '1rem' }}>
                 <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.5rem' }}>Signature Preview</p>
                 <div style={{ fontSize: '0.85rem', color: '#a1a1aa', whiteSpace: 'pre-wrap', fontFamily: 'monospace', lineHeight: 1.6 }}>
                   ──────────────{'\n'}
@@ -1271,10 +1271,10 @@ function Dashboard() {
             )}
 
             <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
-              <button onClick={() => { saveBusinessProfile(businessProfile); setShowProfileModal(false); }} style={{ flex: 1, padding: '12px', background: 'linear-gradient(135deg, #7c3aed, #4facfe)', color: 'var(--text-primary)', border: 'none', borderRadius: '8px', fontSize: '1rem', fontWeight: 600, cursor: 'pointer' }}>
+              <button onClick={() => { saveBusinessProfile(businessProfile); setShowProfileModal(false); }} style={{ flex: 1, padding: '12px', background: 'linear-gradient(135deg, #7c3aed, #4facfe)', color: 'var(--text-primary)', border: 'none', borderRadius: '24px', fontSize: '1rem', fontWeight: 600, cursor: 'pointer' }}>
                 Save Profile
               </button>
-              <button onClick={() => { setProfileDismissed(true); setShowProfileModal(false); }} style={{ padding: '12px 20px', background: 'transparent', color: 'var(--text-muted)', border: '1px solid var(--input-border)', borderRadius: '8px', fontSize: '0.9rem', cursor: 'pointer' }}>
+              <button onClick={() => { setProfileDismissed(true); setShowProfileModal(false); }} style={{ padding: '12px 20px', background: 'transparent', color: 'var(--text-muted)', border: '1px solid var(--input-border)', borderRadius: '24px', fontSize: '0.9rem', cursor: 'pointer' }}>
                 Skip for now
               </button>
             </div>
@@ -1285,7 +1285,7 @@ function Dashboard() {
       {/* Ghost Mode Scheduler Modal */}
       {showGhostConfig && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0, 0, 0, 0.4)', backdropFilter: 'blur(20px) saturate(180%)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, padding: '1rem' }}>
-          <div style={{ background: 'var(--surface)', border: '1px solid var(--input-border)', borderRadius: '16px', padding: '2.5rem', width: '100%', maxWidth: '550px', position: 'relative', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2)' }}>
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--input-border)', borderRadius: '24px', padding: '2.5rem', width: '100%', maxWidth: '550px', position: 'relative', boxShadow: 'var(--shadow-xl)' }}>
             <button onClick={() => setShowGhostConfig(false)} style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)', padding: '8px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onMouseOver={e => e.currentTarget.style.background = 'rgba(255,0,0,0.5)'} onMouseOut={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}><X size={20} /></button>
 
             <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
@@ -1297,7 +1297,7 @@ function Dashboard() {
               {/* Scan Time */}
               <div>
                 <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.5px' }}>⏰ Daily Scan Time</label>
-                <input type="time" value={ghostConfig.scanTime} onChange={e => setGhostConfig(prev => ({ ...prev, scanTime: e.target.value }))} style={{ width: '100%', padding: '10px 14px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.95rem', outline: 'none', boxSizing: 'border-box' }} />
+                <input type="time" value={ghostConfig.scanTime} onChange={e => setGhostConfig(prev => ({ ...prev, scanTime: e.target.value }))} style={{ width: '100%', padding: '10px 14px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '24px', color: 'var(--text-primary)', fontSize: '0.95rem', outline: 'none', boxSizing: 'border-box', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.04), 0 1px 0 rgba(255,255,255,0.8)' }} />
               </div>
 
               {/* Leads Per Day */}
@@ -1310,7 +1310,7 @@ function Dashboard() {
               {/* Scan Mode */}
               <div>
                 <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.5px' }}>🎯 Scan Mode</label>
-                <select value={ghostConfig.scanMode} onChange={e => setGhostConfig(prev => ({ ...prev, scanMode: e.target.value }))} style={{ width: '100%', padding: '10px 14px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.95rem', outline: 'none' }}>
+                <select value={ghostConfig.scanMode} onChange={e => setGhostConfig(prev => ({ ...prev, scanMode: e.target.value }))} style={{ width: '100%', padding: '10px 14px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '24px', color: 'var(--text-primary)', fontSize: '0.95rem', outline: 'none' }}>
                   <option value="hiring">🔥 Hiring Intent</option>
                   <option value="layoff">🎯 Layoff Sniper</option>
                   <option value="vc_whale">🐋 VC Whales</option>
@@ -1321,13 +1321,13 @@ function Dashboard() {
               {/* Keywords */}
               <div>
                 <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.5px' }}>🔍 Target Keywords</label>
-                <input type="text" value={ghostConfig.keywords} onChange={e => setGhostConfig(prev => ({ ...prev, keywords: e.target.value }))} placeholder="e.g. React Developer, Marketing Manager" style={{ width: '100%', padding: '10px 14px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.95rem', outline: 'none', boxSizing: 'border-box' }} />
+                <input type="text" value={ghostConfig.keywords} onChange={e => setGhostConfig(prev => ({ ...prev, keywords: e.target.value }))} placeholder="e.g. React Developer, Marketing Manager" style={{ width: '100%', padding: '10px 14px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '24px', color: 'var(--text-primary)', fontSize: '0.95rem', outline: 'none', boxSizing: 'border-box', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.04), 0 1px 0 rgba(255,255,255,0.8)' }} />
               </div>
 
               {/* Slack Webhook */}
               <div>
                 <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.5px' }}>💬 Slack Webhook URL</label>
-                <input type="url" value={ghostConfig.slackWebhook || ''} onChange={e => setGhostConfig(prev => ({ ...prev, slackWebhook: e.target.value }))} placeholder="https://hooks.slack.com/services/..." style={{ width: '100%', padding: '10px 14px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.95rem', outline: 'none', boxSizing: 'border-box' }} />
+                <input type="url" value={ghostConfig.slackWebhook || ''} onChange={e => setGhostConfig(prev => ({ ...prev, slackWebhook: e.target.value }))} placeholder="https://hooks.slack.com/services/..." style={{ width: '100%', padding: '10px 14px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '24px', color: 'var(--text-primary)', fontSize: '0.95rem', outline: 'none', boxSizing: 'border-box', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.04), 0 1px 0 rgba(255,255,255,0.8)' }} />
               </div>
 
               {/* Enable Toggle */}
@@ -1337,7 +1337,7 @@ function Dashboard() {
               </div>
             </div>
 
-            <button onClick={() => { saveGhostConfig(ghostConfig); setShowGhostConfig(false); }} style={{ width: '100%', padding: '14px', marginTop: '2rem', background: ghostConfig.enabled ? 'linear-gradient(135deg, #27c93f, #10b981)' : 'var(--bg-tertiary)', color: ghostConfig.enabled ? '#000' : 'var(--text-muted)', border: 'none', borderRadius: '8px', fontSize: '1rem', fontWeight: 700, cursor: 'pointer' }}>
+            <button onClick={() => { saveGhostConfig(ghostConfig); setShowGhostConfig(false); }} style={{ width: '100%', padding: '14px', marginTop: '2rem', background: ghostConfig.enabled ? 'linear-gradient(135deg, #27c93f, #10b981)' : 'var(--bg-tertiary)', color: ghostConfig.enabled ? '#000' : 'var(--text-muted)', border: 'none', borderRadius: '24px', fontSize: '1rem', fontWeight: 700, cursor: 'pointer' }}>
               {ghostConfig.enabled ? '👻 Save & Activate Ghost Mode' : 'Save Config (Disabled)'}
             </button>
           </div>
@@ -1347,11 +1347,11 @@ function Dashboard() {
       {/* Deep Dive Intelligence Modal */}
       {reportModal && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0, 0, 0, 0.4)', backdropFilter: 'blur(20px) saturate(180%)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, padding: '1rem' }}>
-          <div style={{ background: 'var(--surface)', border: '1px solid rgba(124,58,237,0.3)', borderRadius: '16px', padding: '2.5rem', width: '100%', maxWidth: '700px', maxHeight: '90vh', overflowY: 'auto', position: 'relative', boxShadow: '0 25px 50px -12px rgba(124,58,237,0.15)' }}>
+          <div style={{ background: 'var(--surface)', border: '1px solid rgba(124,58,237,0.3)', borderRadius: '24px', padding: '2.5rem', width: '100%', maxWidth: '700px', maxHeight: '90vh', overflowY: 'auto', position: 'relative', boxShadow: '0 25px 50px -12px rgba(124,58,237,0.15)' }}>
             <button onClick={() => setReportModal(null)} style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)', padding: '8px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onMouseOver={e => e.currentTarget.style.background = 'rgba(255,0,0,0.5)'} onMouseOut={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}><X size={20} /></button>
 
             <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-              <div style={{ width: '56px', height: '56px', borderRadius: '16px', background: 'linear-gradient(135deg, #7c3aed, #4facfe)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}><Sparkles size={28} color="#fff" /></div>
+              <div style={{ width: '56px', height: '56px', borderRadius: '24px', background: 'linear-gradient(135deg, #7c3aed, #4facfe)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}><Sparkles size={28} color="#fff" /></div>
               <h2 style={{ margin: '0 0 0.5rem 0', fontSize: '1.5rem', background: 'linear-gradient(135deg, #7c3aed, #4facfe)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Company Intelligence</h2>
               <p style={{ color: 'var(--text-muted)', fontSize: '1rem', margin: 0, fontWeight: 500 }}>{reportModal.lead.company}</p>
             </div>
@@ -1363,7 +1363,7 @@ function Dashboard() {
               </div>
 
               {reportModal.report.recent_news && (
-                <div style={{ padding: '1rem', background: 'var(--input-bg)', borderRadius: '8px', border: '1px solid var(--input-border)' }}>
+                <div style={{ padding: '1rem', background: 'var(--input-bg)', borderRadius: '24px', border: '1px solid var(--input-border)' }}>
                   <h4 style={{ color: '#a78bfa', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '1px', margin: '0 0 0.5rem 0' }}>Recent Milestones</h4>
                   <div style={{ color: '#ccc', fontSize: '0.9rem', lineHeight: '1.5', whiteSpace: 'pre-wrap' }}>{reportModal.report.recent_news}</div>
                 </div>
@@ -1405,7 +1405,7 @@ function Dashboard() {
             </div>
 
             {/* DM Content */}
-            <div style={{ background: 'rgba(10, 102, 194, 0.06)', border: '1px solid rgba(10,102,194,0.2)', borderRadius: '12px', padding: '1.25rem', marginBottom: '1.5rem', position: 'relative' }}>
+            <div style={{ background: 'rgba(10, 102, 194, 0.06)', border: '1px solid rgba(10,102,194,0.2)', borderRadius: '20px', padding: '1.25rem', marginBottom: '1.5rem', position: 'relative' }}>
               <div style={{ position: 'absolute', top: '-10px', left: '16px', background: '#0a66c2', color: 'var(--text-primary)', fontSize: '0.65rem', padding: '2px 10px', borderRadius: '999px', fontWeight: 700, letterSpacing: '0.5px' }}>✨ AI GENERATED DM</div>
               <p style={{ margin: 0, color: '#e2e8f0', fontSize: '0.95rem', lineHeight: '1.7', whiteSpace: 'pre-wrap', fontFamily: 'inherit' }}>{linkedinDMModal.dm}</p>
             </div>
@@ -1426,7 +1426,7 @@ function Dashboard() {
                   setCopiedDmId(linkedinDMModal.lead.id);
                   setTimeout(() => setCopiedDmId(null), 2000);
                 }}
-                style={{ width: '100%', padding: '14px', background: copiedDmId === linkedinDMModal.lead.id ? 'linear-gradient(135deg, #27c93f, #10b981)' : 'linear-gradient(135deg, #0a66c2, #0077b5)', color: 'var(--text-primary)', border: 'none', borderRadius: '10px', fontSize: '1rem', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', transition: 'all 0.2s' }}
+                style={{ width: '100%', padding: '14px', background: copiedDmId === linkedinDMModal.lead.id ? 'linear-gradient(135deg, #27c93f, #10b981)' : 'linear-gradient(135deg, #0a66c2, #0077b5)', color: 'var(--text-primary)', border: 'none', borderRadius: '16px', fontSize: '1rem', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', transition: 'all 0.2s' }}
               >
                 {copiedDmId === linkedinDMModal.lead.id ? <><Check size={18} /> Copied to Clipboard!</> : <><Copy size={18} /> Copy DM</>}
               </button>
@@ -1434,7 +1434,7 @@ function Dashboard() {
                 href={`https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(linkedinDMModal.lead.company)}`}
                 target="_blank"
                 rel="noreferrer"
-                style={{ width: '100%', padding: '12px', background: 'transparent', color: '#0a66c2', border: '1px solid rgba(10,102,194,0.4)', borderRadius: '10px', fontSize: '0.9rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', textDecoration: 'none', transition: 'all 0.2s', boxSizing: 'border-box' }}
+                style={{ width: '100%', padding: '12px', background: 'transparent', color: '#0a66c2', border: '1px solid rgba(10,102,194,0.4)', borderRadius: '16px', fontSize: '0.9rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', textDecoration: 'none', transition: 'all 0.2s', boxSizing: 'border-box', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.04), 0 1px 0 rgba(255,255,255,0.8)' }}
               >
                 🔍 Find Contact on LinkedIn →
               </a>
