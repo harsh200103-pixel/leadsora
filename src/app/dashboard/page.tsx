@@ -686,7 +686,7 @@ function Dashboard() {
           {/* Dynamic Keyword Suggestions from Auto-Extract */}
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
             {businessProfile?.suggestedRoles && businessProfile.suggestedRoles.length > 0 ? (
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center', justifyContent: 'center' }}>
+              <div className="ai-target-suggestions">
                 <span className="text-xs text-[#888] uppercase tracking-wider font-semibold">AI Target Suggestions:</span>
                 {businessProfile.suggestedRoles.map((role, idx) => (
                   <button key={idx} type="button" onClick={() => setSearchQuery(role)} style={{ fontSize: '0.75rem', background: 'rgba(124,58,237,0.1)', color: '#a78bfa', border: '1px solid #7c3aed', padding: '0.375rem 0.75rem', borderRadius: '9999px', cursor: 'pointer', fontWeight: 600, boxShadow: '0 0 10px rgba(124,58,237,0.2)' }}>
@@ -695,7 +695,7 @@ function Dashboard() {
                 ))}
               </div>
             ) : (
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center', justifyContent: 'center' }}>
+              <div className="ai-target-suggestions">
                 <span className="text-xs text-[#888] uppercase tracking-wider font-semibold">Popular Targets:</span>
                 {['React Developer', 'Software Engineer', 'Full Stack', 'DevOps', 'Mobile'].map((kw) => (
                   <button key={kw} type="button" onClick={() => setSearchQuery(kw)} style={{ fontSize: '0.75rem', background: 'rgba(255,255,255,0.05)', color: '#aaa', border: '1px solid rgba(255,255,255,0.1)', padding: '0.375rem 0.75rem', borderRadius: '9999px', cursor: 'pointer' }}>
@@ -860,7 +860,7 @@ function Dashboard() {
                           {aiOutreach[lead.id] && <span style={{ position: 'absolute', top: '-10px', left: '12px', background: 'linear-gradient(135deg,#7c3aed,#4facfe)', color: 'var(--text-primary)', fontSize: '0.65rem', padding: '2px 8px', borderRadius: '999px', fontWeight: 700 }}>✨ AI Generated</span>}
                           
                           {/* Omnichannel Blitz / AI Actions */}
-                          <div className="ai-actions-mobile" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', alignSelf: 'flex-end', marginBottom: '0.75rem', flexWrap: 'wrap' }}>
+                          <div className="ai-actions-mobile outreach-actions">
                             <button onClick={() => { setBlitzLead(lead); if(!aiOutreach[lead.id]) generateAIOutreach(lead); if(!foundEmails[lead.id] && hunterKey) fetchEmailsWithHunter(lead); }} disabled={!!generatingId} style={{ background: 'linear-gradient(135deg, #7c3aed, #4facfe)', color: 'var(--text-primary)', border: 'none', cursor: generatingId ? 'not-allowed' : 'pointer', padding: '4px 12px', borderRadius: '4px', fontWeight: 'bold', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '6px' }} title="Omnichannel Blitz">
                               {generatingId === lead.id ? <Loader2 size={12} className="animate-spin" /> : <><Sparkles size={12} /> Blitz</>}
                             </button>
@@ -888,7 +888,7 @@ function Dashboard() {
                         {/* Deep Dive Intelligence Report (List View) Removed (Moved to Modal) */}
 
                         {/* Contact Info / Hunter Integration */}
-                        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center', marginTop: '1rem' }}>
+                        <div className="lead-card-actions">
                           <button 
                             onClick={() => fetchEmailsWithHunter(lead)} 
                             disabled={fetchingEmailsFor === lead.id}
