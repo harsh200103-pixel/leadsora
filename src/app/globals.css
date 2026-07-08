@@ -1,5 +1,5 @@
 /* ===================================================
-   LEADSORA — Premium Design System v2.0
+   ISAI LEADS — Premium Design System v2.0 (ISAI Tech White Luxury Theme)
    Light Mode Default | Dark Mode Toggle
    =================================================== */
 
@@ -8,48 +8,48 @@
 
 /* ── Light Mode (Default) ── */
 :root {
-  --bg:              #f5f5f7;
-  --bg-secondary:    #ffffff;
-  --bg-tertiary:     #f0f0f2;
-  --surface:         rgba(255, 255, 255, 0.65);
-  --surface-raised:  rgba(255, 255, 255, 0.85);
-  --highlight:       rgba(255, 255, 255, 0.7);
-  --border:          rgba(0, 0, 0, 0.06);
-  --border-strong:   rgba(0, 0, 0, 0.12);
-  --text-primary:    #0a0a0f;
-  --text-secondary:  #4b5563;
-  --text-muted:      #9ca3af;
-  --accent:          #6366f1;
-  --accent-hover:    #4f46e5;
-  --accent-light:    rgba(99, 102, 241, 0.1);
-  --accent-glow:     rgba(99, 102, 241, 0.25);
+  --bg:              #ffffff;
+  --bg-secondary:    #f8f9fc;
+  --bg-tertiary:     #f0f4fa;
+  --surface:         rgba(255, 255, 255, 0.75);
+  --surface-raised:  rgba(255, 255, 255, 0.95);
+  --highlight:       rgba(255, 255, 255, 0.8);
+  --border:          rgba(0, 14, 57, 0.08);
+  --border-strong:   rgba(0, 14, 57, 0.16);
+  --text-primary:    #000E39;
+  --text-secondary:  #00194A;
+  --text-muted:      #64748b;
+  --accent:          #00AEEF;
+  --accent-hover:    #0088cc;
+  --accent-light:    rgba(0, 174, 239, 0.1);
+  --accent-glow:     rgba(0, 174, 239, 0.25);
   --green:           #059669;
   --green-light:     rgba(5, 150, 105, 0.1);
   --yellow:          #d97706;
   --yellow-light:    rgba(217, 119, 6, 0.1);
   --red:             #dc2626;
   --red-light:       rgba(220, 38, 38, 0.1);
-  --blue:            #2563eb;
-  --blue-light:      rgba(37, 99, 235, 0.1);
-  --purple:          #7c3aed;
-  --purple-light:    rgba(124, 58, 237, 0.1);
-  --shadow-sm:       0 4px 14px rgba(0,0,0,0.06), inset 0 1px 1px var(--highlight);
-  --shadow-md:       0 12px 32px rgba(0,0,0,0.08), inset 0 1px 1px var(--highlight);
-  --shadow-lg:       0 20px 48px rgba(0,0,0,0.12), inset 0 1px 1px var(--highlight);
-  --shadow-xl:       0 30px 60px rgba(0,0,0,0.15), inset 0 1px 1px var(--highlight);
-  --glow:            0 0 20px rgba(99, 102, 241, 0.15);
-  --glow-hover:      0 0 30px rgba(99, 102, 241, 0.3);
+  --blue:            #00D4FF;
+  --blue-light:      rgba(0, 212, 255, 0.1);
+  --purple:          #00AEEF;
+  --purple-light:    rgba(0, 174, 239, 0.1);
+  --shadow-sm:       0 4px 14px rgba(0, 14, 57, 0.06), inset 0 1px 1px var(--highlight);
+  --shadow-md:       0 12px 32px rgba(0, 14, 57, 0.08), inset 0 1px 1px var(--highlight);
+  --shadow-lg:       0 20px 48px rgba(0, 14, 57, 0.12), inset 0 1px 1px var(--highlight);
+  --shadow-xl:       0 30px 60px rgba(0, 14, 57, 0.15), inset 0 1px 1px var(--highlight);
+  --glow:            0 0 20px rgba(0, 174, 239, 0.15);
+  --glow-hover:      0 0 30px rgba(0, 174, 239, 0.3);
   --radius-sm:       12px;
   --radius-md:       16px;
   --radius-lg:       24px;
   --radius-xl:       32px;
-  --nav-bg:          rgba(255,255,255,0.85);
-  --nav-border:      rgba(0,0,0,0.08);
+  --nav-bg:          rgba(255, 255, 255, 0.9);
+  --nav-border:      rgba(0, 14, 57, 0.08);
   --input-bg:        #ffffff;
-  --input-border:    rgba(0,0,0,0.12);
-  --scrollbar-thumb: rgba(0,0,0,0.15);
-  --grid-line:       rgba(0,0,0,0.03);
-  --badge-bg:        rgba(0,0,0,0.06);
+  --input-border:    rgba(0, 14, 57, 0.14);
+  --scrollbar-thumb: rgba(0, 14, 57, 0.15);
+  --grid-line:       rgba(0, 14, 57, 0.04);
+  --badge-bg:        rgba(0, 174, 239, 0.08);
 }
 
 /* ── Dark Mode ── */
@@ -65,10 +65,10 @@
   --text-primary:    #f0f0ff;
   --text-secondary:  #a0a0c0;
   --text-muted:      #5a5a80;
-  --accent:          #818cf8;
-  --accent-hover:    #a5b4fc;
-  --accent-light:    rgba(129, 140, 248, 0.12);
-  --accent-glow:     rgba(129, 140, 248, 0.3);
+  --accent:          #00AEEF;
+  --accent-hover:    #00D4FF;
+  --accent-light:    rgba(0, 174, 239, 0.12);
+  --accent-glow:     rgba(0, 174, 239, 0.3);
   --green:           #34d399;
   --green-light:     rgba(52, 211, 153, 0.1);
   --yellow:          #fbbf24;
@@ -77,14 +77,14 @@
   --red-light:       rgba(248, 113, 113, 0.1);
   --blue:            #60a5fa;
   --blue-light:      rgba(96, 165, 250, 0.1);
-  --purple:          #a78bfa;
-  --purple-light:    rgba(167, 139, 250, 0.1);
+  --purple:          #00AEEF;
+  --purple-light:    rgba(0, 174, 239, 0.1);
   --shadow-sm:       0 4px 14px rgba(0,0,0,0.4), inset 0 1px 1px var(--highlight);
   --shadow-md:       0 12px 32px rgba(0,0,0,0.5), inset 0 1px 1px var(--highlight);
   --shadow-lg:       0 20px 48px rgba(0,0,0,0.6), inset 0 1px 1px var(--highlight);
   --shadow-xl:       0 30px 60px rgba(0,0,0,0.7), inset 0 1px 1px var(--highlight);
-  --glow:            0 0 20px rgba(129, 140, 248, 0.1);
-  --glow-hover:      0 0 30px rgba(129, 140, 248, 0.25);
+  --glow:            0 0 20px rgba(0, 174, 239, 0.15);
+  --glow-hover:      0 0 30px rgba(0, 174, 239, 0.3);
   --nav-bg:          rgba(8, 8, 16, 0.9);
   --nav-border:      rgba(255, 255, 255, 0.07);
   --input-bg:        rgba(255, 255, 255, 0.04);
@@ -481,7 +481,7 @@ footer {
 .badge-yellow { background: var(--yellow-light); color: var(--yellow); border: 1px solid rgba(217,119,6,0.2); }
 .badge-red { background: var(--red-light); color: var(--red); border: 1px solid rgba(220,38,38,0.2); }
 .badge-blue { background: var(--blue-light); color: var(--blue); border: 1px solid rgba(37,99,235,0.2); }
-.badge-purple { background: var(--purple-light); color: var(--purple); border: 1px solid rgba(124,58,237,0.2); }
+.badge-purple { background: var(--purple-light); color: var(--purple); border: 1px solid rgba(0, 174, 239, 0.2); }
 .badge-neutral { background: var(--badge-bg); color: var(--text-secondary); border: 1px solid var(--border); }
 
 /* ── Nav Links ── */

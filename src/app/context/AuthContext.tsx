@@ -33,7 +33,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Email/password login — stores users in localStorage for now
   const login = async (email: string, password: string): Promise<boolean> => {
-    const users = JSON.parse(localStorage.getItem('dealfinder_users') || '[]');
+    const users = JSON.parse(localStorage.getItem('isai_leads_users') || '[]');
     const found = users.find((u: any) => u.email === email && u.password === password);
     if (!found) return false;
     // Sign in with credentials via NextAuth
@@ -46,30 +46,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signup = async (name: string, email: string, password: string): Promise<boolean> => {
-    const users = JSON.parse(localStorage.getItem('dealfinder_users') || '[]');
+    const users = JSON.parse(localStorage.getItem('isai_leads_users') || '[]');
     const exists = users.find((u: any) => u.email === email);
     if (exists) return false;
     users.push({ name, email, password });
-    localStorage.setItem('dealfinder_users', JSON.stringify(users));
+    localStorage.setItem('isai_leads_users', JSON.stringify(users));
     // Auto login after signup
     await signIn('credentials', { redirect: false, email, password });
     return true;
   };
 
   const logout = () => {
-    signOut({ callbackUrl: '/login' });
+    localStorage.removeItem('isai_leads_user');
+    signOut({ callbackUrl: '/' });
   };
 
   // Real Google OAuth
   const loginWithGoogle = async (): Promise<boolean> => {
     // Dummy implementation as requested by user
-    const dummyUser = { name: 'Google User', email: 'demo@leadsora.com', password: 'google_dummy_password' };
+    const dummyUser = { name: 'Google User', email: 'demo@isaileads.com', password: 'google_dummy_password' };
     
-    const users = JSON.parse(localStorage.getItem('dealfinder_users') || '[]');
+    const users = JSON.parse(localStorage.getItem('isai_leads_users') || '[]');
     const exists = users.find((u: any) => u.email === dummyUser.email);
     if (!exists) {
       users.push(dummyUser);
-      localStorage.setItem('dealfinder_users', JSON.stringify(users));
+      localStorage.setItem('isai_leads_users', JSON.stringify(users));
     }
     
     // Attempt standard credentials login to set the NextAuth cookie

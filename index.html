@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ISAI LEADS — AI & Custom Software by ISAI Tech Solutions</title>
+  <meta name="description" content="Custom software, AI systems, and automated operations built by senior engineers at ISAI Tech Solutions. No juniors. No surprises." />
+  <meta name="keywords" content="AI integration, custom software, workflow automation, GPT-4o, Claude 3.7, Gemini 2.0, ISAI Tech Solutions, ISAI Leads" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Spotlight Cursor -->
+  <div class="spotlight" id="spotlight"></div>
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="navbar" id="navbar" role="navigation" aria-label="Main navigation">
+    <div class="nav-container">
+      <a href="#home" class="nav-logo" aria-label="ISAI LEADS Home">
+        <img src="isai-logo.svg" alt="ISAI LEADS Logo" style="height: 48px; width: auto;" />
+      </a>
+      <ul class="nav-links" role="list">
+        <li><a href="#about" class="nav-link">About</a></li>
+        <li><a href="#process" class="nav-link">Process</a></li>
+        <li><a href="#services" class="nav-link">Services</a></li>
+        <li><a href="#contact" class="nav-link">Contact</a></li>
+      </ul>
+      <a href="#contact" class="btn-nav magnetic-btn" id="nav-cta">Book a Call</a>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="mobile-menu" id="mobile-menu" aria-hidden="true">
+      <a href="#about" class="mobile-link">About</a>
+      <a href="#process" class="mobile-link">Process</a>
+      <a href="#services" class="mobile-link">Services</a>
+      <a href="#contact" class="mobile-link">Contact</a>
+      <a href="#contact" class="btn-nav mobile-cta">Book a Call</a>
+    </div>
+  </nav>
+
+  <!-- ===== HERO ===== -->
+  <section class="hero" id="home" aria-labelledby="hero-headline">
+    <!-- Cinematic persistent background (always underneath) -->
+    <canvas id="cinematic-canvas" aria-hidden="true"></canvas>
+    <!-- Background Video — plays once then fades out -->
+    <video class="hero-video" id="hero-video" autoplay muted playsinline aria-hidden="true">
+      <source src="bg-video.mp4" type="video/mp4" />
+    </video>
+    <div class="hero-video-overlay" aria-hidden="true"></div>
+    <!-- Wireframe sphere canvas (on top of cinematic) -->
+    <canvas id="hero-canvas" aria-hidden="true"></canvas>
+    <div class="hero-particles" aria-hidden="true" id="hero-particles"></div>
+    <div class="hero-content parallax-slow">
+      <div class="hero-badge fade-up">
+        <span class="badge-dot"></span>
+        Available for new enterprises & projects
+      </div>
+      <h1 class="hero-headline fade-up" id="hero-headline">
+        AI is the Strategy.<br /><em>We're the Execution.</em>
+      </h1>
+      <p class="hero-sub fade-up">
+        Custom software. AI systems. Automated operations — built by senior engineers at ISAI Tech Solutions who understand your business before writing a single line of code.
+      </p>
+      <div class="hero-ctas fade-up">
+        <a href="#contact" class="btn-primary magnetic-btn" id="hero-cta-primary">Book a Consultation</a>
+        <a href="#services" class="btn-ghost magnetic-btn" id="hero-cta-secondary">See Our Services <span class="arrow">→</span></a>
+      </div>
+    </div>
+    <div class="hero-scroll-hint fade-up" aria-hidden="true">
+      <span class="scroll-line"></span>
+      <span class="scroll-text">Scroll</span>
+    </div>
+  </section>
+
+  <!-- ===== TRUST BAR / TICKER ===== -->
+  <div class="trust-bar" aria-label="Partners and methodologies">
+    <div class="ticker-track">
+      <div class="ticker-content">
+        <span>GPT-4o & Claude 3.7 Integrated</span>
+        <span class="ticker-dot">●</span>
+        <span>100% Senior Engineering Talent</span>
+        <span class="ticker-dot">●</span>
+        <span>Zero-Downtime Deployment</span>
+        <span class="ticker-dot">●</span>
+        <span>Business-First Architecture</span>
+        <span class="ticker-dot">●</span>
+        <span>Enterprise RAG & AI Agents</span>
+        <span class="ticker-dot">●</span>
+        <span>Powered by ISAI Tech Solutions</span>
+        <span class="ticker-dot">●</span>
+        <span>GPT-4o & Claude 3.7 Integrated</span>
+        <span class="ticker-dot">●</span>
+        <span>100% Senior Engineering Talent</span>
+        <span class="ticker-dot">●</span>
+        <span>Zero-Downtime Deployment</span>
+        <span class="ticker-dot">●</span>
+        <span>Business-First Architecture</span>
+        <span class="ticker-dot">●</span>
+        <span>Enterprise RAG & AI Agents</span>
+        <span class="ticker-dot">●</span>
+        <span>Powered by ISAI Tech Solutions</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== WHO WE ARE ===== -->
+  <section class="section about-section" id="about" aria-labelledby="about-headline">
+    <div class="section-divider" aria-hidden="true"><span class="divider-line"></span></div>
+    <div class="container">
+      <div class="section-tag fade-up">Who We Are</div>
+      <div class="about-grid">
+        <div class="about-text fade-up">
+          <h2 class="section-headline" id="about-headline">
+            Senior Talent.<br />Clear Process.<br /><em>No Surprises.</em>
+          </h2>
+          <p class="about-body">
+            No juniors, no bloat, no agency theater. At ISAI Tech Solutions, we partner with founders and executives who need software built right the first time. Every engagement starts with deep business understanding — code comes second.
+          </p>
+          <a href="#process" class="btn-ghost-sm magnetic-btn">See How We Work →</a>
+        </div>
+        <div class="about-stats fade-up">
+          <div class="stat-card glass-card" id="stat-1">
+            <div class="stat-icon">◈</div>
+            <div class="stat-number" data-target="50" data-suffix="+">0</div>
+            <div class="stat-label">Projects Delivered</div>
+          </div>
+          <div class="stat-card glass-card" id="stat-2">
+            <div class="stat-icon">◉</div>
+            <div class="stat-number" data-target="100" data-suffix="%">0</div>
+            <div class="stat-label">Senior Engineers</div>
+          </div>
+          <div class="stat-card glass-card" id="stat-3">
+            <div class="stat-icon">◆</div>
+            <div class="stat-number" data-target="4" data-suffix="-Step">0</div>
+            <div class="stat-label">Proven Process</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PROCESS ===== -->
+  <section class="section process-section" id="process" aria-labelledby="process-headline">
+    <div class="section-divider" aria-hidden="true"><span class="divider-line"></span></div>
+    <div class="container">
+      <div class="section-tag fade-up">How We Work</div>
+      <h2 class="section-headline centered fade-up" id="process-headline">Four Steps to<br /><em>Remarkable Software</em></h2>
+      <div class="process-track">
+        <div class="process-connector" aria-hidden="true">
+          <div class="connector-line" id="connector-line"></div>
+        </div>
+        <div class="process-steps">
+          <div class="process-step glass-card fade-up" id="step-1">
+            <div class="step-number">01</div>
+            <div class="step-icon">
+              <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+                <circle cx="24" cy="24" r="20" stroke="currentColor" stroke-width="1.8"/>
+                <path d="M16 24C16 19.6 19.6 16 24 16s8 3.6 8 8-3.6 8-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                <circle cx="24" cy="24" r="3" fill="currentColor"/>
+              </svg>
+            </div>
+            <h3 class="step-title">Discover</h3>
+            <p class="step-desc">Deep dive into your business goals, users, and technical landscape. Zero assumptions.</p>
+          </div>
+          <div class="process-step glass-card fade-up" id="step-2">
+            <div class="step-number">02</div>
+            <div class="step-icon">
+              <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+                <rect x="8" y="8" width="32" height="32" rx="4" stroke="currentColor" stroke-width="1.8"/>
+                <path d="M16 20h16M16 28h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                <circle cx="34" cy="28" r="3" stroke="currentColor" stroke-width="1.8"/>
+              </svg>
+            </div>
+            <h3 class="step-title">Design</h3>
+            <p class="step-desc">Architecture blueprints, system design, and UX flows before a single line of code.</p>
+          </div>
+          <div class="process-step glass-card fade-up" id="step-3">
+            <div class="step-number">03</div>
+            <div class="step-icon">
+              <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+                <path d="M12 36l8-20 4 10 4-6 4 16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="36" cy="14" r="4" stroke="currentColor" stroke-width="1.8"/>
+                <path d="M36 10v-2M36 20v2M40 14h2M30 14h-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <h3 class="step-title">Build</h3>
+            <p class="step-desc">Senior engineers write production-grade code. Weekly demos, no surprises, full transparency.</p>
+          </div>
+          <div class="process-step glass-card fade-up" id="step-4">
+            <div class="step-number">04</div>
+            <div class="step-icon">
+              <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+                <path d="M24 8L38 20v20H10V20L24 8z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                <path d="M19 36v-8h10v8" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                <path d="M24 20l3 3-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <h3 class="step-title">Launch & Support</h3>
+            <p class="step-desc">Zero-downtime deployment, post-launch monitoring, and ongoing ISAI partnership.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SERVICES ===== -->
+  <section class="section services-section" id="services" aria-labelledby="services-headline">
+    <div class="section-divider" aria-hidden="true"><span class="divider-line"></span></div>
+    <div class="container">
+      <div class="section-tag fade-up">What We Build</div>
+      <h2 class="section-headline centered fade-up" id="services-headline">Built for Scale.<br /><em>Designed for Results.</em></h2>
+      <div class="services-grid">
+        <div class="service-card glass-card fade-up" id="svc-1" tabindex="0">
+          <div class="service-icon" aria-hidden="true">
+            <svg viewBox="0 0 64 64" fill="none">
+              <path d="M32 8C18.7 8 8 18.7 8 32s10.7 24 24 24 24-10.7 24-24S45.3 8 32 8z" stroke="currentColor" stroke-width="1.8"/>
+              <path d="M24 32c0-4.4 3.6-8 8-8s8 3.6 8 8-3.6 8-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              <path d="M32 24V16M32 48v-8M40 32h8M16 32h8M37.7 26.3l5.6-5.6M20.7 43.3l5.6-5.6M37.7 37.7l5.6 5.6M20.7 20.7l5.6 5.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              <circle cx="32" cy="32" r="3" fill="currentColor"/>
+            </svg>
+          </div>
+          <div class="service-label">01</div>
+          <h3 class="service-title">AI Integration</h3>
+          <p class="service-desc">GPT-4o, Claude 3.7, Gemini 2.0 — latest frontier models and agentic AI systems woven into your existing operations.</p>
+          <ul class="service-features" aria-label="AI Integration features">
+            <li>GPT-4o & Claude 3.7 Integration</li>
+            <li>Custom LLM & RAG Pipelines</li>
+            <li>Agentic AI Workflows</li>
+          </ul>
+          <div class="service-arrow" aria-hidden="true">→</div>
+        </div>
+
+        <div class="service-card glass-card fade-up" id="svc-2" tabindex="0">
+          <div class="service-icon" aria-hidden="true">
+            <svg viewBox="0 0 64 64" fill="none">
+              <rect x="10" y="14" width="44" height="32" rx="4" stroke="currentColor" stroke-width="1.8"/>
+              <path d="M22 50h20M32 46v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              <path d="M20 28l4 4-4 4M30 36h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="service-label">02</div>
+          <h3 class="service-title">Custom Development</h3>
+          <p class="service-desc">Scalable software architecture with zero shortcuts — built to grow with your business.</p>
+          <ul class="service-features" aria-label="Custom Development features">
+            <li>Full-Stack Web & Mobile</li>
+            <li>API Design & Integrations</li>
+            <li>Scalable Architecture</li>
+          </ul>
+          <div class="service-arrow" aria-hidden="true">→</div>
+        </div>
+
+        <div class="service-card glass-card fade-up" id="svc-3" tabindex="0">
+          <div class="service-icon" aria-hidden="true">
+            <svg viewBox="0 0 64 64" fill="none">
+              <path d="M16 32h8l4-8 6 16 4-12 4 8 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="48" cy="20" r="6" stroke="currentColor" stroke-width="1.8"/>
+              <path d="M48 17v3l2 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="service-label">03</div>
+          <h3 class="service-title">Process Automation</h3>
+          <p class="service-desc">End-to-end operational automation that removes bottlenecks and lets your team focus on growth.</p>
+          <ul class="service-features" aria-label="Process Automation features">
+            <li>Workflow Orchestration</li>
+            <li>RPA & Task Automation</li>
+            <li>System Integrations</li>
+          </ul>
+          <div class="service-arrow" aria-hidden="true">→</div>
+        </div>
+
+        <div class="service-card glass-card fade-up" id="svc-4" tabindex="0">
+          <div class="service-icon" aria-hidden="true">
+            <svg viewBox="0 0 64 64" fill="none">
+              <path d="M12 48V36l10-10 8 8 12-16 10 10V48H12z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+              <path d="M12 48h40" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              <circle cx="22" cy="38" r="3" fill="currentColor"/>
+              <circle cx="30" cy="32" r="3" fill="currentColor"/>
+              <circle cx="42" cy="22" r="3" fill="currentColor"/>
+            </svg>
+          </div>
+          <div class="service-label">04</div>
+          <h3 class="service-title">Analytics & Insights</h3>
+          <p class="service-desc">Data pipelines, real-time dashboards, and decision intelligence — turn raw data into revenue.</p>
+          <ul class="service-features" aria-label="Analytics features">
+            <li>Data Pipeline Design</li>
+            <li>Real-Time Dashboards</li>
+            <li>Predictive Analytics</li>
+          </ul>
+          <div class="service-arrow" aria-hidden="true">→</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== WHY US ===== -->
+  <section class="section why-section" id="why" aria-labelledby="why-headline">
+    <div class="section-divider" aria-hidden="true"><span class="divider-line"></span></div>
+    <div class="container">
+      <div class="section-tag fade-up">Why Choose Us</div>
+      <h2 class="section-headline centered fade-up" id="why-headline">The ISAI LEADS<br /><em>Difference</em></h2>
+      <div class="why-grid">
+        <div class="why-card glass-card fade-up" id="why-1">
+          <div class="why-check" aria-hidden="true">✓</div>
+          <h3 class="why-title">No Juniors. Ever.</h3>
+          <p class="why-desc">Every person who touches your codebase is a battle-tested senior engineer from ISAI Tech Solutions. We don't train on your dime.</p>
+        </div>
+        <div class="why-card glass-card fade-up" id="why-2">
+          <div class="why-check" aria-hidden="true">✓</div>
+          <h3 class="why-title">Business-First Thinking</h3>
+          <p class="why-desc">We start with your revenue and operational metrics, not just our stack. Technology serves strategy — never the other way around.</p>
+        </div>
+        <div class="why-card glass-card fade-up" id="why-3">
+          <div class="why-check" aria-hidden="true">✓</div>
+          <h3 class="why-title">Momentum After Launch</h3>
+          <p class="why-desc">We stick around. Post-launch support, performance monitoring, and continuous iterations included as your long-term partner.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CTA BANNER ===== -->
+  <section class="cta-banner" id="cta-banner" aria-labelledby="cta-headline">
+    <div class="cta-noise" aria-hidden="true"></div>
+    <div class="cta-grid-bg" aria-hidden="true"></div>
+    <div class="container cta-inner">
+      <div class="cta-badge fade-up">Ready to Transform?</div>
+      <h2 class="cta-headline fade-up" id="cta-headline">Ready to Transform<br /><em>Your Business?</em></h2>
+      <p class="cta-sub fade-up">Let's discuss how AI and custom engineering can drive real results for your operations.</p>
+      <a href="#contact" class="btn-primary btn-large magnetic-btn fade-up" id="cta-main-btn">Start Your Free Consultation →</a>
+    </div>
+  </section>
+
+  <!-- ===== CONTACT ===== -->
+  <section class="section contact-section" id="contact" aria-labelledby="contact-headline">
+    <div class="section-divider" aria-hidden="true"><span class="divider-line"></span></div>
+    <div class="container contact-grid">
+      <div class="contact-info fade-up">
+        <div class="section-tag">Get in Touch</div>
+        <h2 class="section-headline" id="contact-headline">Let's Build<br /><em>Something Remarkable</em></h2>
+        <p class="contact-tagline">AI-Powered Solutions by ISAI Tech Solutions</p>
+        <div class="contact-details">
+          <div class="contact-item">
+            <span class="contact-icon" aria-hidden="true">✉</span>
+            <a href="mailto:leads@isaitechsolutions.com" class="contact-link">leads@isaitechsolutions.com</a>
+          </div>
+          <div class="contact-item">
+            <span class="contact-icon" aria-hidden="true">◎</span>
+            <span>Available Worldwide · Remote-First · Enterprise Ready</span>
+          </div>
+        </div>
+        <div class="social-links" aria-label="Social media links">
+          <a href="#" class="social-btn magnetic-btn" id="linkedin-btn" aria-label="LinkedIn">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <rect x="2" y="2" width="20" height="20" rx="4" stroke="currentColor" stroke-width="1.8"/>
+              <path d="M7 10v7M7 7v.5M12 17v-4c0-1.5.5-3 2.5-3s2.5 1.5 2.5 3v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+            LinkedIn
+          </a>
+          <a href="#" class="social-btn magnetic-btn" id="twitter-btn" aria-label="Twitter / X">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M4 4l16 16M4 20L20 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+            Twitter
+          </a>
+        </div>
+      </div>
+      <div class="contact-form-wrap fade-up">
+        <form class="contact-form glass-card" id="contact-form" aria-label="Contact form" novalidate>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="contact-name" class="form-label">Name *</label>
+              <input type="text" id="contact-name" name="name" class="form-input" placeholder="Your full name" required autocomplete="name" />
+            </div>
+            <div class="form-group">
+              <label for="contact-email" class="form-label">Email *</label>
+              <input type="email" id="contact-email" name="email" class="form-input" placeholder="you@company.com" required autocomplete="email" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="contact-company" class="form-label">Company</label>
+            <input type="text" id="contact-company" name="company" class="form-input" placeholder="Your company name" autocomplete="organization" />
+          </div>
+          <div class="form-group">
+            <label for="contact-message" class="form-label">Message *</label>
+            <textarea id="contact-message" name="message" class="form-input form-textarea" placeholder="Tell us about your project..." required rows="5"></textarea>
+          </div>
+          <button type="submit" class="btn-primary btn-full magnetic-btn" id="form-submit">
+            <span class="btn-text">Send Message →</span>
+            <span class="btn-loader" aria-hidden="true"></span>
+          </button>
+          <div class="form-success" id="form-success" role="alert" aria-live="polite">
+            ✓ Message sent successfully! We'll get back to you within 24 hours.
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer" role="contentinfo">
+    <div class="footer-divider" aria-hidden="true"></div>
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <img src="isai-logo.svg" alt="ISAI LEADS Logo" style="height: 38px; width: auto;" />
+        </div>
+        <p class="footer-copy">© 2026 ISAI Tech Solutions. All rights reserved.</p>
+      </div>
+      <div class="footer-links-group">
+        <h4 class="footer-group-title">Company</h4>
+        <ul role="list">
+          <li><a href="#about" class="footer-link">About Us</a></li>
+          <li><a href="#services" class="footer-link">Services</a></li>
+          <li><a href="#process" class="footer-link">Process</a></li>
+          <li><a href="#contact" class="footer-link">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-links-group">
+        <h4 class="footer-group-title">Capabilities</h4>
+        <ul role="list">
+          <li><a href="#services" class="footer-link">AI Integration</a></li>
+          <li><a href="#services" class="footer-link">Custom Development</a></li>
+          <li><a href="#services" class="footer-link">Process Automation</a></li>
+          <li><a href="#services" class="footer-link">Analytics & Insights</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="container footer-bottom-inner">
+        <a href="#" class="footer-legal-link">Privacy Policy</a>
+        <a href="#" class="footer-legal-link">Terms of Service</a>
+        <a href="#" class="footer-legal-link">Security & Trust</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>

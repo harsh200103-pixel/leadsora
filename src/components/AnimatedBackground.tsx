@@ -26,10 +26,10 @@ export default function AnimatedBackground() {
     // Theme-aware colors
     const isDark = theme === 'dark';
     const COLORS = isDark
-      ? ['rgba(255,189,46,', 'rgba(255,255,255,', 'rgba(129,140,248,']
-      : ['rgba(99,102,241,', 'rgba(124,58,237,', 'rgba(59,130,246,'];
-    const lineColor = isDark ? 'rgba(255,255,255,' : 'rgba(99,102,241,';
-    const radarColor = isDark ? 'rgba(255,189,46,' : 'rgba(99,102,241,';
+      ? ['rgba(255,189,46,', 'rgba(255,255,255,', 'rgba(0,212,255,']
+      : ['rgba(0,14,57,', 'rgba(0,174,239,', 'rgba(0,212,255,'];
+    const lineColor = isDark ? 'rgba(255,255,255,' : 'rgba(0,174,239,';
+    const radarColor = isDark ? 'rgba(255,189,46,' : 'rgba(0,174,239,';
     const particleOpacity = isDark ? 0.7 : 0.35;
     const connectionOpacity = isDark ? 0.15 : 0.08;
 

@@ -34,7 +34,7 @@ export default function PitchDeck({ params, searchParams }: { params: Promise<{ 
     <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg)', color: 'var(--text-primary)', fontFamily: "'Inter', sans-serif", overflowX: 'hidden' }}>
       
       {/* Background Effects */}
-      <div style={{ position: 'fixed', top: '-20%', left: '-10%', width: '50vw', height: '50vw', background: 'radial-gradient(circle, rgba(124, 58, 237, 0.15) 0%, transparent 70%)', filter: 'blur(80px)', zIndex: 0 }} />
+      <div style={{ position: 'fixed', top: '-20%', left: '-10%', width: '50vw', height: '50vw', background: 'radial-gradient(circle, rgba(0, 174, 239, 0.15) 0%, transparent 70%)', filter: 'blur(80px)', zIndex: 0 }} />
       <div style={{ position: 'fixed', bottom: '-20%', right: '-10%', width: '50vw', height: '50vw', background: 'radial-gradient(circle, rgba(79, 172, 254, 0.15) 0%, transparent 70%)', filter: 'blur(80px)', zIndex: 0 }} />
 
       <div style={{ position: 'relative', zIndex: 1, maxWidth: '1000px', margin: '0 auto', padding: '4rem 2rem' }}>
@@ -48,7 +48,7 @@ export default function PitchDeck({ params, searchParams }: { params: Promise<{ 
             <span style={{ fontSize: '0.85rem', color: '#a1a1aa', letterSpacing: '1px', textTransform: 'uppercase' }}>Exclusive Proposal for {companyName}</span>
           </div>
           <h1 style={{ fontSize: 'clamp(2.5rem, 5vw, 4.5rem)', fontWeight: 800, lineHeight: 1.1, marginBottom: '1.5rem', letterSpacing: '-0.03em' }}>
-            Accelerate <span style={{ background: 'linear-gradient(135deg, #7c3aed, #4facfe)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{companyName}&apos;s</span> Growth.
+            Accelerate <span style={{ background: 'linear-gradient(135deg, #00AEEF, #00D4FF)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{companyName}&apos;s</span> Growth.
           </h1>
           <p style={{ fontSize: '1.25rem', color: '#a1a1aa', maxWidth: '600px', margin: '0 auto', lineHeight: 1.6 }}>
             Bypass the 3-month hiring cycle for {roleName === 'Your Open Role' ? 'your open role' : `your ${roleName}`}. Deploy an elite fractional team tomorrow and hit your scaling targets immediately.
@@ -107,7 +107,7 @@ export default function PitchDeck({ params, searchParams }: { params: Promise<{ 
               { title: "Month 1: Scaling Systems", desc: `Full optimization. We operate as an extension of the ${companyName} team, scaling output autonomously.` }
             ].map((step, i) => (
               <div key={i} style={{ display: 'flex', gap: '1.5rem', background: 'rgba(255,255,255,0.02)', padding: '1.5rem', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'rgba(124, 58, 237, 0.1)', border: '1px solid rgba(124, 58, 237, 0.3)', display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#a78bfa', fontSize: '1.25rem', fontWeight: 700, flexShrink: 0 }}>
+                <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'rgba(0, 174, 239, 0.1)', border: '1px solid rgba(0, 174, 239, 0.3)', display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#00AEEF', fontSize: '1.25rem', fontWeight: 700, flexShrink: 0 }}>
                   {i + 1}
                 </div>
                 <div>
@@ -121,7 +121,7 @@ export default function PitchDeck({ params, searchParams }: { params: Promise<{ 
 
         {/* CTA */}
         <div 
-          style={{ textAlign: 'center', background: 'linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(79, 172, 254, 0.1))', padding: '4rem 2rem', borderRadius: '24px', border: '1px solid rgba(124, 58, 237, 0.2)', animation: 'fadeInUp 0.6s ease-out 0.6s forwards', opacity: 0 }}
+          style={{ textAlign: 'center', background: 'linear-gradient(135deg, rgba(0, 174, 239, 0.1), rgba(0, 212, 255, 0.1))', padding: '4rem 2rem', borderRadius: '24px', border: '1px solid rgba(0, 174, 239, 0.2)', animation: 'fadeInUp 0.6s ease-out 0.6s forwards', opacity: 0 }}
         >
           <h2 style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '1rem' }}>Ready to scale {companyName}?</h2>
           <p style={{ color: '#a1a1aa', marginBottom: '2.5rem', fontSize: '1.1rem' }}>Let&apos;s hop on a 15-minute discovery call to map out exactly how we can step in.</p>

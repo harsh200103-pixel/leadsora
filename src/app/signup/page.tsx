@@ -58,7 +58,7 @@ export default function SignupPage() {
       }} />
       <div style={{
         position: 'fixed', width: '600px', height: '600px',
-        background: 'radial-gradient(circle, rgba(124,58,237,0.04) 0%, transparent 60%)',
+        background: 'radial-gradient(circle, rgba(0,174,239,0.04) 0%, transparent 60%)',
         bottom: '-200px', left: '-200px', borderRadius: '50%', zIndex: 0,
       }} />
 

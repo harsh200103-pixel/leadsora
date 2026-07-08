@@ -11,6 +11,10 @@ export async function POST(request: NextRequest) {
     let text = '';
     let color = '#27c93f';
 
+    const host = req.headers.get('host') || 'localhost:3000';
+    const protocol = host.includes('localhost') ? 'http' : 'https';
+    const origin = req.headers.get('origin') || `${protocol}://${host}`;
+
     if (type === 'new_lead') {
       color = lead.intentScore >= 90 ? '#ff5f56' : '#ffbd2e';
       text = [
@@ -18,18 +22,18 @@ export async function POST(request: NextRequest) {
         `*Company:* ${lead.company}`,
         `*Signal:* ${lead.problem || lead.title}`,
         `*Location:* ${lead.country || 'Global'}`,
-        `*Source:* ${lead.source || 'LEADSORA Scanner'}`,
+        `*Source:* ${lead.source || 'ISAI LEADS Scanner'}`,
         `*Posted:* ${lead.postedAt || 'Recently'}`,
-        `<https://leadsora.vercel.app/dashboard|👉 Open in LEADSORA>`,
+        `<${origin}/dashboard|👉 Open in ISAI LEADS>`,
       ].join('\n');
     } else if (type === 'follow_up') {
-      color = '#7c3aed';
+      color = '#00AEEF';
       text = [
         `🤖 *Auto-Follow-Up Engine Triggered*`,
         `*Company:* ${lead.company}`,
         `*Status:* No reply detected after 4 days`,
         `*Action:* Follow-Up #1 has been auto-drafted`,
-        `<https://leadsora.vercel.app/dashboard|👉 Review & Send in LEADSORA>`,
+        `<${origin}/dashboard|👉 Review & Send in ISAI LEADS>`,
       ].join('\n');
     }
 
@@ -38,8 +42,8 @@ export async function POST(request: NextRequest) {
         {
           color,
           text,
-          footer: 'LEADSORA Autonomous Intelligence',
-          footer_icon: 'https://leadsora.vercel.app/icon.svg',
+          footer: 'ISAI LEADS Autonomous Intelligence',
+          footer_icon: `${origin}/icon.svg`,
           ts: Math.floor(Date.now() / 1000),
         },
       ],

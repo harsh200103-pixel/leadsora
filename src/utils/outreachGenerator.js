@@ -1,7 +1,7 @@
 // ============================================================
 // AI Outreach Generator v2.0
 // ============================================================
-// Context: DealFinder is used by AI SOFTWARE SOLUTIONS companies
+// Context: ISAI Leads is used by AI SOFTWARE SOLUTIONS companies
 // (agencies that BUILD AI products, ML models, automation tools,
 // and intelligent systems for other businesses).
 //
@@ -99,4 +99,82 @@ export async function generateOutreach(company, role, signal) {
   if (aiMessage) return { message: aiMessage, source: 'ai' };
 
   return { message: generateOutreachSync(company, cleanRole, 'B2B agency'), source: 'template' };
+}
+
+/**
+ * Feature 7: Calculate an ICP Match Score (0-100%) based on user configured profile.
+ */
+export function generateICPMatchScore(lead, icpProfile) {
+  if (!icpProfile || !icpProfile.enabled) return Math.min(99, (lead.intentScore || 85) + 3);
+  
+  let score = 70;
+  const leadText = `${lead.company || ''} ${lead.title || ''} ${lead.problem || ''} ${lead.industry || ''} ${lead.country || ''}`.toLowerCase();
+  
+  // 1. Industry Match
+  if (icpProfile.industry) {
+    const indWords = icpProfile.industry.toLowerCase().split(/[\s,]+/);
+    if (indWords.some(w => w.length > 2 && leadText.includes(w))) score += 12;
+    else score -= 8;
+  }
+  
+  // 2. Geography Match
+  if (icpProfile.geography && icpProfile.geography !== 'Global' && icpProfile.geography !== 'Any') {
+    if (leadText.includes(icpProfile.geography.toLowerCase()) || lead.country?.toLowerCase().includes(icpProfile.geography.toLowerCase())) {
+      score += 10;
+    } else if (lead.country !== 'Global' && lead.country !== 'Flexible') {
+      score -= 10;
+    }
+  }
+  
+  // 3. Target Titles / Keywords
+  if (icpProfile.targetTitles) {
+    const titleWords = icpProfile.targetTitles.toLowerCase().split(/[\s,]+/);
+    if (titleWords.some(w => w.length > 2 && leadText.includes(w))) score += 15;
+  }
+  
+  return Math.max(35, Math.min(99, score));
+}
+
+/**
+ * Feature 9: Generate an AI Social Community Reply using NVIDIA NIM.
+ */
+export async function generateSocialReply(postContent, userValueProp, apiKey) {
+  const defaultApiKey = apiKey || (typeof process !== 'undefined' ? process.env?.NVIDIA_API_KEY : null) || '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';
+  try {
+    const res = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${defaultApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'meta/llama-3.1-70b-instruct',
+        messages: [
+          {
+            role: 'system',
+            content: `You are an expert tech consultant and startup advisor participating in online developer/SaaS communities (Reddit, Hacker News, Twitter/X, LinkedIn). 
+Read the community discussion/post where someone is asking for recommendations or expressing technical pain. 
+Write a highly authentic, conversational, helpful, non-promotional reply that answers their problem and gently introduces how our team (${userValueProp || 'our software agency'}) solved this exact challenge.
+Rules:
+- Under 130 words.
+- Do NOT sound like a cold outreach sales email. Sound like a knowledgeable peer offering real value.
+- Do NOT use subject lines or "Dear Sir/Madam".
+- End with a friendly, low-pressure offer to share technical notes or chat in DMs.`
+          },
+          { role: 'user', content: `Post / Discussion:\n"${postContent}"\n\nOur Value Proposition:\n${userValueProp || 'Fractional AI & Full-Stack Software Development Team.'}` }
+        ],
+        temperature: 0.6,
+        top_p: 0.95,
+      }),
+    });
+
+    if (!res.ok) throw new Error('AI request failed');
+    const data = await res.json();
+    const reply = data?.choices?.[0]?.message?.content?.trim();
+    if (reply) return reply;
+  } catch (err) {
+    console.warn('AI social reply drafting failed, using intelligent template:', err);
+  }
+
+  return `Hey there! We actually ran into this exact challenge recently when scaling our client's architecture.\n\nWhat helped us most was decoupling the heavy processing layer and bringing in a fractional specialized team to handle the immediate sprint without bloating long-term headcount.\n\nWe specialize in ${userValueProp || 'high-velocity full-stack & AI development'} and have solved this for a few similar scaling teams. Would be awesome to connect or shoot you over some technical architecture notes if helpful!`;
 }

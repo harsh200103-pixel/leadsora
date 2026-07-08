@@ -18,9 +18,9 @@ export default function AnalyticsPage() {
     const prefix = `_${user.email}`;
 
     // Load all lead data from localStorage
-    const rawLeads = localStorage.getItem(`dealfinder_leads${prefix}`);
-    const rawOutreach = localStorage.getItem(`dealfinder_ai_outreach${prefix}`);
-    const rawEmails = localStorage.getItem(`dealfinder_found_emails${prefix}`);
+    const rawLeads = localStorage.getItem(`isai_leads_data${prefix}`);
+    const rawOutreach = localStorage.getItem(`isai_leads_ai_outreach${prefix}`);
+    const rawEmails = localStorage.getItem(`isai_leads_found_emails${prefix}`);
 
     const leads: any[] = rawLeads ? JSON.parse(rawLeads) : [];
     const outreach: Record<string, string> = rawOutreach ? JSON.parse(rawOutreach) : {};
@@ -92,7 +92,7 @@ export default function AnalyticsPage() {
     return (
       <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ textAlign: 'center' }}>
-          <Activity size={32} color="#7c3aed" style={{ animation: 'pulse 1.5s infinite', marginBottom: '1rem' }} />
+          <Activity size={32} color="#00AEEF" style={{ animation: 'pulse 1.5s infinite', marginBottom: '1rem' }} />
           <p style={{ color: 'var(--text-muted)' }}>Loading analytics...</p>
         </div>
       </div>
@@ -104,7 +104,7 @@ export default function AnalyticsPage() {
     { label: 'New Leads', count: stats.statusCounts['New'], color: '#4facfe', emoji: '🎯' },
     { label: 'Contacted', count: stats.statusCounts['Contacted'], color: '#27c93f', emoji: '📧' },
     { label: 'In Discussion', count: stats.statusCounts['In Discussion'], color: '#ffbd2e', emoji: '💬' },
-    { label: 'Closed', count: stats.statusCounts['Closed'], color: '#7c3aed', emoji: '🏆' },
+    { label: 'Closed', count: stats.statusCounts['Closed'], color: '#00AEEF', emoji: '🏆' },
   ];
 
   const modeLabels: Record<string, string> = {
@@ -133,8 +133,8 @@ export default function AnalyticsPage() {
         {/* Header */}
         <div style={{ marginBottom: '2.5rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
-            <BarChart2 size={28} color="#7c3aed" />
-            <h1 style={{ fontSize: '1.8rem', margin: 0, background: 'linear-gradient(135deg, var(--text-primary) 0%, #a78bfa 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+            <BarChart2 size={28} color="#00AEEF" />
+            <h1 style={{ fontSize: '1.8rem', margin: 0, background: 'linear-gradient(135deg, var(--text-primary) 0%, #00AEEF 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
               Sales Intelligence Dashboard
             </h1>
           </div>
@@ -146,7 +146,7 @@ export default function AnalyticsPage() {
           {[
             { label: 'Total Leads', value: stats.totalLeads, icon: <Target size={18} />, color: '#4facfe' },
             { label: 'Hot Leads (90+)', value: stats.hotLeads, icon: <Zap size={18} />, color: '#ff5f56' },
-            { label: 'Pitches Generated', value: stats.totalOutreach, icon: <TrendingUp size={18} />, color: '#7c3aed' },
+            { label: 'Pitches Generated', value: stats.totalOutreach, icon: <TrendingUp size={18} />, color: '#00AEEF' },
             { label: 'Emails Found', value: stats.totalEmails, icon: <Mail size={18} />, color: '#27c93f' },
             { label: 'Avg Intent Score', value: stats.avgScore, icon: <Activity size={18} />, color: '#ffbd2e' },
           ].map((kpi, i) => (
@@ -186,7 +186,7 @@ export default function AnalyticsPage() {
               })}
             </div>
             {stats.statusCounts['Closed'] > 0 && (
-              <div style={{ marginTop: '1rem', padding: '0.75rem', background: 'rgba(124, 58, 237, 0.1)', borderRadius: '8px', border: '1px solid rgba(124,58,237,0.2)', fontSize: '0.78rem', color: '#a78bfa', textAlign: 'center' }}>
+              <div style={{ marginTop: '1rem', padding: '0.75rem', background: 'rgba(0, 174, 239, 0.1)', borderRadius: '8px', border: '1px solid rgba(0, 174, 239, 0.2)', fontSize: '0.78rem', color: '#00AEEF', textAlign: 'center' }}>
                 🏆 {stats.statusCounts['Closed']} deals closed — conversion rate: {Math.round((stats.statusCounts['Closed'] / funnelTotal) * 100)}%
               </div>
             )}
@@ -246,7 +246,7 @@ export default function AnalyticsPage() {
         {stats.modeStats.length > 0 && (
           <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid #1e1e1e', borderRadius: '16px', padding: '1.5rem' }}>
             <h2 style={{ fontSize: '1rem', color: 'var(--text-primary)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <TrendingUp size={16} color="#7c3aed" /> Scan Mode Performance
+              <TrendingUp size={16} color="#00AEEF" /> Scan Mode Performance
             </h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem' }}>
               {stats.modeStats.map((mode: any, i: number) => (
@@ -270,7 +270,7 @@ export default function AnalyticsPage() {
             <BarChart2 size={48} style={{ marginBottom: '1rem', opacity: 0.3 }} />
             <h3 style={{ color: 'var(--text-muted)', marginBottom: '0.5rem' }}>No data yet</h3>
             <p>Run your first scan on the dashboard to start seeing analytics here.</p>
-            <Link href="/dashboard" style={{ display: 'inline-block', marginTop: '1rem', padding: '10px 24px', background: '#7c3aed', borderRadius: '8px', color: 'var(--text-primary)', textDecoration: 'none', fontSize: '0.9rem' }}>
+            <Link href="/dashboard" style={{ display: 'inline-block', marginTop: '1rem', padding: '10px 24px', background: '#000E39', borderRadius: '8px', color: '#ffffff', textDecoration: 'none', fontSize: '0.9rem' }}>
               Go to Dashboard →
             </Link>
           </div>

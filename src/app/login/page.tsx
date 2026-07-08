@@ -48,7 +48,7 @@ export default function LoginPage() {
       {/* Ambient Background Glows */}
       <div style={{
         position: 'fixed', width: '500px', height: '500px',
-        background: 'radial-gradient(circle, rgba(124,58,237,0.06) 0%, transparent 60%)',
+        background: 'radial-gradient(circle, rgba(0,174,239,0.06) 0%, transparent 60%)',
         top: '-150px', left: '-150px', borderRadius: '50%', zIndex: 0,
       }} />
       <div style={{

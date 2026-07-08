@@ -17,7 +17,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // v2: Always reset to light mode (first time upgrade from old dark-only version)
     // Only use saved preference if user has explicitly toggled it after the v2 upgrade
-    const saved = localStorage.getItem('leadsora_theme_v2') as Theme | null;
+    const saved = localStorage.getItem('isai_leads_theme_v2') as Theme | null;
     const initial = saved || 'light';
     setTheme(initial);
     document.documentElement.setAttribute('data-theme', initial);
@@ -31,7 +31,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const next: Theme = theme === 'light' ? 'dark' : 'light';
     setTheme(next);
     document.documentElement.setAttribute('data-theme', next);
-    localStorage.setItem('leadsora_theme_v2', next);
+    localStorage.setItem('isai_leads_theme_v2', next);
   };
 
   return (

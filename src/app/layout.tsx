@@ -4,8 +4,8 @@ import Providers from "./providers";
 import AnimatedBackground from "../components/AnimatedBackground";
 
 export const metadata: Metadata = {
-  title: "LEADSORA — Find Buying Intent Before Your Competitors",
-  description: "AI-powered lead intelligence that detects real buying intent across the web.",
+  title: "ISAI LEADS — Find Buying Intent Before Your Competitors",
+  description: "AI-powered lead intelligence that detects real buying intent across the web. Built by ISAI Tech Solutions.",
 };
 
 export default function RootLayout({
@@ -24,7 +24,7 @@ export default function RootLayout({
             __html: `
               (function() {
                 try {
-                  var saved = localStorage.getItem('leadsora_theme_v2');
+                  var saved = localStorage.getItem('isai_leads_theme_v2');
                   var theme = saved === 'dark' ? 'dark' : 'light';
                   document.documentElement.setAttribute('data-theme', theme);
                 } catch(e) {
