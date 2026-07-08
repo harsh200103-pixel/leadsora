@@ -26,8 +26,10 @@ export default function LandingPage() {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const isPreview = searchParams.get('preview') === 'true';
     const user = localStorage.getItem('dealfinder_user');
-    if (user) router.replace('/dashboard');
+    if (user && !isPreview) router.replace('/dashboard');
 
     // Only show the counter if there are real signups stored
     const stored = parseInt(localStorage.getItem('leadsora_waitlist_count') || '0');
