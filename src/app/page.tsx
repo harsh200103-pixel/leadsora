@@ -74,9 +74,9 @@ export default function LandingPage() {
 
   // PRIORITY 5: Trimmed to 3 most compelling scan modes
   const scanModes = [
-    { icon: '💼', name: 'Actively Hiring', desc: 'Confirmed budget · role approved', color: '#27c93f' },
-    { icon: '🐋', name: 'VC Funding', desc: 'Fresh raises · growth pressure on', color: '#0a66c2' },
-    { icon: '🕵️', name: 'Defection Signals', desc: 'Unhappy with current vendor', color: '#a78bfa' },
+    { name: 'Actively Hiring', desc: 'Confirmed budget · role approved', color: '#27c93f' },
+    { name: 'VC Funding', desc: 'Fresh raises · growth pressure on', color: '#0a66c2' },
+    { name: 'Defection Signals', desc: 'Unhappy with current vendor', color: '#a78bfa' },
   ];
 
   // PRIORITY 5: Trimmed to 3 most compelling features
@@ -209,7 +209,6 @@ export default function LandingPage() {
         <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', justifyContent: 'center' }}>
           {scanModes.map((m, i) => (
             <div key={i} className="glass-card" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.9rem 1.25rem', borderColor: `${m.color}33`, minWidth: 180 }}>
-              <span style={{ fontSize: '1.5rem' }}>{m.icon}</span>
               <div>
                 <div style={{ fontWeight: 700, fontSize: '0.9rem', color: m.color }}>{m.name}</div>
                 <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{m.desc}</div>
