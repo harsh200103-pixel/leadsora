@@ -8,12 +8,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Company name is required' }, { status: 400 });
     }
 
-    if (!tavilyKey) {
+    const serverTavilyKey = tavilyKey || process.env.TAVILY_API_KEY || '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';
+
+    if (!serverTavilyKey) {
       return NextResponse.json({ error: 'Tavily API key is missing. Add it in Settings.' }, { status: 400 });
     }
 
     const apiKey = process.env.NVIDIA_API_KEY || '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';
-    const serverTavilyKey = process.env.TAVILY_API_KEY || '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';
 
     // 1. Search Tavily for company details
     const searchRes = await fetch('https://api.tavily.com/search', {

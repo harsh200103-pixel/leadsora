@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const search = searchParams.get('q') || '';
+  const search = searchParams.get('q') || searchParams.get('search') || '';
   const locationFilter = searchParams.get('loc') || 'All';
 
   try {
