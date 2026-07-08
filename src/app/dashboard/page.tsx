@@ -392,10 +392,10 @@ function Dashboard() {
     if (p.fullName) sig += `\n${p.fullName}`;
     if (p.jobTitle) sig += ` | ${p.jobTitle}`;
     if (p.companyName) sig += `\n${p.companyName}`;
-    const contact = [p.email ? `📧 ${p.email}` : '', p.phone ? `📞 ${p.phone}` : ''].filter(Boolean).join(' | ');
+    const contact = [p.email ? `${p.email}` : '', p.phone ? `${p.phone}` : ''].filter(Boolean).join(' | ');
     if (contact) sig += `\n${contact}`;
-    if (p.website) sig += `\n🌐 ${p.website}`;
-    if (p.address) sig += `\n📍 ${p.address}`;
+    if (p.website) sig += `\n${p.website}`;
+    if (p.address) sig += `\n${p.address}`;
     return sig;
   };
 
@@ -1300,7 +1300,7 @@ function Dashboard() {
                   value={businessProfile.companyContext || ''}
                   onChange={e => setBusinessProfile(prev => ({ ...prev, companyContext: e.target.value }))}
                   placeholder="Enter your website URL above and click Auto-Extract, or write a short description of your core services and unique value proposition here..."
-                  style={{ width: '100%', minHeight: '80px', padding: '10px 14px', background: 'rgba(124, 58, 237, 0.05)', border: '1px solid #7c3aed55', borderRadius: '24px', color: 'var(--text-primary)', fontSize: '0.85rem', outline: 'none', boxSizing: 'border-box', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.04), 0 1px 0 rgba(255,255,255,0.8)', resize: 'vertical' }}
+                  style={{ width: '100%', minHeight: '80px', padding: '10px 14px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '24px', color: 'var(--text-primary)', fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.04), 0 1px 0 rgba(255,255,255,0.8)', resize: 'vertical' }}
                 />
               </div>
             </div>
@@ -1313,9 +1313,9 @@ function Dashboard() {
                   ──────────────{'\n'}
                   {businessProfile.fullName}{businessProfile.jobTitle ? ` | ${businessProfile.jobTitle}` : ''}{'\n'}
                   {businessProfile.companyName}{'\n'}
-                  {[businessProfile.email ? `📧 ${businessProfile.email}` : '', businessProfile.phone ? `📞 ${businessProfile.phone}` : ''].filter(Boolean).join(' | ')}{'\n'}
-                  {businessProfile.website ? `🌐 ${businessProfile.website}` : ''}{'\n'}
-                  {businessProfile.address ? `📍 ${businessProfile.address}` : ''}
+                  {[businessProfile.email ? `${businessProfile.email}` : '', businessProfile.phone ? `${businessProfile.phone}` : ''].filter(Boolean).join(' | ')}{'\n'}
+                  {businessProfile.website ? `${businessProfile.website}` : ''}{'\n'}
+                  {businessProfile.address ? `${businessProfile.address}` : ''}
                 </div>
               </div>
             )}
