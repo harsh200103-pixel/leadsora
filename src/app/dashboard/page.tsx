@@ -58,6 +58,7 @@ function Dashboard() {
   const [hunterData, setHunterData] = useState<{[key: string]: any}>({});
   const [fetchingEmailsFor, setFetchingEmailsFor] = useState<string | null>(null);
   const [generatingId, setGeneratingId] = useState<string | null>(null);
+  const [sendingEmailId, setSendingEmailId] = useState<string | null>(null);
   const [linkedinDMs, setLinkedinDMs] = useState<{[key: string]: string}>({});
   const [generatingDmId, setGeneratingDmId] = useState<string | null>(null);
   const [linkedinDMModal, setLinkedinDMModal] = useState<{ lead: any; dm: string } | null>(null);
@@ -328,6 +329,48 @@ function Dashboard() {
       alert('Deep Dive Failed: ' + e.message); 
     }
     finally { setAnalyzingCompanyFor(null); }
+  };
+
+  const sendEmailDirectly = async (lead: any) => {
+    const toEmail = foundEmails[lead.id]?.map((e: any) => e.value).join(',') || lead.contactEmail;
+    if (!toEmail) {
+      alert('Cannot send: No contact email found for this lead yet.');
+      return;
+    }
+    setSendingEmailId(lead.id);
+    try {
+      const res = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: toEmail,
+          subject: `Exploring synergies at ${lead.company}`,
+          text: getEmailBody(lead)
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert(data.message);
+        // Automatically drag/update CRM status to "Contacted"
+        const updated = leads.map(l => l.id === lead.id ? { ...l, status: 'Contacted', contactedAt: new Date().toISOString() } : l);
+        setLeads(updated);
+        if (user) {
+          localStorage.setItem(`dealfinder_leads_${user.email}`, JSON.stringify(updated));
+          // Sync to Redis
+          fetch('/api/db/sync', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: user.email, savedLeads: updated })
+          }).catch(console.error);
+        }
+      } else {
+        throw new Error(data.error || 'Failed to send email');
+      }
+    } catch (e: any) {
+      alert('Error sending email: ' + e.message);
+    } finally {
+      setSendingEmailId(null);
+    }
   };
 
   const saveBusinessProfile = (profile: typeof businessProfile) => {
@@ -1148,6 +1191,13 @@ function Dashboard() {
                 </div>
                 <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem' }}>
                   <a href={`https://mail.google.com/mail/?view=cm&fs=1&to=${foundEmails[blitzLead.id]?.map((e: any) => e.value).join(',') || blitzLead.contactEmail || ''}&su=${encodeURIComponent(`Exploring synergies at ${blitzLead.company}`)}&body=${encodeURIComponent(getEmailBody(blitzLead))}`} target="_blank" rel="noreferrer" style={{ background: '#4facfe', color: '#000', padding: '8px 16px', borderRadius: '20px', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px' }}><Mail size={16}/> Open in Gmail</a>
+                  <button 
+                    onClick={() => sendEmailDirectly(blitzLead)} 
+                    disabled={sendingEmailId === blitzLead.id}
+                    style={{ background: 'linear-gradient(135deg, #27c93f, #10b981)', color: '#000', border: 'none', padding: '8px 16px', borderRadius: '20px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                  >
+                    {sendingEmailId === blitzLead.id ? <><Loader2 size={14} className="animate-spin" /> Sending...</> : <><Sparkles size={14}/> Send Directly</>}
+                  </button>
                   {!foundEmails[blitzLead.id] && hunterKey && (
                     <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center' }}>Searching for email... <Loader2 size={12} className="animate-spin" style={{ marginLeft: '4px' }} /></span>
                   )}

@@ -25,6 +25,13 @@ export default function LandingPage() {
   const [position, setPosition] = useState(0);
   const [copied, setCopied] = useState(false);
 
+  // Live signal preview state (falls back to clean templates)
+  const [previewLeads, setPreviewLeads] = useState<any[]>([
+    { company: 'Stripe', country: 'USA', score: 97, signal: 'Hiring: Senior Backend Engineer (Node.js, Rust) · Posted 18 hours ago', source: 'LinkedIn', tag: 'High Intent' },
+    { company: 'Figma', country: 'USA', score: 93, signal: 'Hiring: Full Stack Developer · Engineering team restructured Q1', source: 'Indeed', tag: 'Actively Hiring' },
+    { company: 'Linear', country: 'UK', score: 91, signal: 'Series B · $35M raised · 4 new engineering roles open', source: 'TechCrunch', tag: 'Just Funded' },
+  ]);
+
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
     const isPreview = searchParams.get('preview') === 'true';
@@ -37,6 +44,24 @@ export default function LandingPage() {
       setWaitlistCount(stored);
       setShowCount(true);
     }
+
+    // Fetch live signals for the waitlist preview section
+    fetch('/api/leads?q=React&loc=All')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && Array.isArray(data.leads) && data.leads.length > 0) {
+          const formatted = data.leads.slice(0, 3).map((l: any) => ({
+            company: l.company,
+            country: l.location,
+            score: l.intentScore,
+            signal: l.problem || `Hiring: ${l.title}`,
+            source: l.source || 'Remotive',
+            tag: l.intentScore >= 90 ? 'High Intent' : 'Actively Hiring'
+          }));
+          setPreviewLeads(formatted);
+        }
+      })
+      .catch(e => console.warn('Could not fetch live preview leads, using templates:', e));
   }, [router]);
 
   const handleWaitlist = async (e: React.FormEvent) => {
@@ -278,11 +303,7 @@ export default function LandingPage() {
             </span>
           </div>
           <div className="dashboard-body">
-            {[
-              { company: 'Stripe', country: 'USA', score: 97, signal: 'Hiring: Senior Backend Engineer (Node.js, Rust) · Posted 18 hours ago', source: 'LinkedIn', tag: '🐋 VC-Funded' },
-              { company: 'Figma', country: 'USA', score: 93, signal: 'Hiring: Full Stack Developer · Engineering team restructured Q1', source: 'Indeed', tag: '💼 Actively Hiring' },
-              { company: 'Linear', country: 'UK', score: 91, signal: 'Series B · $35M raised · 4 new engineering roles open', source: 'TechCrunch', tag: '🚀 Just Funded' },
-            ].map((lead, i) => (
+            {previewLeads.map((lead, i) => (
               <div key={i} className="glass-card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1.25rem 1.5rem', marginBottom: '0.75rem', gap: '1rem', flexWrap: 'wrap' }}>
                 <div style={{ flex: 1, minWidth: 200 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.35rem', flexWrap: 'wrap' }}>
