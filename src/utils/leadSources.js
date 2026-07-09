@@ -317,16 +317,39 @@ const fetchJSearch = async (query, location) => {
     const json = await res.json();
     if (!json.data?.length) return getEnterpriseTechLeads(query, location);
 
-    const liveLeads = json.data.slice(0, 15).map((job, i) => buildLead({
-      id: `jsearch-${i}-${job.job_id}`,
-      company: job.employer_name || 'Unknown',
-      country: `${job.job_city || ''} ${job.job_country || ''}`.trim() || 'Flexible',
-      title: job.job_title,
-      description: job.job_description?.slice(0, 500),
-      sourceUrl: job.job_apply_link,
-      postedAt: timeAgo(job.job_posted_at_datetime_utc),
-      sourceName: (job.job_apply_link || '').includes('linkedin.com') ? 'LinkedIn Jobs (Direct)' : (job.job_apply_link || '').includes('indeed.com') ? 'Google Jobs Enterprise' : 'Google Jobs Enterprise',
-    })).filter(Boolean);
+    const liveLeads = json.data.slice(0, 15).map((job, i) => {
+      const applyUrl = job.job_apply_link || '';
+      let sourceName = 'Google Jobs';
+      if (applyUrl) {
+        const urlLower = applyUrl.toLowerCase();
+        if (urlLower.includes('linkedin.com')) sourceName = 'LinkedIn';
+        else if (urlLower.includes('indeed.com')) sourceName = 'Indeed';
+        else if (urlLower.includes('greenhouse.io')) sourceName = 'Greenhouse';
+        else if (urlLower.includes('lever.co')) sourceName = 'Lever';
+        else if (urlLower.includes('workable.com')) sourceName = 'Workable';
+        else {
+          try {
+            const host = new URL(applyUrl).hostname.replace('www.', '');
+            const parts = host.split('.');
+            if (parts.length >= 2) {
+              const dom = parts[parts.length - 2];
+              sourceName = dom.charAt(0).toUpperCase() + dom.slice(1);
+            }
+          } catch {}
+        }
+      }
+
+      return buildLead({
+        id: `jsearch-${i}-${job.job_id}`,
+        company: job.employer_name || 'Unknown',
+        country: `${job.job_city || ''} ${job.job_country || ''}`.trim() || 'Flexible',
+        title: job.job_title,
+        description: job.job_description?.slice(0, 500),
+        sourceUrl: applyUrl,
+        postedAt: timeAgo(job.job_posted_at_datetime_utc),
+        sourceName: sourceName,
+      });
+    }).filter(Boolean);
 
     return liveLeads.length > 0 ? liveLeads : getEnterpriseTechLeads(query, location);
   } catch { return getEnterpriseTechLeads(query, location); }
@@ -476,16 +499,38 @@ const fetchLinkedInJobs = async (query, location) => {
     const json = await res.json();
     if (!Array.isArray(json) || !json.length) return getEnterpriseTechLeads(query, location);
 
-    const liveLeads = json.slice(0, 15).map((job, i) => buildLead({
-      id: `linkedin-${i}-${job.id || i}`,
-      company: job.company || 'Unknown',
-      country: job.location || (location !== 'Global' ? location : 'Global'),
-      title: job.title || 'Open Role',
-      description: job.description?.slice(0, 500) || '',
-      sourceUrl: job.applyUrl || job.url || `https://linkedin.com/jobs`,
-      postedAt: job.ago || 'Recently',
-      sourceName: 'LinkedIn Jobs (Direct)',
-    })).filter(Boolean);
+    const liveLeads = json.slice(0, 15).map((job, i) => {
+      const applyUrl = job.applyUrl || job.url || '';
+      let sourceName = 'LinkedIn';
+      if (applyUrl) {
+        const urlLower = applyUrl.toLowerCase();
+        if (urlLower.includes('indeed.com')) sourceName = 'Indeed';
+        else if (urlLower.includes('greenhouse.io')) sourceName = 'Greenhouse';
+        else if (urlLower.includes('lever.co')) sourceName = 'Lever';
+        else if (urlLower.includes('workable.com')) sourceName = 'Workable';
+        else if (!urlLower.includes('linkedin.com')) {
+          try {
+            const host = new URL(applyUrl).hostname.replace('www.', '');
+            const parts = host.split('.');
+            if (parts.length >= 2) {
+              const dom = parts[parts.length - 2];
+              sourceName = dom.charAt(0).toUpperCase() + dom.slice(1);
+            }
+          } catch {}
+        }
+      }
+
+      return buildLead({
+        id: `linkedin-${i}-${job.id || i}`,
+        company: job.company || 'Unknown',
+        country: job.location || (location !== 'Global' ? location : 'Global'),
+        title: job.title || 'Open Role',
+        description: job.description?.slice(0, 500) || '',
+        sourceUrl: applyUrl || `https://linkedin.com/jobs`,
+        postedAt: job.ago || 'Recently',
+        sourceName: sourceName,
+      });
+    }).filter(Boolean);
 
     return liveLeads.length > 0 ? liveLeads : getEnterpriseTechLeads(query, location);
   } catch { return getEnterpriseTechLeads(query, location); }
@@ -723,9 +768,24 @@ const fetchSocialMentions = async (query, location) => {
 
     return data.results.map((r, i) => {
       let platform = 'Reddit';
-      if (r.url?.includes('ycombinator')) platform = 'Hacker News';
-      else if (r.url?.includes('twitter.com') || r.url?.includes('x.com')) platform = 'Twitter/X';
-      else if (r.url?.includes('linkedin.com')) platform = 'LinkedIn';
+      if (r.url) {
+        const urlLower = r.url.toLowerCase();
+        if (urlLower.includes('ycombinator.com')) platform = 'Hacker News';
+        else if (urlLower.includes('twitter.com') || urlLower.includes('x.com')) platform = 'Twitter/X';
+        else if (urlLower.includes('linkedin.com')) platform = 'LinkedIn';
+        else if (urlLower.includes('youtube.com') || urlLower.includes('youtu.be')) platform = 'YouTube';
+        else if (urlLower.includes('indeed.com')) platform = 'Indeed';
+        else {
+          try {
+            const host = new URL(r.url).hostname.replace('www.', '');
+            const parts = host.split('.');
+            if (parts.length >= 2) {
+              const dom = parts[parts.length - 2];
+              platform = dom.charAt(0).toUpperCase() + dom.slice(1);
+            }
+          } catch {}
+        }
+      }
 
       const titleClean = r.title?.replace(/\s*-\s*(Reddit|Hacker News|Twitter).*$/i, '') || 'Social Mention';
 

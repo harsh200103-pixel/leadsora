@@ -16,7 +16,13 @@ if (redisUrl && redisToken) {
 export async function GET(request: NextRequest) {
   try {
     if (!redis) {
-      return NextResponse.json({ error: 'Redis is not configured in Vercel environment variables' }, { status: 500 });
+      return NextResponse.json({
+        warning: 'Redis is not configured in Vercel environment variables. Settings will be kept locally.',
+        ghostConfig: null,
+        savedLeads: [],
+        aiOutreach: {},
+        companyReports: {}
+      });
     }
 
     const searchParams = request.nextUrl.searchParams;
@@ -50,7 +56,10 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     if (!redis) {
-      return NextResponse.json({ error: 'Redis is not configured in Vercel environment variables' }, { status: 500 });
+      return NextResponse.json({
+        success: false,
+        warning: 'Redis is not configured in Vercel environment variables. Saved locally only.'
+      });
     }
 
     const body = await request.json();

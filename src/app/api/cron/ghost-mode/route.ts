@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
       if (!scanRes.ok) continue;
 
       const results = await scanRes.json();
-      const leads: any[] = Array.isArray(results) ? results : [];
+      const leads: any[] = Array.isArray(results) ? results : (Array.isArray(results?.leads) ? results.leads : []);
 
       // Filter whales with high intent score
       const whales = leads.filter((l: any) => (l.intentScore || 0) >= 90).slice(0, config.leadsPerDay || 10);

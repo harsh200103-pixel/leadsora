@@ -1,50 +1,10 @@
-<svg width="1200" height="400" viewBox="0 0 1200 400" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- ISAI Tech Circular Mark / Icon -->
-  <g transform="translate(100,50)">
-    <!-- Outer Ring Gradient -->
-    <defs>
-      <linearGradient id="isaiGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#00AEEF" />
-        <stop offset="100%" stop-color="#00D4FF" />
-      </linearGradient>
-    </defs>
-    
-    <circle cx="150" cy="150" r="130" stroke="url(#isaiGrad)" stroke-width="12" fill="#000E39" />
-    <circle cx="150" cy="150" r="105" stroke="#00AEEF" stroke-width="4" stroke-opacity="0.4" fill="none" />
-    
-    <!-- Inner AI / Tech Connected Nodes -->
-    <path d="M150 70 L210 120 L190 200 L110 200 L90 120 Z" stroke="#00D4FF" stroke-width="8" stroke-linejoin="round" fill="none" />
-    <line x1="150" y1="70" x2="150" y2="150" stroke="#00AEEF" stroke-width="6" />
-    <line x1="210" y1="120" x2="150" y2="150" stroke="#00AEEF" stroke-width="6" />
-    <line x1="190" y1="200" x2="150" y2="150" stroke="#00AEEF" stroke-width="6" />
-    <line x1="110" y1="200" x2="150" y2="150" stroke="#00AEEF" stroke-width="6" />
-    <line x1="90" y1="120" x2="150" y2="150" stroke="#00AEEF" stroke-width="6" />
-    
-    <circle cx="150" cy="150" r="24" fill="url(#isaiGrad)" />
-    <circle cx="150" cy="70" r="12" fill="#FFFFFF" />
-    <circle cx="210" cy="120" r="12" fill="#FFFFFF" />
-    <circle cx="190" cy="200" r="12" fill="#FFFFFF" />
-    <circle cx="110" cy="200" r="12" fill="#FFFFFF" />
-    <circle cx="90" cy="120" r="12" fill="#FFFFFF" />
-  </g>
-
-  <!-- Brand Name: ISAI LEADS -->
-  <text x="430" y="185"
-        fill="#000E39"
-        font-size="78"
-        font-family="Inter, -apple-system, sans-serif"
-        font-weight="800"
-        letter-spacing="4">
-        ISAI <tspan fill="#00AEEF">LEADS</tspan>
-  </text>
-
-  <!-- Tagline / Subtitle -->
-  <text x="435" y="238"
-        fill="#5A6882"
-        font-size="24"
-        font-family="Inter, -apple-system, sans-serif"
-        font-weight="600"
-        letter-spacing="6">
-        BY ISAI TECH SOLUTIONS
-  </text>
+<svg xmlns="http://www.w3.org/2000/svg" width="155" height="38" viewBox="0 0 116.25 28.5" version="1.2">
+  <!-- Background -->
+  <rect width="116.25" height="28.5" fill="#222222" />
+  
+  <!-- Inner White Border -->
+  <rect x="2.5" y="2.5" width="111.25" height="23.5" fill="none" stroke="#ffffff" stroke-width="1.5" />
+  
+  <!-- Text -->
+  <text x="58.125" y="17.8" text-anchor="middle" font-size="10.5" font-family="system-ui, -apple-system, 'SF Pro Display', Roboto, Helvetica, Arial, sans-serif" font-weight="900" fill="#ffffff" letter-spacing="1.2">ISAI LEADS</text>
 </svg>

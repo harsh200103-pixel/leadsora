@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Globe, Zap, Target, MessageSquare, CheckCircle2, Activity, Briefcase, Users, Search, BarChart2, Bell, Shield, ArrowRight, Sparkles, Copy, Link2 } from 'lucide-react';
+import { Globe, Zap, Target, CheckCircle2, Activity, Briefcase, Users, Search, Copy, ArrowRight, Sparkles, MessageSquare, BarChart2, Bell, Shield, Link2 } from 'lucide-react';
 import Logo from '../components/Logo';
 import MobileNav from '../components/MobileNav';
 import { useAuth } from './context/AuthContext';
@@ -12,17 +12,27 @@ export default function LandingPage() {
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  // PRIORITY 1 — WAITLIST COUNT
-  // Source: localStorage key 'isai_leads_waitlist_count' (per-browser, increments on each new signup).
-  // To use a real backend count instead:
-  //   1. Create GET /api/waitlist/count that returns { count: number } from your DB
-  //   2. Replace the localStorage block below with: const res = await fetch('/api/waitlist/count'); const { count } = await res.json();
-  // Counter is intentionally hidden (null) when count === 0 — showing a zero hurts conversion.
+
+  // PRIORITY 1: Waitlist counter
+  // SOURCE: Reads from localStorage key 'isai_leads_waitlist_count' (per-browser).
+  // To connect a real backend: replace the localStorage read below with
+  // fetch('/api/waitlist/count').then(r => r.json()).then(d => setWaitlistCount(d.count))
+  // and update the POST in handleWaitlist to also hit your backend.
+  // Counter is hidden (null) if waitlistCount === 0 (showing a zero hurts conversion).
   const [waitlistCount, setWaitlistCount] = useState<number | null>(null);
-  // Referral state — shown post-signup
-  const [referralPosition, setReferralPosition] = useState<number | null>(null);
+  const [showCount, setShowCount] = useState(false);
+
+  // PRIORITY 3: Referral state
   const [referralLink, setReferralLink] = useState('');
+  const [position, setPosition] = useState(0);
   const [copied, setCopied] = useState(false);
+
+  // Live signal preview state (falls back to clean templates)
+  const [previewLeads, setPreviewLeads] = useState<any[]>([
+    { company: 'Stripe', country: 'USA', score: 97, signal: 'Hiring: Senior Backend Engineer (Node.js, Rust) · Posted 18 hours ago', source: 'LinkedIn', tag: 'High Intent' },
+    { company: 'Figma', country: 'USA', score: 93, signal: 'Hiring: Full Stack Developer · Engineering team restructured Q1', source: 'Indeed', tag: 'Actively Hiring' },
+    { company: 'Linear', country: 'UK', score: 91, signal: 'Series B · $35M raised · 4 new engineering roles open', source: 'TechCrunch', tag: 'Just Funded' },
+  ]);
 
   useEffect(() => {
     // Commented out to allow viewing the landing page even if logged in:
@@ -30,10 +40,30 @@ export default function LandingPage() {
     //   router.replace('/dashboard');
     // }
 
-    // Load real waitlist count — only show the counter if we have at least 1 real signup
-    const stored = localStorage.getItem('isai_leads_waitlist_count');
-    const count = stored ? parseInt(stored) : 0;
-    if (count > 0) setWaitlistCount(count);
+    // Only show the counter if there are real signups stored
+    const stored = parseInt(localStorage.getItem('isai_leads_waitlist_count') || '0');
+    if (stored > 0) {
+      setWaitlistCount(stored);
+      setShowCount(true);
+    }
+
+    // Fetch live signals for the waitlist preview section
+    fetch('/api/leads?q=React&loc=All')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && Array.isArray(data.leads) && data.leads.length > 0) {
+          const formatted = data.leads.slice(0, 3).map((l: any) => ({
+            company: l.company,
+            country: l.location,
+            score: l.intentScore,
+            signal: l.problem || `Hiring: ${l.title}`,
+            source: l.source || 'Remotive',
+            tag: l.intentScore >= 90 ? 'High Intent' : 'Actively Hiring'
+          }));
+          setPreviewLeads(formatted);
+        }
+      })
+      .catch(e => console.warn('Could not fetch live preview leads, using templates:', e));
   }, [router, user, authLoading]);
 
   const handleWaitlist = async (e: React.FormEvent) => {
@@ -41,60 +71,53 @@ export default function LandingPage() {
     if (!email || submitting) return;
     setSubmitting(true);
 
-    // Save email to localStorage waitlist
-    // TODO: Replace with real backend call: await fetch('/api/waitlist', { method: 'POST', body: JSON.stringify({ email }) })
-    // The response should return { position: number, referralCode: string }
+    // Save to localStorage waitlist
     const existing: string[] = JSON.parse(localStorage.getItem('isai_leads_waitlist') || '[]');
-    let position = existing.length + 1;
-    if (!existing.includes(email)) {
+    let pos = existing.indexOf(email);
+    if (pos === -1) {
       existing.push(email);
       localStorage.setItem('isai_leads_waitlist', JSON.stringify(existing));
-      const newCount = (waitlistCount ?? 0) + 1;
+      pos = existing.length - 1;
+      const newCount = existing.length;
       localStorage.setItem('isai_leads_waitlist_count', String(newCount));
       setWaitlistCount(newCount);
-      position = newCount;
-    } else {
-      position = existing.indexOf(email) + 1;
+      setShowCount(true);
     }
 
-    // Generate a simple referral code from the email
-    const code = btoa(email).replace(/[^a-zA-Z0-9]/g, '').slice(0, 8).toUpperCase();
-    const origin = typeof window !== 'undefined' ? window.location.origin : '';
-    setReferralPosition(position);
-    setReferralLink(`${origin}/?ref=${code}`);
+    // Generate referral link using email hash
+    const slug = btoa(email).replace(/=/g, '').substring(0, 10);
+    const link = `${window.location.origin}/?ref=${slug}`;
+    setReferralLink(link);
+    setPosition(pos + 1);
 
     await new Promise(r => setTimeout(r, 800));
     setSubmitted(true);
     setSubmitting(false);
   };
 
-  const copyReferralLink = useCallback(() => {
-    if (!referralLink) return;
+
+
+  const handleCopy = () => {
     navigator.clipboard.writeText(referralLink);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-  }, [referralLink]);
+  };
 
-  const stats = [
-    { value: '31', label: 'Features Built' },
-    { value: '8+', label: 'Live Data Sources' },
-    { value: '100%', label: 'AI-Powered' },
-    { value: '0', label: 'Cold Guesses' },
-  ];
-
-  // PRIORITY 5 — TOP 3 FEATURES ONLY (remaining 5 saved for post-signup email sequence)
-  const features = [
-    { icon: <Search size={22} />, title: 'Hiring Intent Scrapers', desc: "Scan 8+ job boards in real time — find companies with confirmed budget and active technical pain." },
-    { icon: <Zap size={22} />, title: 'Omnichannel Blitz Engine', desc: "One click generates a cold email, LinkedIn note, and call script referencing the company's exact pain. Under 3 seconds." },
-    { icon: <Target size={22} />, title: 'Hiring Manager Detection', desc: "Auto-finds the CTO or VP Engineering and verifies their email — so you pitch the decision-maker, not a gatekeeper." },
-  ];
-
-  // PRIORITY 5 — TOP 3 SIGNAL MODES ONLY (remaining 2 saved for post-signup email sequence)
+  // PRIORITY 5: Trimmed to 3 most compelling scan modes
   const scanModes = [
-    { icon: '💼', name: 'Actively Hiring', desc: 'Confirmed budget + open role — highest intent signal', color: '#27c93f' },
-    { icon: '🐋', name: 'VC Funded', desc: 'Fresh raise = money to spend on new vendors', color: '#0a66c2' },
-    { icon: '📉', name: 'Layoffs.fyi', desc: 'Restructuring = vendor review cycles are open', color: '#ff5f56' },
+    { name: 'Actively Hiring', desc: 'Confirmed budget · role approved', color: '#27c93f' },
+    { name: 'VC Funding', desc: 'Fresh raises · growth pressure on', color: '#0a66c2' },
+    { name: 'Defection Signals', desc: 'Unhappy with current vendor', color: '#a78bfa' },
   ];
+
+  // PRIORITY 5: Trimmed to 3 most compelling features
+  const features = [
+    { icon: <Search size={22} />, title: 'Hiring Intent Scrapers', desc: 'Scan 8+ job boards in real time and surface companies with confirmed budgets and active technical pain.' },
+    { icon: <Activity size={22} />, title: 'AI Intent Scoring', desc: 'Every lead scored 0–100 by urgency and seniority. Only the hottest reach the top of your list.' },
+    { icon: <Zap size={22} />, title: 'One-Click Outreach Blitz', desc: 'Cold email, LinkedIn DM, and call script — all written and ready in under 3 seconds.' },
+  ];
+
+  const shareText = `I just joined the waitlist for ISAI LEADS — AI that finds B2B companies actively looking to hire and writes the perfect cold email for you. Join me: ${referralLink}`;
 
   return (
     <>
@@ -120,7 +143,7 @@ export default function LandingPage() {
           ISAI LEADS scans job boards, funding databases, and company signals to find businesses with <strong style={{ color: 'var(--text-primary)' }}>confirmed budget</strong> and <strong style={{ color: 'var(--text-primary)' }}>immediate technical pain</strong> — then writes the perfect outreach for you.
         </p>
 
-        {/* Waitlist Form */}
+        {/* Waitlist Form / Post-signup referral */}
         {!submitted ? (
           <form onSubmit={handleWaitlist} style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '1rem' }}>
             <input
@@ -136,57 +159,52 @@ export default function LandingPage() {
             </button>
           </form>
         ) : (
-          // PRIORITY 3 — REFERRAL MECHANIC: shown immediately after signup
-          <div style={{ maxWidth: 520, margin: '0 auto', textAlign: 'left' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', background: 'rgba(39,201,63,0.1)', border: '1px solid rgba(39,201,63,0.3)', borderRadius: '10px', padding: '0.8rem 1.5rem', marginBottom: '1.25rem', color: '#27c93f' }}>
-              <CheckCircle2 size={20} />
-              <span>You&apos;re on the list{referralPosition ? ` — you&apos;re #${referralPosition}` : ''}! We&apos;ll notify you when early access opens.</span>
+          /* PRIORITY 3: Post-signup referral mechanic */
+          <div style={{ maxWidth: 480, margin: '0 auto', textAlign: 'center' }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.75rem', background: 'rgba(39,201,63,0.1)', border: '1px solid rgba(39,201,63,0.3)', borderRadius: '10px', padding: '0.8rem 1.5rem', marginBottom: '1.5rem', color: '#27c93f' }}>
+              <CheckCircle2 size={20} /> You&apos;re #{position} on the waitlist!
             </div>
-            {referralLink && (
-              <div style={{ background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '12px', padding: '1.25rem 1.5rem' }}>
-                <p style={{ fontWeight: 700, fontSize: '0.9rem', marginBottom: '0.35rem', color: 'var(--text-primary)' }}>🚀 Move to the front of the line</p>
-                <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>Refer 3 friends and jump ahead in the queue.</p>
-                {/* Referral link copy row */}
-                <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
-                  <input
-                    readOnly
-                    value={referralLink}
-                    style={{ flex: 1, padding: '0.55rem 0.85rem', background: 'transparent', border: '1px solid var(--input-border)', borderRadius: '8px', color: 'var(--text-secondary)', fontSize: '0.8rem', outline: 'none' }}
-                  />
-                  <button
-                    onClick={copyReferralLink}
-                    style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.55rem 1rem', background: copied ? 'rgba(39,201,63,0.15)' : 'rgba(0,174,239,0.15)', border: `1px solid ${copied ? 'rgba(39,201,63,0.4)' : 'rgba(0,174,239,0.4)'}`, borderRadius: '8px', color: copied ? '#27c93f' : '#00AEEF', fontSize: '0.8rem', cursor: 'pointer', whiteSpace: 'nowrap' }}
-                  >
-                    {copied ? <><CheckCircle2 size={14} /> Copied!</> : <><Copy size={14} /> Copy link</>}
-                  </button>
-                </div>
-                {/* One-click share buttons */}
-                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                  <a
-                    href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Just joined the waitlist for ISAI LEADS — an AI that finds companies that need you RIGHT NOW (hiring signals, funding rounds, layoffs). Early access: ${referralLink}`)}`}
-                    target="_blank" rel="noopener noreferrer"
-                    style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.5rem 0.9rem', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.78rem', textDecoration: 'none' }}
-                  >
-                    𝕏 Share on X
-                  </a>
-                  <a
-                    href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(referralLink)}`}
-                    target="_blank" rel="noopener noreferrer"
-                    style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.5rem 0.9rem', background: 'rgba(10,102,194,0.15)', border: '1px solid rgba(10,102,194,0.35)', borderRadius: '8px', color: '#0a66c2', fontSize: '0.78rem', textDecoration: 'none' }}
-                  >
-                    <Link2 size={13} /> Share on LinkedIn
-                  </a>
-                </div>
-              </div>
-            )}
+
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1rem' }}>
+              <strong style={{ color: 'var(--text-primary)' }}>Refer 3 friends</strong> to move to the front of the line.
+            </p>
+
+            {/* Referral link box */}
+            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '10px', padding: '0.6rem 0.75rem', alignItems: 'center' }}>
+              <span style={{ flex: 1, fontSize: '0.8rem', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{referralLink}</span>
+              <button onClick={handleCopy} style={{ background: copied ? 'rgba(39,201,63,0.15)' : 'rgba(0,174,239,0.15)', border: 'none', borderRadius: '6px', padding: '0.35rem 0.75rem', cursor: 'pointer', color: copied ? '#27c93f' : '#00AEEF', fontSize: '0.78rem', display: 'flex', alignItems: 'center', gap: '0.35rem', flexShrink: 0 }}>
+                <Copy size={13} /> {copied ? 'Copied!' : 'Copy'}
+              </button>
+            </div>
+
+            {/* Share buttons */}
+            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
+              <a
+                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`}
+                target="_blank" rel="noopener noreferrer"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', background: '#000', color: '#fff', border: 'none', borderRadius: '8px', padding: '0.5rem 1rem', fontSize: '0.82rem', cursor: 'pointer', textDecoration: 'none' }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                </svg>
+                Share on X
+              </a>
+              <a
+                href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(referralLink)}`}
+                target="_blank" rel="noopener noreferrer"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', background: '#0a66c2', color: '#fff', border: 'none', borderRadius: '8px', padding: '0.5rem 1rem', fontSize: '0.82rem', cursor: 'pointer', textDecoration: 'none' }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                </svg>
+                Share on LinkedIn
+              </a>
+            </div>
           </div>
         )}
 
-        {/* Live waitlist counter — only shown when count > 0 (real signups recorded in this browser) */}
-        {/* Once connected to a real backend, remove the localStorage dependency above */}
-        {waitlistCount !== null && waitlistCount > 0 && (
-          <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: '0.75rem', animation: 'fadeIn 0.5s ease' }}>
-            🔥 <strong style={{ color: '#00AEEF' }}>{waitlistCount.toLocaleString()}</strong> founders & agencies already waiting
+        {/* PRIORITY 1: Only render counter if count > 0 (real signups only) */}
+        {showCount && waitlistCount !== null && waitlistCount > 0 && (
+          <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: '1rem' }}>
+            🔥 <strong style={{ color: '#00AEEF' }}>{waitlistCount.toLocaleString()}</strong> founders &amp; agencies already waiting
           </p>
         )}
 
@@ -201,7 +219,12 @@ export default function LandingPage() {
       {/* ── STATS ────────────────────────────────────────────── */}
       <section className="container" style={{ padding: '2rem 0 4rem' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1.5rem' }}>
-          {stats.map((s, i) => (
+          {[
+            { value: '31', label: 'Features Built' },
+            { value: '8+', label: 'Live Data Sources' },
+            { value: '100%', label: 'AI-Powered' },
+            { value: '0', label: 'Cold Guesses' },
+          ].map((s, i) => (
             <div key={i} className="glass-card text-center" style={{ padding: '1.5rem 1rem' }}>
               <div style={{ fontSize: '2rem', fontWeight: 800, background: 'linear-gradient(135deg, #00AEEF, #00D4FF)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>{s.value}</div>
               <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>{s.label}</div>
@@ -210,14 +233,13 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── SCAN MODES ───────────────────────────────────────── */}
+      {/* ── SCAN MODES (trimmed to 3) ─────────────────────────── */}
       <section className="container" style={{ padding: '2rem 0 5rem' }}>
-        <p style={{ textAlign: 'center', fontSize: '0.75rem', color: 'var(--text-muted)', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '1rem' }}>5 Intelligence Modes</p>
+        <p style={{ textAlign: 'center', fontSize: '0.75rem', color: 'var(--text-muted)', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '1rem' }}>Signal Intelligence</p>
         <h2 className="section-title text-center" style={{ marginBottom: '2.5rem' }}>Every Buying Signal. Every Source.</h2>
         <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', justifyContent: 'center' }}>
           {scanModes.map((m, i) => (
             <div key={i} className="glass-card" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.9rem 1.25rem', borderColor: `${m.color}33`, minWidth: 180 }}>
-              <span style={{ fontSize: '1.5rem' }}>{m.icon}</span>
               <div>
                 <div style={{ fontWeight: 700, fontSize: '0.9rem', color: m.color }}>{m.name}</div>
                 <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{m.desc}</div>
@@ -243,7 +265,7 @@ export default function LandingPage() {
               <Zap size={26} color="#00D4FF" />
             </div>
             <h3>2. Get the Perfect Pitch</h3>
-            <p style={{ color: 'var(--text-secondary)', marginTop: '0.75rem' }}>Click Blitz. The AI writes a personalized cold email, LinkedIn note, Twitter DM, and call script using the company&apos;s exact pain point. All in under 3 seconds.</p>
+            <p style={{ color: 'var(--text-secondary)', marginTop: '0.75rem' }}>Click Blitz. The AI writes a personalized cold email, LinkedIn note, and call script using the company&apos;s exact pain point. All in under 3 seconds.</p>
           </div>
           <div className="glass-card text-center">
             <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'rgba(39,201,63,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
@@ -255,9 +277,9 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── FEATURES GRID ────────────────────────────────────── */}
+      {/* ── FEATURES GRID (trimmed to 3) ─────────────────────── */}
       <section className="features container">
-        <h2 className="section-title text-center">31 Features. One Platform.</h2>
+        <h2 className="section-title text-center">What Makes It Different</h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.25rem' }}>
           {features.map((f, i) => (
             <div key={i} className="glass-card" style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start', padding: '1.25rem 1.5rem' }}>
@@ -285,12 +307,7 @@ export default function LandingPage() {
             </span>
           </div>
           <div className="dashboard-body">
-            {/* Mock lead card */}
-            {[
-              { company: 'Stripe', country: 'USA', score: 97, signal: 'Hiring: Senior Backend Engineer (Node.js, Rust) · Posted 18 hours ago', source: 'LinkedIn', tag: '🐋 VC-Funded' },
-              { company: 'Figma', country: 'USA', score: 93, signal: 'Hiring: Full Stack Developer · Engineering team restructured Q1', source: 'Indeed', tag: '💼 Actively Hiring' },
-              { company: 'Linear', country: 'UK', score: 91, signal: 'Series B · $35M raised · 4 new engineering roles open', source: 'TechCrunch', tag: '🚀 Just Funded' },
-            ].map((lead, i) => (
+            {previewLeads.map((lead, i) => (
               <div key={i} className="glass-card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1.25rem 1.5rem', marginBottom: '0.75rem', gap: '1rem', flexWrap: 'wrap' }}>
                 <div style={{ flex: 1, minWidth: 200 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.35rem', flexWrap: 'wrap' }}>
@@ -392,8 +409,8 @@ export default function LandingPage() {
               </button>
             </form>
           ) : (
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.75rem', background: 'rgba(39,201,63,0.1)', border: '1px solid rgba(39,201,63,0.3)', borderRadius: '10px', padding: '1rem 1.5rem', color: '#27c93f' }}>
-              <CheckCircle2 size={20} /> You&apos;re in! We&apos;ll be in touch very soon.
+            <div style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+              ✅ You&apos;re on the list — check above for your referral link to move up.
             </div>
           )}
           <div style={{ marginTop: '2rem' }}>
@@ -410,7 +427,7 @@ export default function LandingPage() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
             <Logo style={{ height: '40px', width: 'auto' }} />
             <div style={{ display: 'flex', gap: '2rem' }}>
-              {['Features', 'Pricing', 'Contact'].map(link => (
+              {['Features', 'Contact'].map(link => (
                 <a key={link} href="#" style={{ color: 'var(--text-secondary)', transition: 'color 0.2s' }}
                   onMouseOver={e => (e.currentTarget.style.color = 'var(--text-primary)')}
                   onMouseOut={e => (e.currentTarget.style.color = 'var(--text-secondary)')}>

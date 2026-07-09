@@ -11,9 +11,9 @@ export async function POST(request: NextRequest) {
     let text = '';
     let color = '#27c93f';
 
-    const host = req.headers.get('host') || 'localhost:3000';
+    const host = request.headers.get('host') || 'localhost:3000';
     const protocol = host.includes('localhost') ? 'http' : 'https';
-    const origin = req.headers.get('origin') || `${protocol}://${host}`;
+    const origin = request.headers.get('origin') || `${protocol}://${host}`;
 
     if (type === 'new_lead') {
       color = lead.intentScore >= 90 ? '#ff5f56' : '#ffbd2e';

@@ -59,19 +59,21 @@ export async function POST(request: NextRequest) {
         ],
         temperature: 0.3,
         max_tokens: 300,
-        response_format: { type: "json_object" }
       }),
     });
 
     if (!nimResponse.ok) {
-      const errTxt = await nimResponse.text();
+      const errTxt = await nimResponse.ok ? '' : await nimResponse.text();
       console.error('NVIDIA error parsing website:', errTxt);
       return NextResponse.json({ error: 'Failed to analyze website content.' }, { status: 500 });
     }
 
     const data = await nimResponse.json();
-    let resultContext = data?.choices?.[0]?.message?.content?.trim();
+    let resultContext = data?.choices?.[0]?.message?.content?.trim() || '{}';
     let suggestedRoles = [];
+
+    // Clean up potential markdown formatting from the AI response
+    resultContext = resultContext.replace(/^\s*```(?:json)?\n?|```\s*$/g, '');
 
     try {
       // Attempt to parse JSON response

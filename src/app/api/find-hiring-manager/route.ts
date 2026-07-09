@@ -90,8 +90,9 @@ function seniorityScore(title: string): number {
 export async function POST(request: NextRequest) {
   try {
     const { company, sourceUrl, hunterKey } = await request.json();
+    const serverHunterKey = hunterKey || process.env.HUNTER_API_KEY || 'b937eb0f532629a23bc002872195055922026f68';
 
-    if (!hunterKey) {
+    if (!serverHunterKey) {
       return NextResponse.json({ error: 'Hunter.io API key required' }, { status: 400 });
     }
     if (!company) {
@@ -145,7 +146,7 @@ export async function POST(request: NextRequest) {
 
     for (const domain of domainsToTry) {
       try {
-        const result = await tryHunterDomain(domain, hunterKey);
+        const result = await tryHunterDomain(domain, serverHunterKey);
         if (result?.emails?.length > 0) {
           found = true;
           foundDomain = domain;

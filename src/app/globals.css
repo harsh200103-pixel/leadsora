@@ -552,7 +552,7 @@ input, select, textarea {
   border-radius: var(--radius-sm);
   transition: border-color 0.2s, box-shadow 0.2s;
 }
-input::placeholder, textarea::placeholder { color: var(--text-muted); }
+input::placeholder, textarea::placeholder { color: var(--text-muted); opacity: 1 !important; }
 input:focus, select:focus, textarea:focus {
   outline: none;
   border-color: var(--accent);
@@ -797,4 +797,9 @@ select option { background: var(--surface-raised); color: var(--text-primary); }
   footer .container > div { flex-direction: column; gap: 1.5rem; text-align: center; }
   .scan-mode-tabs button { font-size: 0.75rem !important; padding: 5px 10px !important; min-height: 36px; }
   button { min-height: 36px; }
+}
+
+/* Hide Next.js dev indicator portal in dev mode */
+nextjs-portal {
+  display: none !important;
 }

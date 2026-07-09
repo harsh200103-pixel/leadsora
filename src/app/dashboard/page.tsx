@@ -59,6 +59,7 @@ function Dashboard() {
   const [hunterData, setHunterData] = useState<{[key: string]: any}>({});
   const [fetchingEmailsFor, setFetchingEmailsFor] = useState<string | null>(null);
   const [generatingId, setGeneratingId] = useState<string | null>(null);
+  const [sendingEmailId, setSendingEmailId] = useState<string | null>(null);
   const [linkedinDMs, setLinkedinDMs] = useState<{[key: string]: string}>({});
   const [generatingDmId, setGeneratingDmId] = useState<string | null>(null);
   const [linkedinDMModal, setLinkedinDMModal] = useState<{ lead: any; dm: string } | null>(null);
@@ -401,6 +402,48 @@ function Dashboard() {
     finally { setAnalyzingCompanyFor(null); }
   };
 
+  const sendEmailDirectly = async (lead: any) => {
+    const toEmail = foundEmails[lead.id]?.map((e: any) => e.value).join(',') || lead.contactEmail;
+    if (!toEmail) {
+      alert('Cannot send: No contact email found for this lead yet.');
+      return;
+    }
+    setSendingEmailId(lead.id);
+    try {
+      const res = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: toEmail,
+          subject: `Exploring synergies at ${lead.company}`,
+          text: getEmailBody(lead)
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert(data.message);
+        // Automatically drag/update CRM status to "Contacted"
+        const updated = leads.map(l => l.id === lead.id ? { ...l, status: 'Contacted', contactedAt: new Date().toISOString() } : l);
+        setLeads(updated);
+        if (user) {
+          localStorage.setItem(`dealfinder_leads_${user.email}`, JSON.stringify(updated));
+          // Sync to Redis
+          fetch('/api/db/sync', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: user.email, savedLeads: updated })
+          }).catch(console.error);
+        }
+      } else {
+        throw new Error(data.error || 'Failed to send email');
+      }
+    } catch (e: any) {
+      alert('Error sending email: ' + e.message);
+    } finally {
+      setSendingEmailId(null);
+    }
+  };
+
   const saveBusinessProfile = (profile: typeof businessProfile) => {
     setBusinessProfile(profile);
     if(user) localStorage.setItem(`isai_leads_business_profile_${user.email}`, JSON.stringify(profile));
@@ -420,10 +463,10 @@ function Dashboard() {
     if (p.fullName) sig += `\n${p.fullName}`;
     if (p.jobTitle) sig += ` | ${p.jobTitle}`;
     if (p.companyName) sig += `\n${p.companyName}`;
-    const contact = [p.email ? `📧 ${p.email}` : '', p.phone ? `📞 ${p.phone}` : ''].filter(Boolean).join(' | ');
+    const contact = [p.email ? `${p.email}` : '', p.phone ? `${p.phone}` : ''].filter(Boolean).join(' | ');
     if (contact) sig += `\n${contact}`;
-    if (p.website) sig += `\n🌐 ${p.website}`;
-    if (p.address) sig += `\n📍 ${p.address}`;
+    if (p.website) sig += `\n${p.website}`;
+    if (p.address) sig += `\n${p.address}`;
     return sig;
   };
 
@@ -672,8 +715,7 @@ function Dashboard() {
           {/* Ghost Mode Toggle */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: ghostModeEnabled ? 'var(--green-light)' : 'var(--surface)', padding: '5px 8px', borderRadius: '24px', border: `1px solid ${ghostModeEnabled ? 'var(--green)' : 'var(--border)'}`, flexShrink: 0 }}>
             <span style={{ fontSize: '0.8rem', color: ghostModeEnabled ? 'var(--green)' : 'var(--text-muted)', fontWeight: 600, whiteSpace: 'nowrap' }}>
-              <span className="hide-on-mobile">👻 Ghost Mode</span>
-              <span className="show-on-mobile" style={{ display: 'none' }}>👻</span>
+              <span className="hide-on-mobile">Ghost Mode</span>
             </span>
             <label style={{ position: 'relative', display: 'inline-block', width: '30px', height: '18px', flexShrink: 0 }}>
               <input type="checkbox" checked={ghostModeEnabled} onChange={(e) => { setGhostModeEnabled(e.target.checked); if (e.target.checked) setShowGhostConfig(true); }} style={{ opacity: 0, width: 0, height: 0 }} />
@@ -946,19 +988,19 @@ function Dashboard() {
           <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1.5rem', padding: '0 0.5rem' }}>
             <div className="scan-mode-tabs" style={{ display: 'flex', background: 'rgba(255,255,255,0.05)', padding: '4px', borderRadius: '999px', border: '1px solid var(--input-border)', overflowX: 'auto', maxWidth: '100%' }}>
               <button onClick={() => setScanMode('hiring')} type="button" style={{ padding: '6px 16px', borderRadius: '999px', border: 'none', background: scanMode === 'hiring' ? '#27c93f' : 'transparent', color: scanMode === 'hiring' ? '#000' : '#888', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem', transition: 'all 0.2s', whiteSpace: 'nowrap' }}>
-                👔 Actively Hiring
+                Actively Hiring
               </button>
               <button onClick={() => setScanMode('vc_whale')} type="button" style={{ padding: '6px 16px', borderRadius: '999px', border: 'none', background: scanMode === 'vc_whale' ? '#0a66c2' : 'transparent', color: scanMode === 'vc_whale' ? '#fff' : '#888', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}>
-                💸 Recently Funded
+                Recently Funded
               </button>
               <button onClick={() => setScanMode('stale_job')} type="button" style={{ padding: '6px 16px', borderRadius: '999px', border: 'none', background: scanMode === 'stale_job' ? '#ffbd2e' : 'transparent', color: scanMode === 'stale_job' ? '#000' : '#888', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}>
-                🚨 Urgent Needs (Stale)
+                Urgent Needs (Stale)
               </button>
               <button onClick={() => setScanMode('layoff')} type="button" style={{ padding: '6px 16px', borderRadius: '999px', border: 'none', background: scanMode === 'layoff' ? '#ff5f56' : 'transparent', color: scanMode === 'layoff' ? '#fff' : '#888', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}>
-                📉 Restructuring
+                Restructuring
               </button>
               <button onClick={() => setScanMode('defection_signal')} type="button" style={{ padding: '6px 16px', borderRadius: '999px', border: 'none', background: scanMode === 'defection_signal' ? '#00AEEF' : 'transparent', color: scanMode === 'defection_signal' ? '#fff' : '#888', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}>
-                🕵️ Defection Signals (Beta)
+                Defection Signals (Beta)
               </button>
               <button onClick={() => setScanMode('social_mentions')} type="button" style={{ padding: '6px 16px', borderRadius: '999px', border: 'none', background: scanMode === 'social_mentions' ? '#00D4FF' : 'transparent', color: scanMode === 'social_mentions' ? '#000' : '#888', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}>
                 💬 Social Mentions (AI)
@@ -1413,6 +1455,13 @@ function Dashboard() {
                 </div>
                 <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem' }}>
                   <a href={`https://mail.google.com/mail/?view=cm&fs=1&to=${foundEmails[blitzLead.id]?.map((e: any) => e.value).join(',') || blitzLead.contactEmail || ''}&su=${encodeURIComponent(`Exploring synergies at ${blitzLead.company}`)}&body=${encodeURIComponent(getEmailBody(blitzLead))}`} target="_blank" rel="noreferrer" style={{ background: '#4facfe', color: '#000', padding: '8px 16px', borderRadius: '20px', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px' }}><Mail size={16}/> Open in Gmail</a>
+                  <button 
+                    onClick={() => sendEmailDirectly(blitzLead)} 
+                    disabled={sendingEmailId === blitzLead.id}
+                    style={{ background: 'linear-gradient(135deg, #27c93f, #10b981)', color: '#000', border: 'none', padding: '8px 16px', borderRadius: '20px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                  >
+                    {sendingEmailId === blitzLead.id ? <><Loader2 size={14} className="animate-spin" /> Sending...</> : <><Sparkles size={14}/> Send Directly</>}
+                  </button>
                   {!foundEmails[blitzLead.id] && hunterKey && (
                     <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center' }}>Searching for email... <Loader2 size={12} className="animate-spin" style={{ marginLeft: '4px' }} /></span>
                   )}
@@ -1528,9 +1577,9 @@ function Dashboard() {
                   ──────────────{'\n'}
                   {businessProfile.fullName}{businessProfile.jobTitle ? ` | ${businessProfile.jobTitle}` : ''}{'\n'}
                   {businessProfile.companyName}{'\n'}
-                  {[businessProfile.email ? `📧 ${businessProfile.email}` : '', businessProfile.phone ? `📞 ${businessProfile.phone}` : ''].filter(Boolean).join(' | ')}{'\n'}
-                  {businessProfile.website ? `🌐 ${businessProfile.website}` : ''}{'\n'}
-                  {businessProfile.address ? `📍 ${businessProfile.address}` : ''}
+                  {[businessProfile.email ? `${businessProfile.email}` : '', businessProfile.phone ? `${businessProfile.phone}` : ''].filter(Boolean).join(' | ')}{'\n'}
+                  {businessProfile.website ? `${businessProfile.website}` : ''}{'\n'}
+                  {businessProfile.address ? `${businessProfile.address}` : ''}
                 </div>
               </div>
             )}
@@ -1554,44 +1603,44 @@ function Dashboard() {
             <button onClick={() => setShowGhostConfig(false)} style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)', padding: '8px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onMouseOver={e => e.currentTarget.style.background = 'rgba(255,0,0,0.5)'} onMouseOut={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}><X size={20} /></button>
 
             <div className="ghost-modal-content" style={{ textAlign: 'center', marginBottom: '2rem' }}>
-              <h2 style={{ margin: '0 0 0.5rem 0', fontSize: '1.5rem', color: '#27c93f' }}>👻 Ghost Mode Configuration</h2>
+              <h2 style={{ margin: '0 0 0.5rem 0', fontSize: '1.5rem', color: '#27c93f' }}>Ghost Mode Configuration</h2>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>Configure when and how the autonomous engine hunts for leads.</p>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
               {/* Scan Time */}
               <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.5px' }}>⏰ Daily Scan Time</label>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.5px' }}>Daily Scan Time</label>
                 <input type="time" value={ghostConfig.scanTime} onChange={e => setGhostConfig(prev => ({ ...prev, scanTime: e.target.value }))} style={{ width: '100%', padding: '10px 14px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '24px', color: 'var(--text-primary)', fontSize: '0.95rem', outline: 'none', boxSizing: 'border-box', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.04), 0 1px 0 rgba(255,255,255,0.8)' }} />
               </div>
 
               {/* Leads Per Day */}
               <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.5px' }}>📊 Leads Per Day: <strong style={{ color: '#27c93f' }}>{ghostConfig.leadsPerDay}</strong></label>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.5px' }}>Leads Per Day: <strong style={{ color: '#27c93f' }}>{ghostConfig.leadsPerDay}</strong></label>
                 <input type="range" min="5" max="50" step="5" value={ghostConfig.leadsPerDay} onChange={e => setGhostConfig(prev => ({ ...prev, leadsPerDay: parseInt(e.target.value) }))} style={{ width: '100%', accentColor: '#27c93f' }} />
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: 'var(--text-muted)' }}><span>5</span><span>25</span><span>50</span></div>
               </div>
 
               {/* Scan Mode */}
               <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.5px' }}>🎯 Scan Mode</label>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.5px' }}>Scan Mode</label>
                 <select value={ghostConfig.scanMode} onChange={e => setGhostConfig(prev => ({ ...prev, scanMode: e.target.value }))} style={{ width: '100%', padding: '10px 14px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '24px', color: 'var(--text-primary)', fontSize: '0.95rem', outline: 'none' }}>
-                  <option value="hiring">🔥 Hiring Intent</option>
-                  <option value="layoff">🎯 Layoff Sniper</option>
-                  <option value="vc_whale">🐋 VC Whales</option>
-                  <option value="stale_job">⏳ Stale Jobs</option>
+                  <option value="hiring">Hiring Intent</option>
+                  <option value="layoff">Layoff Sniper</option>
+                  <option value="vc_whale">VC Whales</option>
+                  <option value="stale_job">Stale Jobs</option>
                 </select>
               </div>
 
               {/* Keywords */}
               <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.5px' }}>🔍 Target Keywords</label>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.5px' }}>Target Keywords</label>
                 <input type="text" value={ghostConfig.keywords} onChange={e => setGhostConfig(prev => ({ ...prev, keywords: e.target.value }))} placeholder="e.g. React Developer, Marketing Manager" style={{ width: '100%', padding: '10px 14px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '24px', color: 'var(--text-primary)', fontSize: '0.95rem', outline: 'none', boxSizing: 'border-box', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.04), 0 1px 0 rgba(255,255,255,0.8)' }} />
               </div>
 
               {/* Slack Webhook */}
               <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.5px' }}>💬 Slack Webhook URL</label>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.5px' }}>Slack Webhook URL</label>
                 <input type="url" value={ghostConfig.slackWebhook || ''} onChange={e => setGhostConfig(prev => ({ ...prev, slackWebhook: e.target.value }))} placeholder="https://hooks.slack.com/services/..." style={{ width: '100%', padding: '10px 14px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '24px', color: 'var(--text-primary)', fontSize: '0.95rem', outline: 'none', boxSizing: 'border-box', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.04), 0 1px 0 rgba(255,255,255,0.8)' }} />
               </div>
 
@@ -1603,7 +1652,7 @@ function Dashboard() {
             </div>
 
             <button onClick={() => { saveGhostConfig(ghostConfig); setShowGhostConfig(false); }} style={{ width: '100%', padding: '14px', marginTop: '2rem', background: ghostConfig.enabled ? 'linear-gradient(135deg, #27c93f, #10b981)' : 'var(--bg-tertiary)', color: ghostConfig.enabled ? '#000' : 'var(--text-muted)', border: 'none', borderRadius: '24px', fontSize: '1rem', fontWeight: 700, cursor: 'pointer' }}>
-              {ghostConfig.enabled ? '👻 Save & Activate Ghost Mode' : 'Save Config (Disabled)'}
+              {ghostConfig.enabled ? 'Save & Activate Ghost Mode' : 'Save Config (Disabled)'}
             </button>
           </div>
         </div>
